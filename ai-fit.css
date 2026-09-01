@@ -1,0 +1,439 @@
+/* AI Fit Page Redesign - Dark/Premium Theme */
+
+/* --- Container & Global Overrides --- */
+.ai-fit-container {
+    background-color: #050505;
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px 16px 120px 16px;
+    /* Bottom padding for nav */
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* --- Section 1: Header --- */
+.ai-header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.ai-badge {
+    background-color: rgba(91, 140, 168, 0.2);
+    /* Steel Blue transparent */
+    color: #5B8CA8;
+    /* Steel Blue text */
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 30px;
+    letter-spacing: 1.5px;
+    border: 1px solid rgba(91, 140, 168, 0.3);
+}
+
+.ai-header-section h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.ai-header-section p {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 300px;
+}
+
+/* --- Global Card Style --- */
+.ai-card {
+    background: #121212;
+    border-radius: 16px;
+    border: 1px solid #222;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+/* --- Section 2: Upload Card --- */
+.upload-card {
+    padding: 20px;
+    position: relative;
+    border: 1px solid #333;
+    /* Default border */
+}
+
+/* Upload Area (Dashed) */
+.upload-area {
+    border: 2px dashed #5B8CA8;
+    /* Steel Blue Dashed */
+    border-radius: 12px;
+    background: rgba(91, 140, 168, 0.05);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:active {
+    background: rgba(91, 140, 168, 0.1);
+    transform: scale(0.98);
+}
+
+.upload-icon {
+    font-size: 40px;
+    color: #5B8CA8;
+    background: rgba(91, 140, 168, 0.15);
+    padding: 16px;
+    border-radius: 50%;
+}
+
+.upload-area h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.upload-area p {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+/* Image Preview */
+.image-preview {
+    width: 100%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.image-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+.remove-img-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+
+/* --- Section 3: Waist Input Card --- */
+.input-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    /* Center content */
+}
+
+.input-card label {
+    font-size: 14px;
+    color: #aaa;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stepper-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 6px;
+    border: 1px solid #333;
+}
+
+.stepper-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: none;
+    background: #2a2a2a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.stepper-btn:active {
+    background: #333;
+}
+
+.stepper-value {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stepper-value span:first-child {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.unit {
+    font-size: 11px;
+    color: #666;
+    margin-top: -2px;
+}
+
+/* --- Section 4: Primary Button --- */
+.action-section {
+    padding: 0 10px;
+}
+
+.ai-primary-btn {
+    width: 100%;
+    background: #5B8CA8;
+    /* Steel Blue */
+    color: #ffffff;
+    border: none;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(91, 140, 168, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ai-primary-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 10px rgba(91, 140, 168, 0.2);
+}
+
+.ai-primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Section 5: Results Section --- */
+.results-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: 4px;
+    border-left: 3px solid #D4AF37;
+    /* Minimal Gold Highlight */
+    padding-left: 12px;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.result-card {
+    background: #151515;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.result-label {
+    font-size: 12px;
+    color: #5B8CA8;
+    /* Steel Blue label */
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.result-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.results-caption {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    margin-top: 10px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Desktop Tweaks */
+@media (min-width: 768px) {
+    .ai-fit-container {
+        padding-top: 40px;
+        align-items: center;
+    }
+
+    .ai-card,
+    .action-section,
+    .results-section,
+    .ai-header-section {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .ai-header-section h1 {
+        font-size: 36px;
+    }
+}
+
+/* --- Input Wrapper (Waist) --- */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 2px 16px;
+    width: 100%;
+    max-width: 200px;
+    /* Smaller width for input */
+}
+
+.waist-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+    width: 100%;
+    padding: 12px 0;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    /* Remove spinner firefox */
+}
+
+.waist-input::-webkit-outer-spin-button,
+.waist-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.unit-suffix {
+    color: #666;
+    font-size: 14px;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.input-wrapper:focus-within {
+    border-color: #5B8CA8;
+    box-shadow: 0 0 0 2px rgba(91, 140, 168, 0.2);
+}
+
+/* --- Section 5: AI Output Image --- */
+.ai-output-image-card {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.ai-image-container {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ai-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+
+/* Simulated Scan Line Overlay */
+.scan-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(91, 140, 168, 0) 0%, rgba(91, 140, 168, 0.2) 50%, rgba(91, 140, 168, 0) 100%);
+    background-size: 100% 200%;
+    animation: scan 2s linear infinite;
+    pointer-events: none;
+    border: 2px solid rgba(91, 140, 168, 0.5);
+    border-radius: 8px;
+}
+
+@keyframes scan {
+    0% {
+        background-position: 0% -100%;
+    }
+
+    100% {
+        background-position: 0% 200%;
+    }
+}
+
+.card-caption {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

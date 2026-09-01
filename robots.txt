@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /cart.html
+Disallow: /orders.html
+Disallow: /complete-profile.html
+Disallow: /success.html
+Disallow: /payment-success.html
+
+Sitemap: https://slyte.in/sitemap.xml

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Custom Fit Menswear & Pants — Slyte</title>
+    <meta name="description" content="Search Slyte custom fit pants, trousers, and menswear styles. Find precision AI sizing and custom tailored fits.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://slyte.in/search.html">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+    <style>
+        /* --- Search Page Specific Styles --- */
+        .search-container {
+            padding: 16px 16px 0;
+        }
+
+        /* Sticky search bar area */
+        .search-sticky {
+            position: sticky;
+            top: 70px;
+            z-index: 90;
+            background: #000;
+            padding: 12px 16px 16px;
+        }
+
+        .search-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar-inner {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 44px 12px 48px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #333;
+            border-radius: 12px;
+            background-color: #fff;
+            color: #000;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-input:focus {
+            border-color: #154cbd;
+        }
+
+        .search-icon-input {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 22px;
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+            transition: color 0.2s;
+        }
+
+        .search-clear:hover {
+            color: #000;
+        }
+
+        .search-btn {
+            background: #154cbd;
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .search-btn:hover {
+            background: #1a5de0;
+        }
+
+        .search-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Popular searches section */
+        .popular-section {
+            padding: 0 16px 20px;
+        }
+
+        .popular-section h3 {
+            font-size: 16px;
+            color: #ecebeb;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background-color: #f0f0f0;
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tag:hover {
+            background-color: #154cbd;
+            color: #fff;
+        }
+
+        .tag:active {
+            transform: scale(0.95);
+        }
+
+        /* Results section */
+        .results-section {
+            padding: 20px 16px;
+            min-height: 200px;
+            background-color: #fff;
+            border-radius: 20px 20px 0 0;
+            color: #000;
+        }
+
+        .results-section .product-card {
+            background: #fff;
+            border: 1px solid #eee;
+        }
+
+        .results-section .product-info h3,
+        .results-section .product-info .price {
+            color: #000;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .results-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            margin: 0;
+        }
+
+        .results-count {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Empty state */
+        .search-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .search-empty-state .material-symbols-outlined {
+            font-size: 56px;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .search-empty-state p {
+            font-size: 15px;
+            color: #888;
+            margin: 0;
+        }
+
+        .search-empty-state .hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sticky Search Bar -->
+    <div class="search-sticky">
+        <div class="search-bar-wrapper">
+            <div class="search-bar-inner">
+                <span class="material-symbols-outlined search-icon-input">search</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search pants, trousers, gurkha..."
+                    autofocus>
+                <span class="material-symbols-outlined search-clear" id="searchClear">close</span>
+            </div>
+            <button class="search-btn" id="searchBtn" aria-label="Search">
+                <span class="material-symbols-outlined">search</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Popular Searches -->
+    <div class="popular-section" id="popularSection">
+        <h3>Popular Searches</h3>
+        <div class="tag-cloud" id="tagCloud">
+            <span class="tag">White Trouser</span>
+            <span class="tag">Gurkha</span>
+            <span class="tag">Black</span>
+            <span class="tag">Korean</span>
+            <span class="tag">Brown</span>
+            <span class="tag">Relaxed Fit</span>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <section class="results-section">
+        <div class="results-header">
+            <h2 id="results-heading">All Products</h2>
+            <span class="results-count" id="resultsCount"></span>
+        </div>
+        <div class="products-grid" id="products-grid">
+            <!-- JS renders products here -->
+        </div>
+    </section>
+
+    <!-- Spacer for Navigation -->
+    <div style="height: 80px;"></div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item active">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>AI Fit</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="products-data.js"></script>
+    <script src="api-client.js"></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+</body>
+
+</html>

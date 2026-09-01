@@ -1,0 +1,62 @@
+/* SEO Content Sections (Hidden from main visual layout but crawlable and accessible) */
+.seo-content-section {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* If we want them visible at the bottom for users who scroll to the very end */
+.seo-content-visible {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    border-top: 1px solid #eaeaea;
+}
+
+.seo-content-visible h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #111;
+}
+
+.seo-content-visible h3 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #222;
+}
+
+.seo-content-visible p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.seo-content-visible ul {
+    margin-bottom: 1rem;
+    padding-left: 20px;
+}
+
+.seo-content-visible li {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.seo-content-visible .faq-item {
+    margin-bottom: 1.5rem;
+}
+
+.seo-content-visible .faq-item strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #111;
+}

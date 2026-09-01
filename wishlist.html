@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View your saved custom fit trousers and pants in your Slyte wishlist.">
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+    <style>
+        body.page-wishlist {
+            background-color: var(--primary-white) !important;
+            color: var(--primary-black) !important;
+            padding-bottom: 90px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .page-wishlist .header {
+            background-color: white;
+            box-shadow: none;
+            border-bottom: 1px solid #eee;
+            padding: 12px 16px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111;
+            margin: 20px 16px 12px;
+        }
+
+        .wishlist-items {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .wishlist-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .wishlist-card img {
+            width: 90px;
+            min-width: 90px;
+            max-width: 90px;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .wishlist-card-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .wishlist-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin: 0 0 4px 0;
+        }
+
+        .wishlist-card .price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin-top: 8px;
+        }
+
+        .wishlist-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .wishlist-remove-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .wishlist-remove-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .wishlist-remove-btn .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        .add-to-cart-wishlist {
+            flex: 1;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .add-to-cart-wishlist:hover {
+            background-color: #0d3a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(21, 76, 189, 0.3);
+        }
+
+        .add-to-cart-wishlist:active {
+            transform: translateY(0);
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-wishlist .material-symbols-outlined {
+            font-size: 64px;
+            color: #ccc;
+            margin-bottom: 16px;
+        }
+
+        .empty-wishlist h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .empty-wishlist p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .shop-now-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .shop-now-btn:hover {
+            background-color: #0d3a8a;
+        }
+    </style>
+</head>
+
+<body class="page-wishlist">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="cart-container">
+        <h1 class="page-title">My Wishlist</h1>
+
+        <!-- Wishlist Items (Dynamic) -->
+        <div class="wishlist-items" id="wishlistItems">
+            <!-- Items will be injected by script.js -->
+        </div>
+    </main>
+
+    <!-- Spacer for Navigation -->
+    <div style="height: 80px;"></div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>Size</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="products-data.js"></script>
+
+    <script src="api-client.js"></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+</body>
+
+</html>

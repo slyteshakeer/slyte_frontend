@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Successful – Slyte</title>
+    <meta name="description" content="Your payment was successful. Redirecting to your orders." />
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:      #0a0a0f;
+            --card:    #1c1c27;
+            --border:  rgba(255,255,255,0.07);
+            --accent:  #7c3aed;
+            --accent2: #06b6d4;
+            --success: #22c55e;
+            --text:    #f1f5f9;
+            --muted:   #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding-top: 70px; /* space for sticky header */
+            padding-bottom: 80px; /* space for bottom nav */
+        }
+
+        /* Ambient glow */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 20% 15%, rgba(34,197,94,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(6,182,212,0.10) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 52px 40px 44px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            animation: riseUp .5s cubic-bezier(.16,1,.3,1) both;
+        }
+
+        /* Brand */
+        .brand {
+            font-size: .9rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 36px;
+        }
+        .brand span { color: var(--accent); }
+
+        /* ── Checkmark ring ── */
+        .ring-wrap {
+            position: relative;
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 28px;
+        }
+        .ring-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .ring-bg {
+            fill: none;
+            stroke: rgba(34,197,94,0.12);
+            stroke-width: 3;
+        }
+        .ring-fill {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            animation: drawRing .8s .1s cubic-bezier(.4,0,.2,1) forwards;
+            filter: drop-shadow(0 0 6px rgba(34,197,94,0.6));
+        }
+        .check-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn .5s .6s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        .check-icon svg {
+            width: 40px; height: 40px;
+            color: var(--success);
+        }
+
+        /* Title */
+        .title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, #86efac);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: .92rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* ── User pill (shown when logged in) ── */
+        .user-pill {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(34,197,94,0.08);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 100px;
+            padding: 10px 18px;
+            font-size: .88rem;
+            color: #86efac;
+            margin: 0 auto 28px;
+            width: fit-content;
+        }
+        .user-pill.show { display: flex; }
+        .pill-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            flex-shrink: 0;
+        }
+
+        /* ── Progress bar ── */
+        .progress-wrap { margin-bottom: 10px; }
+        .progress-bar {
+            height: 3px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--success), #4ade80);
+            width: 0%;
+            transition: width .5s cubic-bezier(.4,0,.2,1);
+        }
+        .count-label {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        /* ── Buttons ── */
+        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-size: .9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: opacity .2s, transform .15s;
+        }
+        .btn:hover { opacity: .85; transform: translateY(-1px); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #9f67fa);
+            color: #fff;
+            box-shadow: 0 8px 28px rgba(124,58,237,0.35);
+        }
+        .btn-ghost {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        /* ── No-token warning ── */
+        .warn-box {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: .84rem;
+            color: #fde68a;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .warn-box.show { display: block; }
+
+        /* Animations */
+        @keyframes riseUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes drawRing {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(.4); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 440px) {
+            .card { padding: 40px 24px 36px; }
+            .title { font-size: 1.45rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+<div class="wrap">
+    <div class="card">
+
+        <p class="brand">SLYTE</p>
+
+        <!-- Animated checkmark ring -->
+        <div class="ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 100 100">
+                <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                <circle class="ring-fill" cx="50" cy="50" r="40"/>
+            </svg>
+            <div class="check-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="title">Payment Successful!</h1>
+        <p class="subtitle">
+            Your order is confirmed and you're logged in.<br>
+            Taking you to your orders…
+        </p>
+
+        <!-- Shown if token found -->
+        <div class="user-pill" id="userPill">
+            <span class="pill-dot"></span>
+            <span id="pillText">Logged in</span>
+        </div>
+
+        <!-- Shown if token missing (edge case) -->
+        <div class="warn-box" id="warnBox">
+            Auto-login unavailable — you can still view orders by logging in manually.
+        </div>
+
+        <!-- Countdown progress -->
+        <div class="progress-wrap">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="count-label" id="countLabel">Redirecting in 3…</p>
+        </div>
+
+        <div class="btn-group">
+            <a href="my-orders.html" class="btn btn-primary">
+                View My Orders
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+            <a href="index.html" class="btn btn-ghost">Shop More</a>
+        </div>
+
+    </div>
+</div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>Size</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="products-data.js"></script>
+    <script src="api-client.js"></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+    <script>
+    // ── Read login state set during checkout (by api-client.js) ────────────
+    const token    = localStorage.getItem('userToken');
+    const userName = localStorage.getItem('userName') || '';
+    const phone    = localStorage.getItem('userPhone') || '';
+
+    const userPill    = document.getElementById('userPill');
+    const pillText    = document.getElementById('pillText');
+    const warnBox     = document.getElementById('warnBox');
+    const progressFill = document.getElementById('progressFill');
+    const countLabel   = document.getElementById('countLabel');
+
+    if (token) {
+        // User is already logged in — show greeting
+        const display = userName || (phone ? phone.slice(-4).padStart(phone.length, '•') : 'you');
+        pillText.textContent = `Logged in as ${display}`;
+        userPill.classList.add('show');
+    } else {
+        // Edge case: page opened directly without going through checkout
+        warnBox.classList.add('show');
+    }
+
+    // ── Countdown redirect ──────────────────────────────────────────────────
+    let secs = 3;
+    progressFill.style.width = '0%';
+
+    const tick = setInterval(() => {
+        secs--;
+        const pct = Math.round(((3 - secs) / 3) * 100);
+        progressFill.style.width = pct + '%';
+
+        if (secs > 0) {
+            countLabel.textContent = `Redirecting in ${secs}…`;
+        } else {
+            countLabel.textContent = 'Redirecting now…';
+            clearInterval(tick);
+            window.location.href = 'my-orders.html';
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>

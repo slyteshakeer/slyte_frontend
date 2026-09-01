@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Bag | Slyte</title>
+    <meta name="description" content="View your shopping bag and proceed to checkout with Slyte custom fit menswear.">
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cart.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+
+    <!-- Cashfree SDK for Checkout -->
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <style>
+        .cart-page-container {
+            background-color: var(--primary-white);
+            color: var(--primary-black);
+            min-height: calc(100vh - 150px);
+            padding-bottom: 180px;
+        }
+
+        .cart-header-title {
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        .cart-header-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        body {
+            background-color: var(--primary-white);
+            color: var(--primary-black);
+        }
+
+        .cart-summary {
+            background-color: #f9f9f9;
+            margin: 16px;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .sticky-footer {
+            background-color: var(--primary-white);
+            border-top: 1px solid #eee;
+        }
+
+        .pay-btn {
+            background-color: var(--primary-blue);
+            border-radius: 12px;
+            height: 52px;
+            font-weight: 700;
+        }
+
+        .pay-btn:hover:not(:disabled) {
+            background-color: #0d3a95;
+        }
+    </style>
+</head>
+
+<body class="page-cart">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn" aria-label="Wishlist">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn active" aria-label="Cart">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn" aria-label="Open Menu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Cart Container -->
+    <main class="cart-page-container">
+        <div class="cart-header-title">
+            <h1>Shopping Bag</h1>
+        </div>
+
+        <div id="cart-root" class="cart-items-list">
+            <!-- Items rendered via JS -->
+        </div>
+
+        <section class="cart-summary" id="cart-summary" style="display: none;">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal-amount">₹0</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span id="shipping-amount">Free</span>
+            </div>
+            <hr class="summary-divider" />
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span id="grand-total">₹0</span>
+            </div>
+        </section>
+
+        <!-- Error message element -->
+        <p class="err" id="checkout-err" hidden></p>
+    </main>
+
+    <!-- Sticky footer -->
+    <div class="sticky-footer" id="sticky-footer" style="display: none;">
+        <button type="button" class="pay-btn" id="pay-btn">ORDER NOW</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item" aria-label="Home">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item" aria-label="Search">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center" aria-label="AI Fit">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item" aria-label="Shop">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item active" aria-label="Cart">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn" aria-label="Close Menu">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>Size & AI Fit</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Dependencies -->
+    <script src="products-data.js" defer></script>
+    <script src="api-client.js?v=4" defer></script>
+    <script src="cart.js?v=4" defer></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+</body>
+
+</html>

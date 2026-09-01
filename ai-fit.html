@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slyte AI Fit Assistant | Find Your Perfect Size</title>
+    <meta name="description" content="Use the Slyte AI Fit Assistant to find your perfect custom fit for pants and trousers. No tape measure required.">
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" href="https://slyte.in/ai-fit.html">
+
+    <meta property="og:site_name" content="Slyte">
+    <meta property="og:title" content="Slyte AI Fit Assistant | Find Your Perfect Size">
+    <meta property="og:description" content="Use the Slyte AI Fit Assistant to find your perfect custom fit for pants and trousers. No tape measure required.">
+    <meta property="og:url" content="https://slyte.in/ai-fit.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://slyte.in/images/logos/slyte-logo-black.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Slyte AI Fit Assistant | Find Your Perfect Size">
+    <meta name="twitter:description" content="Use the Slyte AI Fit Assistant to find your perfect custom fit for pants and trousers.">
+    <meta name="twitter:image" content="https://slyte.in/images/logos/slyte-logo-black.png">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+    <style>
+        body {
+            background: #fff;
+            color: #000;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 70px;
+            /* space for bottom nav */
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+            display: none;
+            /* Hide by default to prevent flashing if logged in */
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .icon-circle span {
+            font-size: 40px;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #999;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .btn-launch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .btn-launch:active {
+            transform: scale(0.98);
+        }
+
+        .loading {
+            display: none;
+            color: #666;
+            margin-top: 16px;
+        }
+    
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 6rem;
+    }
+
+    /* ── INNER HEADER ── */
+    .ai-fit-header { text-align: center; margin-bottom: 2.5rem; }
+    .ai-fit-header-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: #000; margin-bottom: 0.5rem; }
+    .ai-fit-header-sub { font-size: 1.1rem; font-weight: 500; color: #52525b; }
+    .ai-fit-header-sub b { color: #000; font-weight: 700; }
+
+    /* ── STEP HEADER ── */
+    .step-header {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #18181b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 2rem 0 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid #f4f4f5;
+      padding-bottom: 0.5rem;
+    }
+
+    /* ── INPUTS ── */
+    .text-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      border: 2px solid #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #000;
+      background: #fff;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .text-input:focus { border-color: #000; box-shadow: 0 0 0 4px rgba(0,0,0,0.05); }
+    .text-input::placeholder { color: #a1a1aa; font-weight: 400; }
+
+    /* ── UPLOAD BOX ── */
+    #upload-zone {
+      width: 100%;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 24px;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      gap: 12px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    #upload-zone:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); }
+    #upload-zone:active { transform: scale(0.98); }
+    .upload-arrow { font-size: 3.5rem; line-height: 1; color: #000; }
+    .upload-label { font-size: 1.05rem; font-weight: 700; color: #000; text-align: center; padding: 0 1rem; }
+    .upload-hint { font-size: 0.8rem; color: #71717a; font-weight: 500; }
+
+    /* Preview thumbnail inside upload zone */
+    #upload-preview {
+      display: none;
+      width: 100%;
+      height: 250px;
+      object-fit: contain;
+      border-radius: 22px;
+    }
+    #upload-success-badge {
+      display: none;
+      position: absolute;
+      top: 12px; right: 12px;
+      background: #22c55e;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── MOBILE PICKER SHEET ── */
+    #picker-sheet {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 16px 20px 40px;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+      z-index: 1000;
+      animation: slideUp 0.25s ease;
+    }
+    #picker-sheet.open { display: block; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .picker-cancel {
+      color: #22c55e; font-size: 1rem; font-weight: 700;
+      background: none; border: none; cursor: pointer;
+      padding: 4px 0 16px; display: block;
+    }
+    .picker-options { display: flex; gap: 16px; flex-wrap: wrap; }
+    .picker-option {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; cursor: pointer; min-width: 72px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .picker-icon {
+      width: 72px; height: 72px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; transition: transform 0.15s;
+    }
+    .picker-option:active .picker-icon { transform: scale(0.92); }
+    .picker-icon.camera { background: #1a1a2e; }
+    .picker-icon.files  { background: #e8f0fe; }
+    .picker-name { font-size: 0.8rem; font-weight: 600; color: #111; }
+    #picker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 999; }
+    #picker-overlay.open { display: block; }
+
+    /* ── TILT CAMERA FULLSCREEN (phone_tilt exact) ── */
+    #tilt-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    #tilt-screen.open { display: block; }
+
+    /* Design tokens scoped to tilt */
+    #tilt-screen {
+      --ts-green:       #00e676;
+      --ts-green-dim:   rgba(0,230,118,0.18);
+      --ts-green-glow:  rgba(0,230,118,0.5);
+      --ts-yellow:      #ffc107;
+      --ts-red:         #ff5252;
+      --ts-white:       #ffffff;
+      --ts-black:       #000000;
+      --ts-muted:       rgba(255,255,255,0.45);
+      --ts-glass-dark:  rgba(0,0,0,0.55);
+      --ts-glass-border:rgba(255,255,255,0.14);
+      --ts-blur:        blur(20px) saturate(180%);
+      --ts-blur-sm:     blur(12px) saturate(160%);
+      --ts-spring:      cubic-bezier(0.16,1,0.3,1);
+      --ts-ring-circ:   239;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #fff;
+    }
+
+    /* App shell */
+    #tilt-screen .ts-app {
+      position: relative; width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    }
+
+    /* Camera layer */
+    #tilt-screen .camera-layer {
+      position: absolute; inset: 0; z-index: 0; background: #000;
+    }
+    #tilt-screen #camera-feed {
+      width: 100%; height: 100%; object-fit: contain; display: block; background: #000;
+    }
+    #tilt-screen .camera-fallback {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: #0a0a0a; text-align: center; padding: 32px;
+    }
+    #tilt-screen .fallback-icon { font-size: 56px; opacity: 0.5; }
+    #tilt-screen .camera-fallback p { font-size: 15px; color: var(--ts-muted); max-width: 240px; line-height: 1.5; }
+    #tilt-screen .btn-retry {
+      margin-top: 8px; padding: 10px 28px;
+      background: rgba(255,255,255,0.12); border: 1px solid var(--ts-glass-border);
+      border-radius: 50px; font-size: 14px; font-weight: 600; color: #fff;
+      cursor: pointer; font-family: inherit;
+    }
+
+    /* Overlay layer */
+    #tilt-screen .overlay-layer {
+      position: absolute; inset: 0; z-index: 10;
+      display: flex; flex-direction: column; pointer-events: none;
+    }
+
+    /* Top bar */
+    #tilt-screen .top-bar {
+      pointer-events: all; display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px 10px;
+      padding-top: max(14px, env(safe-area-inset-top));
+      background: linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0) 100%);
+    }
+    #tilt-screen .brand {
+      font-size: 15px; font-weight: 800; letter-spacing: 1.5px; color: #fff; opacity: 0.92;
+    }
+    #tilt-screen .ts-back-btn {
+      pointer-events: all; width: 34px; height: 34px; display: flex;
+      align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.85); border-radius: 50%;
+      background: none; border: none; font-size: 1.2rem; cursor: pointer;
+      transition: background 0.18s ease;
+    }
+    #tilt-screen .ts-back-btn:active { background: rgba(255,255,255,0.15); }
+    #tilt-screen .icon-btn {
+      pointer-events: all; width: 34px; height: 34px; display: flex;
+      align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.85); border-radius: 50%;
+      background: none; border: none; cursor: pointer;
+      transition: background 0.18s ease; color: inherit;
+    }
+    #tilt-screen .icon-btn svg { width: 18px; height: 18px; }
+    #tilt-screen .icon-btn:active { background: rgba(255,255,255,0.15); }
+
+    /* Status pill */
+    #tilt-screen .status-pill {
+      display: flex; align-items: center; gap: 7px; padding: 6px 14px;
+      background: var(--ts-glass-dark); backdrop-filter: var(--ts-blur-sm);
+      -webkit-backdrop-filter: var(--ts-blur-sm); border: 1px solid var(--ts-glass-border);
+      border-radius: 50px; transition: border-color 0.4s var(--ts-spring);
+    }
+    #tilt-screen .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--ts-muted);
+      transition: background 0.35s var(--ts-spring), box-shadow 0.35s var(--ts-spring); flex-shrink: 0;
+    }
+    #tilt-screen .status-pill.state-green .status-dot { background: var(--ts-green); box-shadow: 0 0 8px var(--ts-green-glow); }
+    #tilt-screen .status-pill.state-yellow .status-dot { background: var(--ts-yellow); box-shadow: 0 0 8px rgba(255,193,7,0.6); }
+    #tilt-screen .status-pill.state-red .status-dot { background: var(--ts-red); box-shadow: 0 0 8px rgba(255,82,82,0.6); }
+    #tilt-screen .status-label {
+      font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap;
+      letter-spacing: 0.2px; transition: color 0.35s var(--ts-spring);
+    }
+    #tilt-screen .status-pill.state-green .status-label { color: var(--ts-green); }
+    #tilt-screen .status-pill.state-yellow .status-label { color: var(--ts-yellow); }
+    #tilt-screen .status-pill.state-red .status-label { color: var(--ts-red); }
+
+    /* Horizon line */
+    #tilt-screen .horizon-container {
+      position: absolute; top: 50%; left: 0; right: 0;
+      transform: translateY(-50%); display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 5;
+    }
+    #tilt-screen .horizon-line {
+      position: relative; width: 100%; max-width: 340px; height: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transform-origin: center; transition: filter 0.3s ease;
+    }
+    #tilt-screen .horizon-tick {
+      flex: 1; height: 1.5px; background: rgba(255,255,255,0.55);
+      border-radius: 2px; transition: background 0.3s ease;
+    }
+    #tilt-screen .horizon-line.is-level .horizon-tick { background: var(--ts-green); }
+    #tilt-screen .horizon-center-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #fff;
+      margin: 0 10px; flex-shrink: 0;
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s var(--ts-spring);
+    }
+    #tilt-screen .horizon-line.is-level .horizon-center-dot {
+      background: var(--ts-green); box-shadow: 0 0 12px var(--ts-green-glow); transform: scale(1.25);
+    }
+
+    /* Pant outline */
+    #tilt-screen .pant-outline-wrapper {
+      position: absolute; top: 58px; bottom: 120px; left: 50%;
+      transform: translateX(-50%); width: 92%; max-width: none;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 4;
+    }
+    #tilt-screen .pant-svg { width: 100%; height: 100%; overflow: visible; }
+    #tilt-screen .pant-path {
+      transition: stroke 0.5s var(--ts-spring), filter 0.5s var(--ts-spring), stroke-opacity 0.5s var(--ts-spring);
+    }
+    #tilt-screen .pant-path.is-ready {
+      stroke: var(--ts-green) !important;
+      filter: drop-shadow(0 0 6px var(--ts-green-glow));
+    }
+
+    /* Instruction pill */
+    #tilt-screen .instruction-wrapper {
+      position: absolute; bottom: 118px; left: 0; right: 0;
+      display: flex; justify-content: center; pointer-events: none; z-index: 15;
+    }
+    #tilt-screen .instruction-pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
+      background: var(--ts-glass-dark); backdrop-filter: var(--ts-blur-sm);
+      -webkit-backdrop-filter: var(--ts-blur-sm); border: 1px solid var(--ts-glass-border);
+      border-radius: 50px;
+      transition: opacity 0.3s var(--ts-spring), transform 0.3s var(--ts-spring), border-color 0.4s var(--ts-spring);
+    }
+    #tilt-screen .instruction-pill.is-ready { opacity: 0; transform: translateY(6px); }
+    #tilt-screen .instruction-icon {
+      font-size: 14px; font-weight: 700; color: #fff; opacity: 0.85;
+      transition: color 0.3s ease; line-height: 1;
+    }
+    #tilt-screen .instruction-text {
+      font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap; letter-spacing: 0.1px;
+    }
+
+    /* Bottom bar */
+    #tilt-screen .bottom-bar {
+      pointer-events: all; margin-top: auto;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 16px 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      background: linear-gradient(to top, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0) 100%);
+    }
+    #tilt-screen .hold-label {
+      font-size: 12px; font-weight: 600; color: #fff; opacity: 0.8; letter-spacing: 0.3px;
+    }
+    #tilt-screen .shutter-unit {
+      position: relative; width: 78px; height: 78px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #tilt-screen .progress-ring {
+      position: absolute; inset: 0; transform: rotate(-90deg); pointer-events: none;
+    }
+    #tilt-screen .progress-ring-track { fill: none; stroke: rgba(255,255,255,0.18); stroke-width: 3; }
+    #tilt-screen .progress-ring-fill {
+      fill: none; stroke: var(--ts-green); stroke-width: 3.5; stroke-linecap: round;
+      stroke-dasharray: var(--ts-ring-circ);
+      stroke-dashoffset: var(--ts-ring-circ);
+      transition: stroke-dashoffset 0.08s linear;
+    }
+    #tilt-screen .shutter-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 3.5px solid rgba(255,255,255,0.88); background: transparent;
+      display: flex; align-items: center; justify-content: center; padding: 4px;
+      cursor: pointer; font-family: inherit;
+      transition: transform 0.2s var(--ts-spring), border-color 0.35s var(--ts-spring), opacity 0.3s ease;
+      position: relative; z-index: 1;
+    }
+    #tilt-screen .shutter-inner {
+      width: 100%; height: 100%; border-radius: 50%; background: #fff;
+      transition: background 0.35s var(--ts-spring), transform 0.2s var(--ts-spring), box-shadow 0.35s var(--ts-spring);
+    }
+    #tilt-screen .shutter-btn.is-ready .shutter-inner { background: var(--ts-green); box-shadow: 0 0 16px var(--ts-green-glow); }
+    #tilt-screen .shutter-btn.is-ready { border-color: var(--ts-green); }
+    #tilt-screen .shutter-btn:active { transform: scale(0.92); }
+    #tilt-screen .shutter-btn:active .shutter-inner { transform: scale(0.92); }
+    #tilt-screen .shutter-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    @keyframes ts-shutter-shake {
+      0%  { transform: translateX(0); } 20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); } 60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); } 100%{ transform: translateX(0); }
+    }
+    #tilt-screen .shutter-btn.shake { animation: ts-shutter-shake 0.38s cubic-bezier(0.4,0,0.2,1); }
+
+    /* Countdown */
+    #tilt-screen .countdown-overlay {
+      position: absolute; inset: 0; z-index: 80;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+    #tilt-screen .countdown-number {
+      font-size: 108px; font-weight: 700; color: #fff;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+      animation: ts-countdown-pulse 1s var(--ts-spring);
+    }
+    @keyframes ts-countdown-pulse {
+      from { transform: scale(1.4); opacity: 0; } to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Success flash + toast */
+    #tilt-screen .success-flash {
+      position: absolute; inset: 0; z-index: 90; background: #fff;
+      pointer-events: none; opacity: 0; animation: none;
+    }
+    #tilt-screen .success-flash.flash-anim { animation: ts-flash 0.35s ease-out forwards; }
+    @keyframes ts-flash { 0% { opacity: 0.85; } 100% { opacity: 0; } }
+    #tilt-screen .success-toast {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(0.9); z-index: 95;
+      display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px;
+      background: var(--ts-green); color: #000; font-size: 15px; font-weight: 700;
+      border-radius: 50px; box-shadow: 0 8px 30px rgba(0,230,118,0.4);
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.25s var(--ts-spring), transform 0.25s var(--ts-spring);
+    }
+    #tilt-screen .success-toast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    #tilt-screen .success-toast svg { width: 18px; height: 18px; }
+    #tilt-screen .tilt-error-toast {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(0.88); z-index: 95;
+      display: inline-flex; align-items: center; gap: 9px; padding: 13px 22px;
+      background: rgba(255,82,82,0.92); color: #fff; font-size: 14px; font-weight: 700;
+      border-radius: 50px; box-shadow: 0 8px 30px rgba(255,82,82,0.35);
+      pointer-events: none; opacity: 0; white-space: nowrap;
+      transition: opacity 0.22s var(--ts-spring), transform 0.22s var(--ts-spring);
+    }
+    #tilt-screen .tilt-error-toast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+
+    /* Permission overlay */
+    #tilt-screen .permission-overlay {
+      position: absolute; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: rgba(0,0,0,0.72); backdrop-filter: var(--ts-blur); -webkit-backdrop-filter: var(--ts-blur);
+    }
+    #tilt-screen .permission-card {
+      width: 100%; max-width: 340px; background: rgba(18,18,22,0.95);
+      border: 1px solid var(--ts-glass-border); border-radius: 28px; padding: 32px 28px;
+      text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    #tilt-screen .permission-icon { font-size: 48px; }
+    #tilt-screen .permission-title { font-size: 20px; font-weight: 700; color: #fff; }
+    #tilt-screen .permission-body { font-size: 14px; color: var(--ts-muted); line-height: 1.55; max-width: 260px; }
+
+    /* Sensor notice */
+    #tilt-screen .sensor-notice {
+      position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 50;
+      background: rgba(255,82,82,0.9); color: #fff; font-size: 12px; font-weight: 600;
+      padding: 6px 16px; border-radius: 50px; white-space: nowrap; pointer-events: none;
+    }
+
+    /* Settings panel */
+    #tilt-screen .settings-overlay {
+      position: absolute; inset: 0; z-index: 150;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: rgba(0,0,0,0.6); backdrop-filter: var(--ts-blur); -webkit-backdrop-filter: var(--ts-blur);
+      padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+    #tilt-screen .settings-card {
+      width: 100%; max-width: 380px; background: rgba(14,14,18,0.96);
+      border: 1px solid var(--ts-glass-border); border-radius: 28px; overflow: hidden;
+    }
+    #tilt-screen .settings-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    #tilt-screen .settings-title { font-size: 16px; font-weight: 700; letter-spacing: 0.2px; }
+    #tilt-screen .settings-close {
+      width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.1); border-radius: 50%; border: none; cursor: pointer;
+      color: #fff; font-family: inherit; transition: background 0.18s ease;
+    }
+    #tilt-screen .settings-close:active { background: rgba(255,255,255,0.22); }
+    #tilt-screen .settings-close svg { width: 14px; height: 14px; }
+    #tilt-screen .settings-body { display: flex; flex-direction: column; gap: 4px; padding: 16px 22px 24px; }
+    #tilt-screen .settings-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0;
+    }
+    #tilt-screen .settings-row-info { display: flex; flex-direction: column; gap: 2px; }
+    #tilt-screen .settings-row-label { font-size: 14px; font-weight: 600; }
+    #tilt-screen .settings-row-desc { font-size: 11px; color: var(--ts-muted); }
+    #tilt-screen .mode-toggle-group {
+      display: flex; align-items: center; background: rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 3px; gap: 2px; flex-shrink: 0;
+    }
+    #tilt-screen .mode-btn {
+      padding: 5px 13px; border-radius: 8px; font-size: 11px; font-weight: 700;
+      color: var(--ts-muted); background: none; border: none; cursor: pointer; font-family: inherit;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    #tilt-screen .mode-btn.active { background: #fff; color: #000; }
+    #tilt-screen .settings-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 8px 0; }
+    #tilt-screen .settings-action-btn {
+      width: 100%; display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; font-size: 14px; font-weight: 600; color: #fff;
+      text-align: left; cursor: pointer; font-family: inherit; margin-top: 4px;
+      transition: background 0.18s ease;
+    }
+    #tilt-screen .settings-action-btn:active { background: rgba(255,255,255,0.14); }
+    #tilt-screen .settings-action-btn.secondary { color: var(--ts-muted); background: transparent; border-color: transparent; }
+
+    /* Preview modal */
+    #tilt-screen .preview-modal {
+      position: absolute; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    #tilt-screen .preview-card {
+      width: 100%; max-width: 420px; background: #0e0e12;
+      border: 1px solid var(--ts-glass-border); border-radius: 28px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    #tilt-screen .preview-header {
+      padding: 18px 22px 14px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #tilt-screen .preview-title { font-size: 15px; font-weight: 700; }
+    #tilt-screen .preview-image-wrap { background: #000; width: 100%; display: flex; align-items: center; justify-content: center; }
+    #tilt-screen .preview-image-wrap img { width: 100%; height: auto; object-fit: contain; display: block; max-height: 65vh; }
+    #tilt-screen .preview-actions { display: flex; gap: 10px; padding: 16px 20px; }
+    #tilt-screen .btn-primary {
+      flex: 1; padding: 13px 20px; background: #fff; color: #000;
+      font-size: 14px; font-weight: 700; border-radius: 14px; border: none;
+      cursor: pointer; font-family: inherit;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    #tilt-screen .btn-primary:active { opacity: 0.8; transform: scale(0.98); }
+    #tilt-screen .btn-secondary {
+      flex: 1; padding: 13px 20px; background: rgba(255,255,255,0.1); color: #fff;
+      font-size: 14px; font-weight: 600; border-radius: 14px;
+      border: 1px solid var(--ts-glass-border); cursor: pointer; font-family: inherit;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    #tilt-screen .btn-secondary:active { background: rgba(255,255,255,0.18); transform: scale(0.98); }
+    #tilt-screen .ts-hidden { display: none !important; }
+
+    /* ── WAIST INPUT ── */
+    .waist-wrapper {
+      display: flex; align-items: center;
+      background: #fff; border: 2px solid #e2e8f0;
+      border-radius: 16px; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .waist-wrapper:focus-within { border-color: #000; box-shadow: 0 0 0 4px rgba(0,0,0,0.05); }
+    #waist-input {
+      flex: 1; text-align: center; font-size: 1.75rem; font-weight: 800;
+      border: none; outline: none; padding: 1rem;
+      font-family: 'Inter', sans-serif; background: transparent; color: #000;
+      -moz-appearance: textfield;
+    }
+    #waist-input::-webkit-inner-spin-button,
+    #waist-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* ── ANALYZE BUTTON ── */
+    #analyze-btn {
+      width: 100%; margin-top: 2rem;
+      background: #000; color: #fff;
+      border: none; border-radius: 16px;
+      padding: 1.25rem; font-family: 'Inter', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    #analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.35); }
+    #analyze-btn:active { transform: scale(0.98); }
+    #analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .social-proof { text-align: center; font-size: 0.9rem; color: #64748b; font-weight: 600; margin-top: 1.5rem; }
+
+    /* ── SPINNER ── */
+    .spinner-wrap { display: none; text-align: center; padding: 2rem; }
+    .spinner-wrap.active { display: block; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid #f0f0f0;
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-label { font-size: 0.9rem; font-weight: 600; color: #52525b; }
+
+    /* ── RESULT ── */
+    .result-section { display: none; margin-top: 2rem; }
+    .result-section.show { display: block; }
+    #result-image {
+      width: 100%; border-radius: 20px;
+      border: 1px solid #f0f0f0;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .results-card {
+      background: #fff;
+      border: 1px solid #f4f4f5;
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+    }
+    .results-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; color: #09090b; }
+    .size-label { font-size: 0.7rem; color: #a1a1aa; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+    .size-badge { font-size: 4.5rem; font-weight: 800; line-height: 1; margin: 0.3rem 0 1.5rem; color: #000; }
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      border-top: 1px solid #f4f4f5; padding-top: 1.5rem;
+    }
+    .detail-label { font-size: 0.7rem; color: #a1a1aa; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+    .detail-value { font-size: 1.3rem; font-weight: 700; color: #09090b; margin-top: 2px; }
+    .gpu-footer { margin-top: 1rem; font-size: 0.75rem; color: #a1a1aa; text-align: center; }
+
+    .sync-badge {
+      display: inline-block; margin-top: 1rem;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700;
+      background: #dcfce7; color: #15803d;
+    }
+    .sync-badge.error { background: #fee2e2; color: #dc2626; }
+
+
+    /* ── ERROR TOAST ── */
+    .error-toast {
+      display: none; background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 12px; padding: 1rem 1.25rem;
+      color: #dc2626; font-size: 0.9rem; font-weight: 600;
+      margin-top: 1rem;
+    }
+    .error-toast.show { display: block; }
+
+    /* hidden inputs */
+    input[type=file] { display: none; }
+
+    @media (max-width: 480px) {
+      .app-container { padding: 1.5rem 1rem 5rem; }
+    }
+  
+</style>
+
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="main-content" id="mainContent">
+<div class="app-container">
+
+  <!-- Header -->
+  <div class="ai-fit-header">
+    <h1 style="font-size: 24px; margin-bottom: 8px; color: #000;">AI Fit Assistant</h1>
+    <div style="color: #52525b; font-size: 0.95rem; margin-bottom: 24px;">Find your perfect custom size in 10 seconds.</div>
+  </div>
+
+  <!-- Step 1: Name -->
+  <div class="step-header">STEP 1 — ENTER YOUR NAME</div>
+  <input id="name-input" class="text-input" type="text" placeholder="Enter your name" autocomplete="off">
+
+  <!-- Step 2: Upload -->
+  <div class="step-header">STEP 2 — UPLOAD A FLAT LAID PANT IMAGE</div>
+  <div id="upload-zone">
+    <div class="upload-arrow">⬆</div>
+    <div class="upload-label">Upload flat laid pant image</div>
+    <div class="upload-hint">Tap to upload or use camera</div>
+    <img id="upload-preview" alt="Uploaded pant">
+    <span id="upload-success-badge">✓ Ready</span>
+  </div>
+
+  <!-- Step 3: Waist -->
+  <div class="step-header">STEP 3 — ENTER WAIST SIZE</div>
+  <div class="waist-wrapper">
+    <input id="waist-input" type="number" value="32" min="24" max="60" step="1">
+  </div>
+
+  <!-- CTA -->
+  <div class="social-proof">Used by 500+ Users</div>
+  <button id="analyze-btn">ANALYZE MY FIT</button>
+
+  <!-- Spinner -->
+  <div class="spinner-wrap" id="spinner">
+    <div class="spinner"></div>
+    <div class="spinner-label" id="spinner-label">Removing background with SAM3…</div>
+  </div>
+
+  <!-- Error toast -->
+  <div class="error-toast" id="error-toast"></div>
+
+  <!-- Result -->
+  <div class="result-section" id="result-section">
+    <div id="sync-badge" class="sync-badge" style="display:none; margin-bottom: 1.5rem; width: 100%; box-sizing: border-box; text-align: left; padding: 1rem 1.25rem;"></div>
+    <img id="result-image" alt="AI Detection Result">
+    <div style="text-align:center; font-size: 0.8rem; color: #a1a1aa; margin-top: -1rem; margin-bottom: 1.5rem;">AI Detection Result</div>
+    <div class="results-card">
+      <div class="results-header" id="result-greeting"></div>
+      <div class="size-label">Recommended Size</div>
+      <div class="size-badge" id="result-size"></div>
+      <div class="detail-grid">
+        <div><div class="detail-label">Waist</div><div class="detail-value" id="result-waist"></div></div>
+        <div><div class="detail-label">Outseam</div><div class="detail-value" id="result-outseam"></div></div>
+        <div><div class="detail-label">Inseam</div><div class="detail-value" id="result-inseam"></div></div>
+        <div><div class="detail-label">Ankle</div><div class="detail-value" id="result-ankle"></div></div>
+      </div>
+      <div class="gpu-footer" id="gpu-footer"></div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- Mobile Picker Overlay + Sheet -->
+<div id="picker-overlay"></div>
+<div id="picker-sheet">
+  <button class="picker-cancel" id="picker-cancel">Cancel</button>
+  <div class="picker-options">
+    <div class="picker-option" id="pick-camera">
+      <div class="picker-icon camera">📷</div>
+      <div class="picker-name">Camera</div>
+    </div>
+    <div class="picker-option" id="pick-files">
+      <div class="picker-icon files">📁</div>
+      <div class="picker-name">Files</div>
+    </div>
+  </div>
+</div>
+
+<!-- Phone Tilt Fullscreen Camera (phone_tilt exact) -->
+<div id="tilt-screen">
+  <div class="ts-app">
+
+    <!-- Camera layer -->
+    <div class="camera-layer">
+      <video id="camera-feed" autoplay playsinline muted></video>
+      <div id="camera-fallback" class="camera-fallback ts-hidden">
+        <div class="fallback-icon">📷</div>
+        <p id="fallback-message">Initializing camera…</p>
+        <button id="retry-camera-btn" class="btn-retry">Try Again</button>
+      </div>
+    </div>
+
+    <!-- Overlay layer -->
+    <div class="overlay-layer">
+
+      <!-- Top bar -->
+      <header class="top-bar" id="ts-top-bar">
+        <button class="ts-back-btn" id="tilt-back" aria-label="Close camera">←</button>
+        <div class="status-pill" id="status-pill">
+          <span class="status-dot" id="status-dot"></span>
+          <span class="status-label" id="status-label">Calibrating…</span>
+        </div>
+        <button class="icon-btn" id="ts-settings-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Horizon level line -->
+      <div class="horizon-container" id="ts-horizon-container" aria-hidden="true">
+        <div class="horizon-line" id="ts-horizon-line">
+          <div class="horizon-tick left"></div>
+          <div class="horizon-center-dot" id="ts-horizon-dot"></div>
+          <div class="horizon-tick right"></div>
+        </div>
+      </div>
+
+      <!-- Pant outline SVG -->
+      <div class="pant-outline-wrapper" aria-hidden="true">
+        <svg id="ts-pant-svg" class="pant-svg" viewBox="0 0 2461 3095" preserveAspectRatio="xMidYMid meet">
+          <path
+            id="ts-pant-path"
+            class="pant-path"
+            d="M2211.43 1709.41L2256.71 1910.52V1910.52L2246.96 1912.71L2292.24 2113.82L2302 2111.62L2347.29 2312.73H2347.29L2337.53 2314.93L2382.82 2516.04L2392.57 2513.84V2513.84L2437.86 2714.95H2437.86L2428.1 2717.14L2448.88 2809.42L2321.49 2861.11L2325.25 2870.38L2054.75 2980.12L2050.99 2970.86L1925.36 3021.83L1892.13 2930.14L1882.72 2933.55L1809.17 2730.65L1818.58 2727.24L1745.03 2524.34L1735.62 2527.75L1662.07 2324.85L1671.48 2321.44L1597.93 2118.54L1588.52 2121.95L1514.97 1919.05L1524.38 1915.64L1450.83 1712.74L1441.42 1716.15L1367.88 1513.25L1377.28 1509.84L1303.73 1306.94L1294.32 1310.35L1220.77 1107.45L1230.18 1104.04L1193.4 1002.59L1182.83 973.442L1174.38 1003.27L1144.78 1107.7L1154.4 1110.42L1095.2 1319.27L1085.58 1316.55L1026.38 1525.4L1036 1528.12L976.8 1736.97L967.179 1734.25L907.979 1943.1L917.6 1945.83L858.399 2154.67L848.779 2151.95L789.579 2360.8L799.199 2363.52L740 2572.38L730.379 2569.65L671.179 2778.5L680.8 2781.22L621.6 2990.08L611.979 2987.35L584.864 3083L519.827 3070.92L518 3080.75L370 3053.25L371.827 3043.42L223.827 3015.92L222 3025.75L74 2998.25L75.8271 2988.42L11.5898 2976.48L26.501 2892.99L16.6562 2891.23L49.9688 2704.7L59.8135 2706.46L93.126 2519.93L83.2812 2518.17L116.594 2331.64L126.438 2333.4L159.751 2146.87L149.906 2145.11L183.219 1958.58L193.062 1960.34L226.376 1773.8L216.531 1772.05L249.844 1585.52L259.688 1587.27L293 1400.74L283.156 1398.98L316.469 1212.45L326.313 1214.21L359.626 1027.68L349.781 1025.92L383.094 839.391L392.938 841.148L426.251 654.617L416.406 652.859L449.719 466.328L459.563 468.086L492.876 281.555L483.031 279.797L516.344 93.2656L526.188 95.0234L541.373 10H640.792V0H856.375V10H1071.96V0H1287.54V10H1503.12V0H1718.71V10H1818.5L1839.39 102.751L1849.14 100.554V100.553L1894.43 301.661H1894.43L1884.67 303.857L1929.96 504.965L1939.71 502.769V502.768L1985 703.875L1975.24 706.072L2020.53 907.179L2030.29 904.982L2075.57 1106.09V1106.09L2065.82 1108.29L2111.1 1309.39L2120.86 1307.2L2166.14 1508.3V1508.3L2156.39 1510.5L2201.67 1711.61L2211.43 1709.41Z"
+            fill="none"
+            stroke="rgba(255,255,255,0.65)"
+            stroke-width="30"
+            stroke-dasharray="200 140"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <!-- Instruction pill -->
+      <div class="instruction-wrapper">
+        <div class="instruction-pill" id="ts-instruction-pill">
+          <span class="instruction-icon" id="ts-instruction-icon">↑</span>
+          <span class="instruction-text" id="ts-instruction-text">Align your phone</span>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <footer class="bottom-bar">
+        <div class="shutter-unit">
+          <svg class="progress-ring" viewBox="0 0 84 84" aria-hidden="true">
+            <circle class="progress-ring-track" cx="42" cy="42" r="38"/>
+            <circle class="progress-ring-fill" id="ts-progress-ring-fill" cx="42" cy="42" r="38"/>
+          </svg>
+          <button id="ts-capture-btn" class="shutter-btn" aria-label="Capture photo">
+            <span class="shutter-inner"></span>
+          </button>
+        </div>
+        <div class="hold-label ts-hidden" id="ts-hold-label">Hold still</div>
+      </footer>
+
+    </div><!-- /overlay-layer -->
+
+    <!-- Countdown overlay -->
+    <div class="countdown-overlay ts-hidden" id="ts-countdown-overlay" aria-live="polite">
+      <div class="countdown-number" id="ts-countdown-number">3</div>
+    </div>
+
+    <!-- Success flash -->
+    <div class="success-flash ts-hidden" id="ts-success-flash" aria-live="assertive"></div>
+
+    <!-- Success toast -->
+    <div class="success-toast ts-hidden" id="ts-success-toast">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+      Photo saved
+    </div>
+
+    <!-- Tilt error toast -->
+    <div class="tilt-error-toast ts-hidden" id="ts-tilt-error-toast" aria-live="assertive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+        <circle cx="12" cy="12" r="10"></circle>
+      </svg>
+      Adjust phone tilt first
+    </div>
+
+    <!-- iOS permission banner -->
+    <div class="permission-overlay ts-hidden" id="ts-permission-banner" role="dialog" aria-modal="true">
+      <div class="permission-card">
+        <div class="permission-icon">📡</div>
+        <h2 class="permission-title">Motion Access Needed</h2>
+        <p class="permission-body">DASH needs motion sensors to guide you to a perfectly level shot.</p>
+        <button id="ts-request-permission-btn" class="btn-primary">Allow Motion Access</button>
+      </div>
+    </div>
+
+    <!-- Sensor unavailable notice -->
+    <div class="sensor-notice ts-hidden" id="ts-sensor-unavailable-banner">Motion sensors unavailable — camera only mode</div>
+
+    <!-- Settings panel -->
+    <div class="settings-overlay ts-hidden" id="ts-settings-menu" role="dialog" aria-modal="true">
+      <div class="settings-card">
+        <div class="settings-header">
+          <span class="settings-title">Settings</span>
+          <button class="settings-close" id="ts-menu-close-btn" aria-label="Close Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="settings-body">
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <span class="settings-row-label">Auto Capture</span>
+              <span class="settings-row-desc">Captures automatically when level</span>
+            </div>
+            <div class="mode-toggle-group">
+              <button id="ts-mode-auto-btn" class="mode-btn active" aria-pressed="true">AUTO</button>
+              <button id="ts-mode-manual-btn" class="mode-btn" aria-pressed="false">MANUAL</button>
+            </div>
+          </div>
+          <div class="settings-divider"></div>
+          <button id="ts-calibrate-btn" class="settings-action-btn"><span>🎯</span><span>Calibrate Level</span></button>
+          <button id="ts-reset-calibration-btn" class="settings-action-btn secondary"><span>↺</span><span>Reset Calibration</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview modal -->
+    <div class="preview-modal ts-hidden" id="ts-capture-modal" role="dialog" aria-modal="true">
+      <div class="preview-card">
+        <div class="preview-header">
+          <span class="preview-title">Photo</span>
+        </div>
+        <div class="preview-image-wrap">
+          <img id="ts-captured-image-view" src="" alt="Captured pant photo">
+        </div>
+        <div class="preview-actions">
+          <button id="ts-retake-btn" class="btn-secondary">Retake</button>
+          <button id="ts-continue-btn" class="btn-primary">Use Photo</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ts-app -->
+</div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="file-input" accept="image/jpeg,image/png,image/jpg,image/webp">
+<input type="file" id="file-input-camera" accept="image/*" capture="environment">
+<canvas id="capture-canvas" style="display:none;"></canvas>
+
+<script type="module">
+import { auth } from './firestore.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+  window._currentUser = user || null;
+});
+
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const API_URL = "https://dashgaming-slyte.hf.space/analyze";
+const CLOUDINARY_UPLOAD_PRESET = ""; // Set if you want direct Cloudinary uploads from frontend (optional)
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let uploadedFile = null;
+let capturedBlob = null;
+let cameraStream = null;
+let isLevelOk = false;
+let autoCapture = true;
+let levelHoldTimer = null;
+let levelProgress = 0;
+const LEVEL_THRESHOLD = 12; // degrees
+const HOLD_DURATION = 1500; // ms before auto-capture
+
+// ── MOBILE DETECTION ─────────────────────────────────────────────────────
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+              || (navigator.maxTouchPoints > 1 && window.screen.width < 1024);
+
+// ── UPLOAD ZONE ──────────────────────────────────────────────────────────
+const uploadZone = document.getElementById('upload-zone');
+const uploadPreview = document.getElementById('upload-preview');
+const uploadSuccessBadge = document.getElementById('upload-success-badge');
+const fileInput = document.getElementById('file-input');
+const fileInputCamera = document.getElementById('file-input-camera');
+
+uploadZone.addEventListener('click', () => {
+  if (isMobile) {
+    openPicker();
+  } else {
+    fileInput.click();
+  }
+});
+
+function showUploadPreview(file) {
+  const url = URL.createObjectURL(file);
+  uploadPreview.src = url;
+  uploadPreview.style.display = 'block';
+  uploadZone.querySelector('.upload-arrow').style.display = 'none';
+  uploadZone.querySelector('.upload-label').style.display = 'none';
+  uploadZone.querySelector('.upload-hint').style.display = 'none';
+  uploadSuccessBadge.style.display = 'inline-block';
+}
+
+function showBlobPreview(blob) {
+  const url = URL.createObjectURL(blob);
+  uploadPreview.src = url;
+  uploadPreview.style.display = 'block';
+  uploadZone.querySelector('.upload-arrow').style.display = 'none';
+  uploadZone.querySelector('.upload-label').style.display = 'none';
+  uploadZone.querySelector('.upload-hint').style.display = 'none';
+  uploadSuccessBadge.style.display = 'inline-block';
+}
+
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadedFile = file;
+  capturedBlob = null;
+  showUploadPreview(file);
+  fileInput.value = '';
+});
+
+fileInputCamera.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadedFile = file;
+  capturedBlob = null;
+  showUploadPreview(file);
+  fileInputCamera.value = '';
+  closePicker();
+});
+
+// ── PICKER SHEET ──────────────────────────────────────────────────────────
+const pickerSheet = document.getElementById('picker-sheet');
+const pickerOverlay = document.getElementById('picker-overlay');
+
+function openPicker() {
+  pickerSheet.classList.add('open');
+  pickerOverlay.classList.add('open');
+}
+function closePicker() {
+  pickerSheet.classList.remove('open');
+  pickerOverlay.classList.remove('open');
+}
+
+document.getElementById('picker-cancel').addEventListener('click', closePicker);
+pickerOverlay.addEventListener('click', closePicker);
+
+document.getElementById('pick-files').addEventListener('click', () => {
+  closePicker();
+  fileInput.click();
+});
+
+document.getElementById('pick-camera').addEventListener('click', () => {
+  closePicker();
+  openTiltCamera();
+});
+
+// ── TILT CAMERA (phone_tilt exact, inlined) ──────────────────────────────
+const tiltScreen = document.getElementById('tilt-screen');
+const captureCanvas = document.getElementById('capture-canvas');
+
+// ── Camera Manager ────────────────────────────────────────────────────────
+class TSCameraManager {
+  constructor() {
+    this.videoEl = document.getElementById('camera-feed');
+    this.stream = null;
+    this.isActive = false;
+    this.onErrorCallback = null;
+    this.onSuccessCallback = null;
+  }
+  async init() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this._error(new Error('Camera not supported.')); return false;
+    }
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+      });
+      this._attach(); return true;
+    } catch (e) {
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        this._attach(); return true;
+      } catch (e2) { this._error(e2); return false; }
+    }
+  }
+  _attach() {
+    if (!this.videoEl || !this.stream) return;
+    this.videoEl.srcObject = this.stream;
+    this.videoEl.setAttribute('playsinline', 'true');
+    this.videoEl.muted = true;
+    this.videoEl.play().then(() => { this.isActive = true; this.onSuccessCallback?.(); }).catch(e => this._error(e));
+  }
+  stop() {
+    this.stream?.getTracks().forEach(t => t.stop());
+    this.stream = null; this.isActive = false;
+  }
+  takeSnapshot() {
+    if (!this.videoEl || !this.isActive) return null;
+    const c = document.createElement('canvas');
+    c.width = this.videoEl.videoWidth || 1280;
+    c.height = this.videoEl.videoHeight || 720;
+    c.getContext('2d').drawImage(this.videoEl, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.95);
+  }
+  _error(e) { console.error('Camera:', e); this.isActive = false; this.onErrorCallback?.(e); }
+}
+
+// ── Sensor Manager ────────────────────────────────────────────────────────
+class TSSensorManager {
+  constructor() {
+    this.rawBeta=0; this.rawGamma=0; this.pitchOffset=0; this.rollOffset=0;
+    this.filteredPitch=0; this.filteredRoll=0; this.smoothingAlpha=0.2;
+    this.isSupported=false;
+    this.onUpdateCallback=null; this.onPermissionRequiredCallback=null; this.onSensorUnavailableCallback=null;
+    this._handler = this._handle.bind(this);
+  }
+  async init() {
+    if (!window.DeviceOrientationEvent) {
+      this.isSupported=false; this.onSensorUnavailableCallback?.(); return false;
+    }
+    this.isSupported=true;
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      this.onPermissionRequiredCallback?.(); return false;
+    }
+    this._start(); return true;
+  }
+  async requestIOSPermission() {
+    if (typeof DeviceOrientationEvent.requestPermission !== 'function') return true;
+    try {
+      const r = await DeviceOrientationEvent.requestPermission();
+      if (r === 'granted') { this._start(); return true; }
+      this.onSensorUnavailableCallback?.(); return false;
+    } catch { this.onSensorUnavailableCallback?.(); return false; }
+  }
+  _start() { window.addEventListener('deviceorientation', this._handler, true); }
+  stop()   { window.removeEventListener('deviceorientation', this._handler, true); }
+  calibrate() { this.pitchOffset=this.rawBeta; this.rollOffset=this.rawGamma; this.filteredPitch=0; this.filteredRoll=0; }
+  resetCalibration() { this.pitchOffset=0; this.rollOffset=0; }
+  _handle(e) {
+    if (e.beta===null||e.gamma===null) return;
+    this.rawBeta=e.beta; this.rawGamma=e.gamma;
+    const p=e.beta-this.pitchOffset, r=e.gamma-this.rollOffset;
+    this.filteredPitch += (p-this.filteredPitch)*this.smoothingAlpha;
+    this.filteredRoll  += (r-this.filteredRoll)*this.smoothingAlpha;
+    this.onUpdateCallback?.(this._payload());
+  }
+  _color(p,r) { const e=Math.max(Math.abs(p),Math.abs(r)); return e<=5?'green':e<=8?'yellow':'red'; }
+  _status(c) { return c==='green'?'🟢 Ready':c==='yellow'?'🟡 Adjust':'🔴 Tilt Phone'; }
+  _guidance(p,r) {
+    if (Math.abs(p)<=5&&Math.abs(r)<=5) return '✓ Ready';
+    if (Math.abs(p)>=Math.abs(r)) return p>5?'Tilt phone slightly forward':'Tilt phone slightly backward';
+    return r>5?'Rotate slightly left':'Rotate slightly right';
+  }
+  _payload() {
+    const p=this.filteredPitch, r=this.filteredRoll, c=this._color(p,r);
+    return { filteredPitch:p, filteredRoll:r, colorState:c, statusText:this._status(c), guidanceText:this._guidance(p,r), isReady:c==='green' };
+  }
+}
+
+// ── Tilt Indicator ────────────────────────────────────────────────────────
+class TSTiltIndicator {
+  constructor() {
+    this.pill    = document.getElementById('status-pill');
+    this.dot     = document.getElementById('status-dot');
+    this.label   = document.getElementById('status-label');
+    this.pantPath= document.getElementById('ts-pant-path');
+    this.hLine   = document.getElementById('ts-horizon-line');
+    this.capBtn  = document.getElementById('ts-capture-btn');
+  }
+  update({filteredRoll,colorState,statusText,isReady}) {
+    if (this.pill) this.pill.className=`status-pill state-${colorState}`;
+    if (this.label) this.label.textContent=statusText;
+    if (this.hLine) {
+      const a=Math.max(-45,Math.min(45,filteredRoll))*(30/45);
+      this.hLine.style.transform=`rotate(${a}deg)`;
+      this.hLine.classList.toggle('is-level',isReady);
+    }
+    if (this.pantPath) this.pantPath.classList.toggle('is-ready',isReady);
+    if (this.capBtn)   this.capBtn.classList.toggle('is-ready',isReady);
+  }
+}
+
+// ── UI Manager ────────────────────────────────────────────────────────────
+class TSUIManager {
+  constructor() {
+    this.pill  = document.getElementById('ts-instruction-pill');
+    this.icon  = document.getElementById('ts-instruction-icon');
+    this.text  = document.getElementById('ts-instruction-text');
+    this.permBanner   = document.getElementById('ts-permission-banner');
+    this.sensorBanner = document.getElementById('ts-sensor-unavailable-banner');
+    this.settingsMenu = document.getElementById('ts-settings-menu');
+  }
+  updateTelemetry({guidanceText,isReady}, custom=null) {
+    const g=custom||guidanceText;
+    if (this.pill) {
+      if (isReady&&!custom) { this.pill.classList.add('is-ready'); return; }
+      this.pill.classList.remove('is-ready');
+    }
+    if (!this.text||!this.icon) return;
+    if (custom==='Hold Still') { this.icon.textContent='🔒'; this.text.textContent='Hold still'; return; }
+    if (g.includes('forward'))  { this.icon.textContent='↑'; this.text.textContent='Tilt phone forward'; }
+    else if (g.includes('backward')) { this.icon.textContent='↓'; this.text.textContent='Tilt phone backward'; }
+    else if (g.includes('left'))  { this.icon.textContent='←'; this.text.textContent='Rotate slightly left'; }
+    else if (g.includes('right')) { this.icon.textContent='→'; this.text.textContent='Rotate slightly right'; }
+    else if (g==='✓ Ready') { this.icon.textContent='✓'; this.text.textContent='Perfect — ready to shoot'; }
+    else { this.icon.textContent='↑'; this.text.textContent=g; }
+  }
+  setPermissionBannerVisible(v) { this.permBanner?.classList.toggle('ts-hidden',!v); }
+  showSensorUnavailableBanner() { this.sensorBanner?.classList.remove('ts-hidden'); }
+  openSettings()  { this.settingsMenu?.classList.remove('ts-hidden'); }
+  closeSettings() { this.settingsMenu?.classList.add('ts-hidden'); }
+}
+
+// ── Capture Manager ───────────────────────────────────────────────────────
+class TSCaptureManager {
+  constructor(cam) {
+    this.cam=cam;
+    this.capBtn       = document.getElementById('ts-capture-btn');
+    this.ringFill     = document.getElementById('ts-progress-ring-fill');
+    this.holdLabel    = document.getElementById('ts-hold-label');
+    this.cdOverlay    = document.getElementById('ts-countdown-overlay');
+    this.cdNumber     = document.getElementById('ts-countdown-number');
+    this.flash        = document.getElementById('ts-success-flash');
+    this.toast        = document.getElementById('ts-success-toast');
+    this.errToast     = document.getElementById('ts-tilt-error-toast');
+    this.modal        = document.getElementById('ts-capture-modal');
+    this.capturedImg  = document.getElementById('ts-captured-image-view');
+    this.retakeBtn    = document.getElementById('ts-retake-btn');
+    this.continueBtn  = document.getElementById('ts-continue-btn');
+    this.isAuto=true; this.isCaptured=false; this.isReady=false;
+    this.levelHoldStart=null; this.holdDuration=1200; this.ringCirc=239;
+    this.isCountingDown=false; this.cdTimer=null;
+    this._initEvents();
+  }
+  _initEvents() {
+    this.capBtn?.addEventListener('click', () => this.isReady ? this._triggerCapture() : this._showTiltError());
+    this.retakeBtn?.addEventListener('click',   () => this._closeModal());
+    this.continueBtn?.addEventListener('click', () => {
+      // "Use Photo" — convert the captured data URL back to a blob then hand it to the main page
+      const img = this.capturedImg;
+      if (!img?.src) return;
+      fetch(img.src).then(r=>r.blob()).then(blob=>{
+        capturedBlob = blob; uploadedFile = null;
+        this._closeModal();
+        closeTiltCameraNew();
+        showBlobPreview(blob);
+      });
+    });
+  }
+  evaluateTelemetry({isReady}) {
+    if (this.isCaptured) return false;
+    this.isReady=isReady;
+    if (!this.isAuto) { this._resetRing(); return false; }
+    if (isReady) {
+      const now=performance.now();
+      if (!this.levelHoldStart) this.levelHoldStart=now;
+      const p=Math.min(1,(now-this.levelHoldStart)/this.holdDuration);
+      this._setRing(p);
+      if (p>=1&&!this.isCountingDown) this._startCountdown();
+    } else { this._resetRing(); if (this.isCountingDown) this._cancelCountdown(); }
+    return this.isCountingDown;
+  }
+  get isAutoCaptureEnabled() { return this.isAuto; }
+  set isAutoCaptureEnabled(v) { this.isAuto=v; this._resetRing(); }
+  resetAutoCaptureProgress() { this._resetRing(); if (this.isCountingDown) this._cancelCountdown(); }
+  _setRing(r) { if(this.ringFill) this.ringFill.style.strokeDashoffset=this.ringCirc*(1-r); }
+  _resetRing() { this.levelHoldStart=null; this._setRing(0); this.holdLabel?.classList.add('ts-hidden'); }
+  _startCountdown() {
+    this.isCountingDown=true; let v=3;
+    this.holdLabel?.classList.remove('ts-hidden');
+    this.cdOverlay?.classList.remove('ts-hidden');
+    if (this.cdNumber) this.cdNumber.textContent='3';
+    this.cdTimer=setInterval(()=>{
+      v--;
+      if (v>0) {
+        if (this.cdNumber) { this.cdNumber.style.animation='none'; void this.cdNumber.offsetWidth; this.cdNumber.style.animation=''; this.cdNumber.textContent=v; }
+      } else { clearInterval(this.cdTimer); this.cdTimer=null; this._cancelCountdown(); this._triggerCapture(); }
+    },1000);
+  }
+  _cancelCountdown() {
+    if (this.cdTimer) { clearInterval(this.cdTimer); this.cdTimer=null; }
+    this.isCountingDown=false;
+    this.cdOverlay?.classList.add('ts-hidden');
+    this.holdLabel?.classList.add('ts-hidden');
+  }
+  _showTiltError() {
+    if (!this.errToast) return;
+    this.capBtn?.classList.remove('shake'); void this.capBtn?.offsetWidth; this.capBtn?.classList.add('shake');
+    this.capBtn?.addEventListener('animationend',()=>this.capBtn?.classList.remove('shake'),{once:true});
+    this.errToast.classList.remove('ts-hidden'); this.errToast.classList.add('show');
+    clearTimeout(this._errTimer);
+    this._errTimer=setTimeout(()=>{ this.errToast.classList.remove('show'); setTimeout(()=>this.errToast.classList.add('ts-hidden'),250); },1800);
+  }
+  _triggerCapture() {
+    if (!this.cam||this.isCaptured) return;
+    const url=this.cam.takeSnapshot(); if (!url) return;
+    this.isCaptured=true;
+    if (this.flash) { this.flash.classList.remove('ts-hidden'); this.flash.classList.add('flash-anim'); this.flash.addEventListener('animationend',()=>{this.flash.classList.add('ts-hidden');this.flash.classList.remove('flash-anim');},{once:true}); }
+    if (this.toast) {
+      this.toast.classList.remove('ts-hidden'); this.toast.classList.add('show');
+      setTimeout(()=>{ this.toast.classList.remove('show'); setTimeout(()=>{ this.toast.classList.add('ts-hidden'); this._showModal(url); },300); },1400);
+    } else this._showModal(url);
+  }
+  _showModal(url) { if(this.capturedImg) this.capturedImg.src=url; this.modal?.classList.remove('ts-hidden'); }
+  _closeModal() { this.modal?.classList.add('ts-hidden'); if(this.capturedImg) this.capturedImg.src=''; this.isCaptured=false; this._resetRing(); }
+}
+
+// ── App Wiring ────────────────────────────────────────────────────────────
+const tsCamera   = new TSCameraManager();
+const tsSensors  = new TSSensorManager();
+const tsTilt     = new TSTiltIndicator();
+const tsUI       = new TSUIManager();
+const tsCapture  = new TSCaptureManager(tsCamera);
+
+async function openTiltCamera() {
+  tiltScreen.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Camera setup
+  tsCamera.onErrorCallback = (err) => {
+    const fb = document.getElementById('camera-fallback');
+    const msg = document.getElementById('fallback-message');
+    if (msg) msg.textContent = err.message || 'Camera permission denied.';
+    fb?.classList.remove('ts-hidden');
+  };
+  tsCamera.onSuccessCallback = () => {
+    document.getElementById('camera-fallback')?.classList.add('ts-hidden');
+  };
+  await tsCamera.init();
+  // Sensor setup
+  tsSensors.onUpdateCallback = (tel) => {
+    tsTilt.update(tel);
+    const holdingStill = tsCapture.evaluateTelemetry(tel);
+    tsUI.updateTelemetry(tel, holdingStill ? 'Hold Still' : null);
+  };
+  tsSensors.onPermissionRequiredCallback = () => tsUI.setPermissionBannerVisible(true);
+  tsSensors.onSensorUnavailableCallback = () => { tsUI.setPermissionBannerVisible(false); tsUI.showSensorUnavailableBanner(); };
+  await tsSensors.init();
+}
+
+function closeTiltCameraNew() {
+  tiltScreen.classList.remove('open');
+  document.body.style.overflow = '';
+  tsSensors.stop();
+  tsCamera.stop();
+  tsCapture.resetAutoCaptureProgress();
+}
+
+// Controls
+document.getElementById('tilt-back')?.addEventListener('click', closeTiltCameraNew);
+document.getElementById('retry-camera-btn')?.addEventListener('click', () => tsCamera.init());
+document.getElementById('ts-request-permission-btn')?.addEventListener('click', async () => {
+  const ok = await tsSensors.requestIOSPermission();
+  if (ok) tsUI.setPermissionBannerVisible(false);
+});
+document.getElementById('ts-settings-btn')?.addEventListener('click', () => tsUI.openSettings());
+document.getElementById('ts-menu-close-btn')?.addEventListener('click', () => tsUI.closeSettings());
+document.getElementById('ts-settings-menu')?.addEventListener('click', (e) => { if (e.target===e.currentTarget) tsUI.closeSettings(); });
+const modeAuto   = document.getElementById('ts-mode-auto-btn');
+const modeManual = document.getElementById('ts-mode-manual-btn');
+modeAuto?.addEventListener('click', () => {
+  tsCapture.isAutoCaptureEnabled=true; tsCapture.resetAutoCaptureProgress();
+  modeAuto.classList.add('active'); modeAuto.setAttribute('aria-pressed','true');
+  modeManual.classList.remove('active'); modeManual.setAttribute('aria-pressed','false');
+});
+modeManual?.addEventListener('click', () => {
+  tsCapture.isAutoCaptureEnabled=false; tsCapture.resetAutoCaptureProgress();
+  modeManual.classList.add('active'); modeManual.setAttribute('aria-pressed','true');
+  modeAuto.classList.remove('active'); modeAuto.setAttribute('aria-pressed','false');
+});
+document.getElementById('ts-calibrate-btn')?.addEventListener('click', () => { tsSensors.calibrate(); tsUI.closeSettings(); });
+document.getElementById('ts-reset-calibration-btn')?.addEventListener('click', () => { tsSensors.resetCalibration(); tsUI.closeSettings(); });
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────
+const analyzeBtn = document.getElementById('analyze-btn');
+const spinner = document.getElementById('spinner');
+const spinnerLabel = document.getElementById('spinner-label');
+const resultSection = document.getElementById('result-section');
+const errorToast = document.getElementById('error-toast');
+
+analyzeBtn.addEventListener('click', async () => {
+  const name = document.getElementById('name-input').value.trim();
+  const waist = parseFloat(document.getElementById('waist-input').value);
+
+  if (!name) { showError('Please enter your name.'); return; }
+  if (!uploadedFile && !capturedBlob) { showError('Please upload or capture a pant image.'); return; }
+  if (!waist || waist < 24 || waist > 60) { showError('Please enter a waist size between 24 and 60.'); return; }
+
+  hideError();
+  setLoading(true, 'Analyzing with SAM3 + HRNet AI…');
+
+  try {
+    const { client } = await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js");
+    const hfApp = await client("dashgaming/slyte");
+    
+    // Attach Firebase token if logged in
+    let token = "";
+    if (window._currentUser) {
+      token = await window._currentUser.getIdToken();
+    }
+    
+    // Compress image before upload (max 800px, 75% JPEG) to speed up transfer
+    const rawFile = uploadedFile
+      ? uploadedFile
+      : new File([capturedBlob], 'captured.jpg', { type: 'image/jpeg' });
+    const imageFile = await compressImageFile(rawFile, 800, 0.75);
+    setLoading(true, `Uploading image (${(imageFile.size/1024).toFixed(0)} KB)…`);
+
+    // Call the hidden JSON API endpoint we added in Gradio
+    const response = await hfApp.predict("/analyze_json", [
+      name,
+      waist,
+      imageFile,
+      token
+    ]);
+
+    const data = response.data[0];
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    showResults(data, name);
+    emitFitData(data, name);
+
+  } catch (err) {
+    showError(`Error: ${err.message}`);
+  } finally {
+    setLoading(false);
+  }
+});
+
+function setLoading(on, label = '') {
+  analyzeBtn.disabled = on;
+  spinner.classList.toggle('active', on);
+  if (on) {
+    resultSection.classList.remove('show');
+  }
+  if (label) spinnerLabel.textContent = label;
+}
+
+function showResults(data, name) {
+  document.getElementById('result-greeting').textContent = `Hello ${name},`;
+  document.getElementById('result-size').textContent = data.recommended_size;
+  document.getElementById('result-waist').textContent = `${data.waist}in`;
+  document.getElementById('result-outseam').textContent = `${data.outseam}in`;
+  document.getElementById('result-inseam').textContent = `${data.inseam}in`;
+  document.getElementById('result-ankle').textContent = `${data.ankle}in`;
+  document.getElementById('result-image').src = `data:image/jpeg;base64,${data.result_image_b64}`;
+  document.getElementById('gpu-footer').textContent =
+    `⏱️ ZeroGPU Time: ${data.gpu_time}s (Cumulative: ${data.cumulative_gpu_time}s)`;
+
+  // Sync badge
+  const syncBadge = document.getElementById('sync-badge');
+  if (data.sync_status === 'saved') {
+    syncBadge.textContent = "✅ Measurements saved successfully! You can now access them via 'Custom Fit' on the DASH website.";
+    syncBadge.className = 'sync-badge';
+    syncBadge.style.display = 'inline-block';
+  } else if (data.sync_status === 'not_logged_in') {
+    syncBadge.style.display = 'none';
+  } else {
+    syncBadge.textContent = `⚠️ ${data.sync_status}`;
+    syncBadge.className = 'sync-badge error';
+    syncBadge.style.display = 'inline-block';
+  }
+
+  resultSection.classList.add('show');
+  resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function emitFitData(data, name) {
+  const payload = {
+    type: 'dashFitResult',
+    name, waist: data.waist,
+    outseam: data.outseam, inseam: data.inseam, ankle: data.ankle,
+    recommendedSize: data.recommended_size,
+    saved_at: data.saved_at
+  };
+  try { window.top.postMessage(payload, '*'); } catch(e) {}
+  try { window.parent.postMessage(payload, '*'); } catch(e) {}
+  console.log('✅ Fit data emitted:', payload);
+
+  // Save to localStorage so product.html Custom Fit modal can read it
+  saveFitToLocalStorage(payload);
+}
+
+// ── SAVE FIT TO LOCALSTORAGE (for product.html Custom Fit modal) ──────────
+const SAVED_FITS_KEY = 'slyteFitResult';
+
+function saveFitToLocalStorage(fitData) {
+  const existing = JSON.parse(localStorage.getItem(SAVED_FITS_KEY) || '[]');
+  const list = Array.isArray(existing) ? existing : (existing ? [existing] : []);
+  list.unshift({
+    name: fitData.name || 'User',
+    waist: fitData.waist,
+    outseam: fitData.outseam,
+    inseam: fitData.inseam,
+    ankle: fitData.ankle,
+    recommendedSize: fitData.recommendedSize,
+    saved_at: fitData.saved_at || new Date().toISOString()
+  });
+  localStorage.setItem(SAVED_FITS_KEY, JSON.stringify(list));
+}
+
+function showError(msg) {
+  errorToast.textContent = msg;
+  errorToast.classList.add('show');
+}
+function hideError() {
+  errorToast.classList.remove('show');
+}
+
+/** Resize + compress an image File to maxDim×maxDim at jpegQuality before upload */
+async function compressImageFile(file, maxDim = 800, jpegQuality = 0.75) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width: w, height: h } = img;
+      if (Math.max(w, h) > maxDim) {
+        const scale = maxDim / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+      }, 'image/jpeg', jpegQuality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); }; // fallback: original
+    img.src = url;
+  });
+}
+
+// Hide camera option on desktop in picker
+if (!isMobile) {
+  document.getElementById('pick-camera').style.display = 'none';
+}
+</script>
+
+
+</div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>AI Fit</span>
+            </a>
+        </nav>
+    </div>
+
+    
+
+    <script src="api-client.js"></script>
+    <script type="module" src="script.js?v=6"></script>
+
+</body>
+
+</html>

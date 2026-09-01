@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Orders — Slyte</title>
+    <meta name="description" content="Look up all your Slyte custom trouser orders by entering your mobile number." />
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Central Application Config -->
+    <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #ffffff;
+            --surface-2: #f8f8f8;
+            --border: #eeeeee;
+            --text-primary: #000000;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --accent: #154cbd;
+            --accent-light: #0d3a95;
+            --paid-bg: #e8f5e9;
+            --paid-color: #2e7d32;
+            --pending-pay-bg: #fff8e1;
+            --pending-pay-color: #e65100;
+            --error: #c62828;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            padding-bottom: 100px; /* Extra space above fixed bottom-nav */
+        }
+
+        .page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        .lookup-hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .lookup-hero .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .lookup-hero h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .lookup-hero p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .lookup-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 32px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .phone-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .phone-prefix {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        #mobileInput {
+            width: 100%;
+            height: 52px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0 16px 0 50px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fafafa;
+        }
+
+        #mobileInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.1);
+            background: #fff;
+        }
+
+        #trackBtn {
+            height: 52px;
+            padding: 0 24px;
+            background: var(--primary-black);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        #trackBtn:active {
+            transform: scale(0.98);
+        }
+
+        /* Results Area */
+        .order-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .order-id-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .payment-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-badge.paid { background: #e8f5e9; color: #2e7d32; }
+        .payment-badge.pending { background: #fff8e1; color: #e65100; }
+        .payment-badge.cancelled { background: #ffebee; color: #c62828; }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Stepper */
+        .stepper {
+            display: flex;
+            margin-bottom: 24px;
+            padding-top: 10px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #eee;
+            z-index: 1;
+        }
+
+        .step.done:not(:last-child)::after {
+            background: var(--accent);
+        }
+
+        .step-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #eee;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ccc;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step.active .step-dot {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .step.done .step-dot {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .step-text {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .step.active .step-text {
+            color: var(--text-primary);
+        }
+
+        .details-block {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .detail-row:last-child { margin-bottom: 0; }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .tracking-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .track-btn-link {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .show-more-btn {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .show-more-btn:hover { background: #f5f5f5; }
+
+        .expanded-section {
+            display: none;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border);
+            margin-top: 20px;
+        }
+
+        .expanded-section.open { display: block; }
+
+        .timeline {
+            margin-top: 16px;
+            border-left: 2px solid #eee;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .timeline-item {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #eee;
+        }
+
+        .timeline-item:first-child::before {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .timeline-item-cancel::before,
+        .timeline-item-cancel:first-child::before {
+            background: var(--error) !important;
+            border-color: var(--error) !important;
+        }
+
+        .timeline-date {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .timeline-status {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ffcdd2;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover { background: #ffebee; }
+
+        #loader { text-align: center; padding: 40px 0; display: none; }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #eee;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 480px) {
+            .input-row { flex-direction: column; }
+            #trackBtn { width: 100%; }
+        }
+    </style>
+</head>
+
+<body class="page-orders">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="page-container">
+        <section class="lookup-hero">
+            <span class="tag">Tracking</span>
+            <h1>Track Orders</h1>
+            <p>Get real-time updates on your slyte shipments.</p>
+        </section>
+
+        <div class="lookup-card" id="lookupCard">
+            <div id="mobileStep">
+                <label class="field-label">Mobile Number</label>
+                <div class="input-row">
+                    <div class="phone-wrapper">
+                        <span class="phone-prefix">+91</span>
+                        <input type="tel" id="mobileInput" maxlength="10" placeholder="98XXXXXXXX" />
+                    </div>
+                    <button type="button" id="trackBtn">Get OTP</button>
+                </div>
+            </div>
+
+            <div id="otpStep" style="display:none;">
+                <p style="font-size: 14px; margin-bottom: 16px; font-weight: 500;">
+                    OTP sent to <span id="displaySentMobile" style="font-weight: 700;"></span>
+                    <a href="#" id="editMobileBtn" style="color: var(--accent); margin-left: 8px; font-size: 13px; text-decoration: none;">Edit</a>
+                </p>
+                <label class="field-label">Enter 6-digit OTP</label>
+                <div class="input-row">
+                    <div class="phone-wrapper">
+                        <input type="tel" id="otpInput" maxlength="6" placeholder="------" style="width: 100%; height: 52px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px;" />
+                    </div>
+                    <button type="button" id="verifyBtn">Verify OTP</button>
+                </div>
+                <div style="margin-top: 12px; font-size: 13px; text-align: right;">
+                    <span id="resendTimer" style="color: var(--text-muted);">Resend in 60s</span>
+                    <a href="#" id="resendBtn" style="color: var(--accent); display: none; text-decoration: none; font-weight: 600;">Resend OTP</a>
+                </div>
+            </div>
+
+            <div id="loggedInStep" style="display:none; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="field-label" style="margin-bottom: 4px;">Verified Mobile</div>
+                    <div id="loggedInMobile" style="font-weight: 700; font-size: 16px;"></div>
+                </div>
+                <button type="button" id="logoutBtn" style="background: none; border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;">Logout</button>
+            </div>
+
+            <div id="errorBanner" style="display:none; color: var(--error); font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
+            <div id="successBanner" style="display:none; color: var(--paid-color); background: var(--paid-bg); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
+        </div>
+
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="font-size:14px; color:var(--text-secondary); font-weight: 500;">Fetching your order details...</p>
+        </div>
+
+        <div id="resultsArea"></div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="material-symbols-outlined">home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+            <span class="material-symbols-outlined">search</span>
+        </a>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
+        </a>
+    </nav>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2>Menu</h2>
+        </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>Size</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="api-client.js?v=5"></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+
+    <style>
+        /* ── Extra styles for lifecycle dashboard ── */
+        .lc-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 800; padding: 5px 12px;
+            border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .lc-badge.created    { background:#f3f4f6; color:#374151; }
+        .lc-badge.paid       { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.confirmed,.lc-badge.ready { background:#e3f2fd; color:#1565c0; }
+        .lc-badge.shipped,.lc-badge.transit,.lc-badge.out_for { background:#fff8e1; color:#e65100; }
+        .lc-badge.delivered  { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.cancelled  { background:#ffebee; color:#c62828; }
+        .lc-badge.return_init,.lc-badge.rto_transit { background:#fce4ec; color:#880e4f; }
+        .lc-badge.rto_delivered { background:#f3e5f5; color:#6a1b9a; }
+        .lc-badge.refund_pending { background:#fff8e1; color:#e65100; }
+        .lc-badge.refunded   { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.refund_failed { background:#ffebee; color:#c62828; }
+
+        .product-type-tag {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; padding: 3px 8px; border-radius: 6px;
+            margin-left: 8px; vertical-align: middle;
+        }
+        .tag-standard { background:#e3f2fd; color:#1565c0; }
+        .tag-custom   { background:#f3e5f5; color:#6a1b9a; }
+
+        .msg-banner {
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 13px; font-weight: 600; margin-top: 16px; line-height: 1.5;
+        }
+        .msg-info    { background:#e3f2fd; color:#1565c0; }
+        .msg-warn    { background:#fff8e1; color:#e65100; }
+        .msg-success { background:#e8f5e9; color:#2e7d32; }
+        .msg-error   { background:#ffebee; color:#c62828; }
+        .msg-purple  { background:#f3e5f5; color:#6a1b9a; }
+
+        .action-btn {
+            width:100%; padding:13px; border-radius:10px; font-weight:700;
+            font-size:14px; cursor:pointer; border:none; margin-top:12px;
+            transition:opacity 0.2s, transform 0.15s;
+        }
+        .action-btn:active { transform:scale(0.98); }
+        .btn-cancel  { background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
+        .btn-rto     { background:#fff8e1; color:#e65100; border:1px solid #ffe0b2; }
+        .btn-track   { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
+        .btn-support { background:#f5f5f5; color:#333; border:1px solid #e0e0e0; text-decoration:none;
+                       display:block; text-align:center; }
+
+        .refund-strip {
+            display:flex; align-items:center; justify-content:space-between;
+            background:#f9f9f9; border-radius:10px; padding:12px 16px; margin-top:12px;
+        }
+        .refund-strip .label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; }
+        .refund-strip .value { font-size:13px; font-weight:700; }
+    </style>
+
+    <script>
+        (function () {
+            const API_BASE = 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1';
+
+            // ── Lifecycle status config ────────────────────────────────────
+            const LC_LABEL = {
+                CREATED:          'Order Placed',
+                PAID:             'Payment Confirmed',
+                CONFIRMED:        'Confirmed',
+                READY_TO_SHIP:    'Ready to Ship',
+                SHIPPED:          'Shipped',
+                IN_TRANSIT:       'In Transit',
+                OUT_FOR_DELIVERY: 'Out for Delivery',
+                DELIVERED:        'Delivered',
+                CANCEL_REQUESTED: 'Cancel Requested',
+                CANCELLED:        'Cancelled',
+                RETURN_INITIATED: 'Return Initiated',
+                RTO_IN_TRANSIT:   'Return in Transit',
+                RTO_DELIVERED:    'Return Delivered',
+                REFUND_PENDING:   'Refund Initiated',
+                REFUNDED:         'Refund Completed',
+                REFUND_FAILED:    'Refund Failed'
+            };
+
+            const LC_CSS = {
+                CREATED:'created', PAID:'paid', CONFIRMED:'confirmed',
+                READY_TO_SHIP:'ready', SHIPPED:'shipped', IN_TRANSIT:'transit',
+                OUT_FOR_DELIVERY:'out_for', DELIVERED:'delivered',
+                CANCEL_REQUESTED:'refund_pending', CANCELLED:'cancelled',
+                RETURN_INITIATED:'return_init', RTO_IN_TRANSIT:'rto_transit',
+                RTO_DELIVERED:'rto_delivered', REFUND_PENDING:'refund_pending',
+                REFUNDED:'refunded', REFUND_FAILED:'refund_failed'
+            };
+
+            // Forward progress steps for normal stepper
+            const FORWARD_STEPS = [
+                { key:'CREATED',          label:'Placed' },
+                { key:'SHIPPED',          label:'Shipped' },
+                { key:'OUT_FOR_DELIVERY', label:'Out for Delivery' },
+                { key:'DELIVERED',        label:'Delivered' }
+            ];
+            const FORWARD_RANK = { CREATED:0, PAID:0, CONFIRMED:0, READY_TO_SHIP:0,
+                                   SHIPPED:1, IN_TRANSIT:1,
+                                   OUT_FOR_DELIVERY:2, DELIVERED:3 };
+
+            // ── getCancelAction ────────────────────────────────────────────
+            function getCancelAction(order) {
+                if (order.productType === 'CUSTOM') return 'NOT_ALLOWED';
+                
+                if (order.createdAt) {
+                    const diffDays = (Date.now() - new Date(order.createdAt).getTime()) / (1000 * 3600 * 24);
+                    if (diffDays > 8) return 'NOT_ALLOWED';
+                }
+
+                const PRE  = ['CREATED','PAID','CONFIRMED','READY_TO_SHIP','CANCEL_REQUESTED'];
+                const POST = ['SHIPPED','IN_TRANSIT','OUT_FOR_DELIVERY'];
+                if (PRE.includes(order.orderLifecycleStatus))  return 'DIRECT_CANCEL';
+                if (POST.includes(order.orderLifecycleStatus)) return 'RTO_CANCEL';
+                return 'NOT_ALLOWED';
+            }
+
+            // ── DOM refs ───────────────────────────────────────────────────
+            const mobileInput = document.getElementById('mobileInput');
+            const trackBtn    = document.getElementById('trackBtn');
+            const otpInput    = document.getElementById('otpInput');
+            const verifyBtn   = document.getElementById('verifyBtn');
+            const resendBtn   = document.getElementById('resendBtn');
+            const resendTimer = document.getElementById('resendTimer');
+            const editMobileBtn = document.getElementById('editMobileBtn');
+            const logoutBtn   = document.getElementById('logoutBtn');
+            const displaySentMobile = document.getElementById('displaySentMobile');
+            const loggedInMobile = document.getElementById('loggedInMobile');
+            
+            const mobileStep = document.getElementById('mobileStep');
+            const otpStep    = document.getElementById('otpStep');
+            const loggedInStep = document.getElementById('loggedInStep');
+
+            const errorBanner = document.getElementById('errorBanner');
+            const successBanner = document.getElementById('successBanner');
+            const loader      = document.getElementById('loader');
+            const resultsArea = document.getElementById('resultsArea');
+            let   currentMobile = '';
+            let   countdownInterval = null;
+
+            function esc(s) {
+                if (!s) return '';
+                const d = document.createElement('div');
+                d.textContent = s;
+                return d.innerHTML;
+            }
+            function fmtDate(ds) {
+                if (!ds) return '';
+                const d = new Date(ds);
+                return isNaN(d) ? ds : d.toLocaleString('en-IN',
+                    { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+            }
+            function setLoading(on, text = '...') {
+                loader.style.display = on ? 'block' : 'none';
+                if(text !== '...') trackBtn.textContent = text;
+            }
+
+            function showError(msg) {
+                successBanner.style.display = 'none';
+                errorBanner.textContent = msg;
+                errorBanner.style.display = 'block';
+            }
+            function showSuccess(msg) {
+                errorBanner.style.display = 'none';
+                successBanner.textContent = msg;
+                successBanner.style.display = 'block';
+            }
+            function clearMessages() {
+                errorBanner.style.display = 'none';
+                successBanner.style.display = 'none';
+            }
+
+            // ── Authentication Check ───────────────────────────────────────
+            document.addEventListener('DOMContentLoaded', async () => {
+                // Priority 1: Already OTP-verified (has JWT token)
+                const token = localStorage.getItem('slyte_otp_token');
+                if (token) {
+                    showLoggedInState();
+                    fetchOrders();
+                    return;
+                }
+
+                // Priority 2: Logged in via checkout (Cashfree set userPhone)
+                const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
+                if (checkoutPhone && checkoutPhone.length === 10) {
+                    // Silently exchange the checkout phone for a JWT
+                    try {
+                        const res = await fetch(`${API_BASE}/auto-login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: checkoutPhone })
+                        });
+                        const data = await res.json();
+                        if (data.success && data.token) {
+                            localStorage.setItem('slyte_otp_token', data.token);
+                            localStorage.setItem('slyte_phone', checkoutPhone);
+                            // 'username' is what script.js reads to show name in hamburger menu
+                            const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
+                                ? data.user.name
+                                : (localStorage.getItem('userName') || localStorage.getItem('username') || checkoutPhone);
+                            localStorage.setItem('username', displayName);
+                            localStorage.setItem('userName', displayName);
+                            showLoggedInState();
+                            fetchOrders();
+                            return;
+                        }
+                    } catch (e) {
+                        // Silently fall through to mobile entry screen
+                    }
+                }
+
+                // Priority 3: Not logged in — show mobile input
+                showMobileStep();
+            });
+
+            function showLoggedInState() {
+                mobileStep.style.display = 'none';
+                otpStep.style.display = 'none';
+                loggedInStep.style.display = 'flex';
+                // Decode token payload manually just to show number, or rely on fetch
+                const phone = localStorage.getItem('slyte_phone') || 'User';
+                loggedInMobile.textContent = '+91 ' + phone;
+            }
+
+            function showMobileStep() {
+                mobileStep.style.display = 'block';
+                otpStep.style.display = 'none';
+                loggedInStep.style.display = 'none';
+                resultsArea.innerHTML = '';
+                clearMessages();
+            }
+
+            function showOtpStep(phone) {
+                mobileStep.style.display = 'none';
+                loggedInStep.style.display = 'none';
+                otpStep.style.display = 'block';
+                displaySentMobile.textContent = '+91 ' + phone;
+                startResendTimer();
+            }
+
+            // ── Send OTP ───────────────────────────────────────────────
+            async function requestOtp() {
+                const val = mobileInput.value.trim().replace(/\D/g,'').slice(-10);
+                if (val.length < 10) {
+                    showError('Enter a valid 10-digit mobile number.');
+                    return;
+                }
+                currentMobile = val;
+                clearMessages();
+                trackBtn.disabled = true;
+                trackBtn.textContent = 'Sending...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/send-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ phone: currentMobile })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        showOtpStep(currentMobile);
+                        showSuccess('OTP sent successfully.');
+                    } else {
+                        showError(data.message || 'Failed to send OTP.');
+                    }
+                } catch (e) {
+                    showError('Network error. Please try again.');
+                } finally {
+                    trackBtn.disabled = false;
+                    trackBtn.textContent = 'Get OTP';
+                }
+            }
+
+            // ── Verify OTP ───────────────────────────────────────────────
+            async function verifyOtp() {
+                const otp = otpInput.value.trim();
+                if (otp.length !== 6) {
+                    showError('Enter a valid 6-digit OTP.');
+                    return;
+                }
+                clearMessages();
+                verifyBtn.disabled = true;
+                verifyBtn.textContent = 'Verifying...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ phone: currentMobile, otp })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        localStorage.setItem('slyte_otp_token', data.token);
+                        if (data.user && data.user.phone) {
+                            const phone = data.user.phone;
+                            const name = data.user.name || '';
+                            // Sync to slyte_phone AND the checkout keys so everything stays consistent
+                            localStorage.setItem('slyte_phone', phone);
+                            localStorage.setItem('userPhone', phone);
+                            // 'username' is what script.js reads to show name in hamburger menu
+                            localStorage.setItem('username', name || phone);
+                            localStorage.setItem('userName', name || phone);
+                        }
+                        showLoggedInState();
+                        fetchOrders();
+                    } else {
+                        showError(data.message || 'Invalid OTP.');
+                    }
+                } catch (e) {
+                    showError('Network error. Please try again.');
+                } finally {
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify OTP';
+                }
+            }
+
+            // ── Timer Logic ──────────────────────────────────────────────
+            function startResendTimer() {
+                resendBtn.style.display = 'none';
+                resendTimer.style.display = 'inline';
+                let timeLeft = 60;
+                resendTimer.textContent = `Resend in ${timeLeft}s`;
+                
+                if (countdownInterval) clearInterval(countdownInterval);
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        resendTimer.style.display = 'none';
+                        resendBtn.style.display = 'inline';
+                    } else {
+                        resendTimer.textContent = `Resend in ${timeLeft}s`;
+                    }
+                }, 1000);
+            }
+
+            // ── Fetch orders (Protected) ─────────────────────────────────
+            function fetchOrders() {
+                const token = localStorage.getItem('slyte_otp_token');
+                if (!token) {
+                    showMobileStep();
+                    return;
+                }
+                
+                setLoading(true);
+                clearMessages();
+                resultsArea.innerHTML = '';
+
+                fetch(`${API_BASE}/orders-lookup`, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(r => {
+                    if (r.status === 401) throw new Error('Unauthorized');
+                    return r.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    if (!data.success) {
+                        showError(data.message || 'No orders found.');
+                        return;
+                    }
+                    renderOrders(data.orders);
+                })
+                .catch((e) => {
+                    setLoading(false);
+                    if (e.message === 'Unauthorized') {
+                        localStorage.removeItem('slyte_otp_token');
+                        showMobileStep();
+                        showError('Session expired. Please verify mobile again.');
+                    } else {
+                        showError('Failed to fetch orders. Please try again.');
+                    }
+                });
+            }
+
+            // Bindings
+            trackBtn.onclick = requestOtp;
+            verifyBtn.onclick = verifyOtp;
+            resendBtn.onclick = (e) => { e.preventDefault(); requestOtp(); };
+            editMobileBtn.onclick = (e) => { e.preventDefault(); showMobileStep(); };
+            logoutBtn.onclick = () => {
+                localStorage.removeItem('slyte_otp_token');
+                localStorage.removeItem('slyte_phone');
+                localStorage.removeItem('userPhone');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('username');
+                localStorage.removeItem('slyteUser');
+                showMobileStep();
+                // Reload so script.js updates the hamburger menu to logged-out state
+                location.reload();
+            };
+            
+            mobileInput.onkeyup = e => { if (e.key === 'Enter') requestOtp(); };
+            otpInput.onkeyup = e => { if (e.key === 'Enter') verifyOtp(); };
+
+            // ── Toggle expand ──────────────────────────────────────────────
+            window.toggleExpand = function(id) {
+                const el  = document.getElementById('expand-' + id);
+                const btn = document.getElementById('btn-more-' + id);
+                const open = el.classList.toggle('open');
+                btn.textContent = open ? 'Hide Details' : 'Show Details';
+            };
+
+            // ── Cancel / RTO ───────────────────────────────────────────────
+            window.doCancel = function(orderId, action, btn, paymentGroup, isCod) {
+                const isCodOrder = isCod === true || isCod === 'true';
+                let msg = '';
+                if (action === 'RTO_CANCEL') {
+                    msg = !isCodOrder
+                        ? `Order is already shipped. We'll initiate a return — you'll be refunded once it reaches our warehouse. Continue?`
+                        : `Order is already shipped. We'll initiate a return. No cash refund for COD. Continue?`;
+                } else {
+                    msg = !isCodOrder
+                        ? `Cancel this order? Refund will be initiated immediately to your payment method.`
+                        : `Cancel this COD order? No refund as no payment was made. Continue?`;
+                }
+                
+                if (!confirm(msg)) return;
+
+                const orig = btn.textContent;
+                setLoading(true, 'Cancelling...');
+                btn.textContent = '...'; btn.disabled = true;
+
+                const token = localStorage.getItem('slyte_otp_token');
+                fetch(`${API_BASE}/orders-cancel`, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    setLoading(false);
+                    if (res.success) {
+                        // Show different alert based on payment type
+                        const msg = res.message || (res.isCodOrder
+                            ? 'Order cancelled successfully.'
+                            : 'Order cancelled. Refund will be credited within 5–7 business days.');
+                        alert(msg);
+                        fetchOrders();
+                    } else {
+                        alert(res.message || 'Could not cancel. Contact support.');
+                        btn.textContent = orig; btn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    setLoading(false);
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+            // ── Retry refund (prepaid orders only) ─────────────────────────
+            window.doRetryRefund = function(orderId, btn) {
+                const orig = btn.textContent;
+                btn.textContent = 'Retrying...'; btn.disabled = true;
+                const token = localStorage.getItem('slyte_otp_token');
+                setLoading(true, 'Retrying Refund...');
+                fetch(`${API_BASE}/refund-retry`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    alert(res.message || (res.success ? 'Refund retry initiated.' : 'Retry failed. Contact support.'));
+                    if (res.success) fetchOrders();
+                    else { btn.textContent = orig; btn.disabled = false; }
+                })
+                .catch(() => {
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+            // ── Delete Order ───────────────────────────────────────────────
+            window.doDelete = function(orderId, btn) {
+                if (!confirm('Are you sure you want to permanently delete this cancelled order?')) return;
+
+                const orig = btn.textContent;
+                btn.textContent = '...'; btn.disabled = true;
+
+                const token = localStorage.getItem('slyte_otp_token');
+                fetch(`${API_BASE}/orders/delete`, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        fetchOrders();
+                    } else {
+                        alert(res.message || 'Could not delete order.');
+                        btn.textContent = orig; btn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+
+            // ── Build stepper HTML ─────────────────────────────────────────
+            function buildStepper(lcs) {
+                const cancelStatuses = [
+                    'CANCELLED', 'REFUNDED', 'REFUND_FAILED', 'REFUND_PENDING', 
+                    'CANCEL_REQUESTED', 'RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED'
+                ];
+                
+                if (cancelStatuses.includes(lcs)) {
+                    return `<div class="stepper">
+                        <div class="step done">
+                            <div class="step-dot">✓</div>
+                            <div class="step-text">Placed</div>
+                        </div>
+                        <div class="step active" style="--accent: var(--error);">
+                            <div class="step-dot" style="background: var(--error); border-color: var(--error); color: #fff;">✕</div>
+                            <div class="step-text" style="color: var(--error); font-weight: 700;">Canceled (completed)</div>
+                        </div>
+                    </div>`;
+                }
+
+                const rank = FORWARD_RANK[lcs] ?? 0;
+                return `<div class="stepper">
+                    ${FORWARD_STEPS.map((s,i) => `
+                        <div class="step ${i < rank ? 'done' : i === rank ? 'active' : ''}">
+                            <div class="step-dot">${i <= rank ? '✓' : ''}</div>
+                            <div class="step-text">${s.label}</div>
+                        </div>`).join('')}
+                </div>`;
+            }
+
+            // ── Build cancel/action buttons ───────────────────────────────
+            function buildActionUI(order) {
+                const lcs    = order.orderLifecycleStatus || 'CREATED';
+                const action = getCancelAction(order);
+                const parts  = [];
+
+                // Tracking button (always show if AWB available)
+                if (order.trackingNumber) {
+                    parts.push(`<a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
+                        target="_blank" class="action-btn btn-track">📦 Track Live</a>`);
+                }
+
+                // ── CASE 1: CUSTOM → no cancel ─────────────────────────────
+                if (order.productType === 'CUSTOM') {
+                    parts.push(`<div class="msg-banner msg-purple">✂️ Custom fit orders cannot be cancelled.</div>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 2: Direct cancel (pre-shipping) ───────────────────
+                if (action === 'DIRECT_CANCEL') {
+                    const btnLabel = order.isCodOrder ? '✕ Cancel Order (COD)' : '✕ Cancel Order';
+                    parts.push(`<button class="action-btn btn-cancel"
+                        onclick="doCancel('${esc(order.orderId)}','DIRECT_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">${btnLabel}</button>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 3: RTO (post-shipping) ────────────────────────────
+                if (action === 'RTO_CANCEL') {
+                    const notice = !order.isCodOrder
+                        ? 'Order already shipped. A return will be initiated and you will be refunded once received at our warehouse.'
+                        : 'Order already shipped (COD). A return will be initiated. No cash refund applies.';
+                    parts.push(`<div class="msg-banner msg-warn">⚠️ ${notice}</div>`);
+                    if (!order.rtoShiprocketOrderId) {
+                        parts.push(`<button class="action-btn btn-rto"
+                            onclick="doCancel('${esc(order.orderId)}','RTO_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">↩ Cancel (Return to Origin)</button>`);
+                    }
+                    return parts.join('');
+                }
+
+                // ── CASE 4: Return in progress ─────────────────────────────
+                if (['RETURN_INITIATED','RTO_IN_TRANSIT'].includes(lcs)) {
+                    parts.push(`<div class="msg-banner msg-purple">🔄 Return in progress. Refund will be processed once the package reaches our warehouse.</div>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 5: Terminal states ────────────────────────────────
+                if (lcs === 'CANCELLED' || lcs === 'REFUNDED') {
+                    parts.push(`<div class="msg-banner msg-error">✕ Order cancelled.</div>`);
+                    parts.push(`<button class="action-btn" style="background-color: var(--error); color: white; margin-top: 10px;"
+                        onclick="doDelete('${esc(order.orderId)}', this)">🗑️ Delete Order</button>`);
+                    return parts.join('');
+                }
+                if (lcs === 'DELIVERED') {
+                    parts.push(`<div class="msg-banner msg-success">✓ Delivered! Enjoy your order.</div>`);
+                    return parts.join('');
+                }
+                if (lcs === 'RTO_DELIVERED') {
+                    const rtoMsg = order.isCodOrder
+                        ? '📦 Return received. No refund applicable (COD order).'
+                        : '📦 Return received. Refund is being processed — 5-7 business days.';
+                    parts.push(`<div class="msg-banner msg-purple">${rtoMsg}</div>`);
+                    return parts.join('');
+                }
+
+                // ── Support fallback ───────────────────────────────────────
+                parts.push(`<a href="https://wa.me/916363887497" target="_blank"
+                    class="action-btn btn-support">💬 Contact Support</a>`);
+                return parts.join('');
+            }
+
+            // ── Build refund strip ─────────────────────────────────────────
+            // RULE: COD orders NEVER show a refund strip.
+            // Prepaid orders show refund status with retry for REFUND_FAILED.
+            function buildRefundStrip(order) {
+                // ❌ HARD BLOCK: No refund UI for COD orders
+                // Check both isCodOrder flag AND paymentGroup for robustness
+                const isCod = order.isCodOrder === true ||
+                              (order.paymentGroup || '').toUpperCase() === 'COD' ||
+                              (order.paymentGroup || '').toLowerCase().includes('cash');
+                if (isCod) {
+                    const lcsCheck = order.orderLifecycleStatus || '';
+                    if (['CANCELLED','CANCEL_REQUESTED'].includes(lcsCheck)) {
+                        return `<div class="refund-strip">
+                            <div><div class="label">Payment Mode</div>
+                            <div class="value">💵 Cash on Delivery — no refund applicable</div></div>
+                        </div>`;
+                    }
+                    return '';
+                }
+
+                const lcs = order.orderLifecycleStatus || '';
+                const ref = order.refund;
+
+                // Only show if there is a refund scenario for prepaid
+                const refundStatuses = ['REFUND_PENDING','REFUNDED','REFUND_FAILED',
+                                        'CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'];
+                if (!refundStatuses.includes(lcs) && !ref) return '';
+
+                let icon = '💳', label = '', retryHtml = '';
+                if (ref?.status === 'SUCCESS' || lcs === 'REFUNDED') {
+                    icon = '✅'; label = 'Refund completed';
+                } else if (ref?.status === 'FAILED' || lcs === 'REFUND_FAILED') {
+                    icon = '❌'; label = 'Refund failed — contact support';
+                    retryHtml = `<button onclick="doRetryRefund('${esc(order.orderId)}',this)"
+                        style="margin-top:8px;background:#fff3e0;color:#e65100;border:1px solid #ffe0b2;
+                        padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">↺ Retry Refund</button>`;
+                } else if (lcs === 'REFUND_PENDING' || ref?.status === 'PENDING') {
+                    icon = '⏳'; label = 'Refund initiated — 5-7 business days';
+                } else if (['CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'].includes(lcs) && !ref) {
+                    icon = '⏳'; label = 'Refund will be initiated shortly';
+                } else { return ''; }
+
+                const amt = ref?.amount ? `₹${ref.amount}` : `₹${order.amount}`;
+                return `<div class="refund-strip">
+                    <div style="flex:1">
+                        <div class="label">Refund Status</div>
+                        <div class="value">${icon} ${label}</div>
+                        ${retryHtml}
+                    </div>
+                    <div class="value" style="font-size:16px">${amt}</div>
+                </div>`;
+            }
+
+            // ── Main render ────────────────────────────────────────────────
+            function renderOrders(orders) {
+                if (!orders.length) {
+                    resultsArea.innerHTML = `<div style="text-align:center;padding:40px;
+                        color:var(--text-secondary);font-weight:500;">No orders found.</div>`;
+                    return;
+                }
+
+                resultsArea.innerHTML = orders.map((order, i) => {
+                    const lcs    = order.orderLifecycleStatus || 'CREATED';
+                    const cssCls = LC_CSS[lcs] || 'created';
+                    const lcLabel = LC_LABEL[lcs] || lcs;
+                    const isRtoPath = ['RETURN_INITIATED','RTO_IN_TRANSIT',
+                                       'RTO_DELIVERED'].includes(lcs);
+                    const isCancelled = ['CANCELLED','CANCEL_REQUESTED'].includes(lcs);
+                    // Robust COD check — use both flag and paymentGroup
+                    const isCod = order.isCodOrder === true ||
+                                  (order.paymentGroup || '').toUpperCase() === 'COD' ||
+                                  (order.paymentGroup || '').toLowerCase().includes('cash');
+                    const typeTag = order.productType === 'CUSTOM'
+                        ? `<span class="product-type-tag tag-custom">Custom</span>`
+                        : `<span class="product-type-tag tag-standard">Standard</span>`;
+
+                    // Stepper: show RTO path or normal path
+                    let stepperHtml = '';
+                    if (!isCancelled && !isRtoPath) {
+                        stepperHtml = buildStepper(lcs);
+                    } else if (isRtoPath) {
+                        stepperHtml = `<div class="msg-banner msg-purple">
+                            🔄 ${lcLabel}</div>`;
+                    } else {
+                        stepperHtml = `<div class="msg-banner msg-error">
+                            ✕ ${lcLabel}</div>`;
+                    }
+
+                    // Tracking timeline
+                    let timelineHtml = `<div class="timeline-status"
+                        style="color:var(--text-muted);font-size:11px;">No updates yet</div>`;
+                    if (order.trackingHistory?.length) {
+                        timelineHtml = order.trackingHistory.map(t => `
+                            <div class="timeline-item">
+                                <div class="timeline-date">${fmtDate(t.date)}</div>
+                                <div class="timeline-status">${esc(t.activity||t.status||'')}
+                                    ${t.location ? '— '+esc(t.location) : ''}</div>
+                            </div>`).join('');
+                    } else {
+                        timelineHtml = `<div class="timeline-item">
+                            <div class="timeline-date">${fmtDate(order.createdAt)}</div>
+                            <div class="timeline-status">Order placed successfully</div>
+                        </div>`;
+                    }
+
+                    // Prepend a cancellation/return event at the top of the timeline
+                    const cancelStatuses = ['CANCELLED','CANCEL_REQUESTED','RETURN_INITIATED','RTO_IN_TRANSIT','RTO_DELIVERED'];
+                    if (cancelStatuses.includes(lcs)) {
+                        // Pick the best timestamp: last lifecycle history entry → cancelRequestedAt → now
+                        const lh = order.lifecycleHistory;
+                        const cancelTs = (lh && lh.length)
+                            ? lh[lh.length - 1].timestamp
+                            : null;
+                        const cancelDate = fmtDate(cancelTs || new Date().toISOString());
+
+                        const cancelLabel = {
+                            CANCELLED:         '✕ Order cancelled',
+                            CANCEL_REQUESTED:  '⏳ Cancellation requested',
+                            RETURN_INITIATED:  '↩ Return initiated',
+                            RTO_IN_TRANSIT:    '🚚 Return in transit',
+                            RTO_DELIVERED:     '📦 Return delivered to warehouse'
+                        }[lcs] || '✕ Order cancelled';
+
+                        const cancelEntry = `<div class="timeline-item timeline-item-cancel">
+                            <div class="timeline-date">${cancelDate}</div>
+                            <div class="timeline-status" style="color:#c62828;font-weight:600;">${cancelLabel}</div>
+                        </div>`;
+                        timelineHtml = cancelEntry + timelineHtml;
+                    }
+
+                    const addr = order.deliveryAddress;
+                    const addrStr = addr
+                        ? `${esc(addr.addressLine1)}, ${esc(addr.city)}, ${esc(addr.pincode)}`
+                        : 'N/A';
+
+                    return `
+                    <div class="order-card" style="animation-delay:${i*0.08}s" id="card-${esc(order.orderId)}">
+                        <div class="card-header">
+                            <div>
+                                <div class="order-id-label">${esc(order.displayId)}</div>
+                                <div class="product-name">
+                                    ${esc(order.productName)}
+                                    ${order.fitType ? `<span style="font-weight:400;font-size:13px;color:var(--text-secondary)"> — ${esc(order.fitType)}</span>` : ''}
+                                    ${typeTag}
+                                </div>
+                            </div>
+                            <span class="lc-badge ${cssCls}">${lcLabel}</span>
+                        </div>
+
+                        <div class="card-body">
+                            ${stepperHtml}
+                            ${buildRefundStrip(order)}
+
+                            <div class="details-block" style="margin-top:16px;">
+                                <div class="detail-row">
+                                    <span class="detail-label">Current Status</span>
+                                    <span class="detail-value" style="color:var(--accent)">
+                                        ${esc(order.fulfillmentStatus || lcLabel)}
+                                    </span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Amount</span>
+                                    <span class="detail-value">₹${order.amount}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Payment</span>
+                                    <span class="detail-value">
+                                        ${isCod
+                                            ? '<span style="background:#fff8e1;color:#e65100;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">COD</span>'
+                                            : `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">PREPAID</span>`
+                                        }
+                                        ${isCod ? 'Cash on Delivery' : esc(order.paymentGroup)}
+                                    </span>
+                                </div>
+                                ${order.estimatedDelivery ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Est. Delivery</span>
+                                    <span class="detail-value" style="color:#2e7d32;">${fmtDate(order.estimatedDelivery)}</span>
+                                </div>` : ''}
+                                ${order.trackingNumber ? `
+                                <div class="tracking-card">
+                                    <div>
+                                        <div class="detail-label" style="font-size:10px;text-transform:uppercase;">AWB</div>
+                                        <div class="detail-value" style="font-size:13px;text-align:left;">${esc(order.trackingNumber)}</div>
+                                    </div>
+                                    <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
+                                       target="_blank" class="track-btn-link">Track Live</a>
+                                </div>` : ''}
+                            </div>
+
+                            ${buildActionUI(order)}
+
+                            <button class="show-more-btn" style="margin-top:16px;"
+                                id="btn-more-${esc(order.orderId)}"
+                                onclick="toggleExpand('${esc(order.orderId)}')">Show Details</button>
+
+                            <div class="expanded-section" id="expand-${esc(order.orderId)}">
+                                <div class="detail-row">
+                                    <span class="detail-label">Order ID</span>
+                                    <span class="detail-value" style="font-size:11px;">${esc(order.orderId)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Payment Mode</span>
+                                    <span class="detail-value">${esc(order.paymentGroup)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Ordered</span>
+                                    <span class="detail-value">${fmtDate(order.createdAt)}</span>
+                                </div>
+                                <div class="detail-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+                                    <span class="detail-label">Delivery Address</span>
+                                    <span class="detail-value" style="text-align:left;font-size:12px;font-weight:500;">${addrStr}</span>
+                                </div>
+                                <div style="margin-top:20px;font-weight:700;font-size:11px;
+                                    text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;">
+                                    Shipment Timeline
+                                </div>
+                                <div class="timeline">${timelineHtml}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // Auto-fill from localStorage
+            const saved = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
+            if (saved) {
+                mobileInput.value = saved.replace(/\D/g,'').slice(-10);
+                fetchOrders();
+            }
+
+        })();
+    </script>
+</body>
+
+</html>
+
+
