@@ -144,7 +144,7 @@
 
             try {
                 // Use the backend URL from api-client.js
-                const url = window.BACKEND_URL || "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1"; 
+                const url = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) ? window.SLYTE_CONFIG.API_BASE_URL : (window.BACKEND_URL || "https://api.slyte.in"); 
                 
                 const response = await fetch(`${url}/verify-order/${orderId}`);
                 const result = await response.json();

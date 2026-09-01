@@ -3,9 +3,12 @@
  * Set your API URL once (or override before load): window.SLYTE_API_BASE = 'https://your-host/api';
  */
 (function () {
-    const DEFAULT_API = "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
+    const DEFAULT_API = "https://api.slyte.in";
 
     function apiBase() {
+        if (typeof window !== "undefined" && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) {
+            return String(window.SLYTE_CONFIG.API_BASE_URL).replace(/\/$/, "");
+        }
         const b = (typeof window !== "undefined" && window.SLYTE_API_BASE) || DEFAULT_API;
         return String(b).replace(/\/$/, "");
     }

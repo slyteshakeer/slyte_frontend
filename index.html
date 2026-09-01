@@ -377,7 +377,7 @@
 
                 const apiBase = (window.SLYTE_API && window.SLYTE_API.apiBase)
                     ? window.SLYTE_API.apiBase()
-                    : "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
+                    : ((window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) ? window.SLYTE_CONFIG.API_BASE_URL : "https://api.slyte.in");
 
                 fetch(`${apiBase}/verify-order/${orderId}`)
                     .then(res => res.json())

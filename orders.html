@@ -635,7 +635,9 @@
 
     <script>
         (function () {
-            const API_BASE = 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1';
+            const API_BASE = (typeof window !== 'undefined' && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
+                ? window.SLYTE_CONFIG.API_BASE_URL
+                : ((typeof window !== 'undefined' && window.SLYTE_API_BASE) || 'https://api.slyte.in');
 
             // ── Lifecycle status config ────────────────────────────────────
             const LC_LABEL = {
