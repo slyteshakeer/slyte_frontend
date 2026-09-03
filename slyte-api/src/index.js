@@ -22,7 +22,8 @@ function getCorsHeaders(request, env) {
                       origin.endsWith(".slyte.in") || 
                       origin.includes("localhost") || 
                       origin.includes("127.0.0.1") ||
-                      origin.includes(".pages.dev");
+                      origin.includes(".pages.dev") ||
+                      origin.includes(".workers.dev");
 
     return {
         "Access-Control-Allow-Origin": isAllowed ? origin : allowedOrigin,
