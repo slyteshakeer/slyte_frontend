@@ -122,37 +122,47 @@ export default {
                 let paymentSessionId = null;
                 let cashfreeOrder = null;
 
-                if (env.CASHFREE_APP_ID && env.CASHFREE_SECRET_KEY) {
-                    const cfRes = await fetch(cashfreeBaseUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "x-api-version": "2023-08-01",
-                            "x-client-id": env.CASHFREE_APP_ID,
-                            "x-client-secret": env.CASHFREE_SECRET_KEY
-                        },
-                        body: JSON.stringify({
-                            order_id: orderId,
-                            order_amount: totalAmount,
-                            order_currency: "INR",
-                            customer_details: {
-                                customer_id: `CUST_${phone}`,
-                                customer_name: name,
-                                customer_email: email,
-                                customer_phone: phone
-                            },
-                            order_meta: {
-                                return_url: `${url.origin}/payment-success.html?order_id={order_id}`
-                            }
-                        })
-                    });
+                if (!env.CASHFREE_APP_ID || !env.CASHFREE_SECRET_KEY) {
+                    return jsonResponse({
+                        success: false,
+                        error: "Server configuration error: Missing Cashfree API credentials."
+                    }, 500, corsHeaders);
+                }
 
-                    cashfreeOrder = await cfRes.json().catch(() => ({}));
-                    if (cfRes.ok && cashfreeOrder.payment_session_id) {
-                        paymentSessionId = cashfreeOrder.payment_session_id;
-                    } else {
-                        console.error("[slyte-api] Cashfree Order creation error:", cashfreeOrder);
-                    }
+                const cfRes = await fetch(cashfreeBaseUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-version": "2023-08-01",
+                        "x-client-id": env.CASHFREE_APP_ID,
+                        "x-client-secret": env.CASHFREE_SECRET_KEY
+                    },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        order_amount: totalAmount,
+                        order_currency: "INR",
+                        customer_details: {
+                            customer_id: `CUST_${phone}`,
+                            customer_name: name,
+                            customer_email: email,
+                            customer_phone: phone
+                        },
+                        order_meta: {
+                            return_url: `${url.origin}/payment-success.html?order_id={order_id}`
+                        }
+                    })
+                });
+
+                cashfreeOrder = await cfRes.json().catch(() => ({}));
+                if (cfRes.ok && cashfreeOrder.payment_session_id) {
+                    paymentSessionId = cashfreeOrder.payment_session_id;
+                } else {
+                    console.error("[slyte-api] Cashfree Order creation error:", cashfreeOrder);
+                    return jsonResponse({
+                        success: false,
+                        error: "Failed to initialize payment with the payment gateway.",
+                        details: cashfreeOrder
+                    }, 502, corsHeaders);
                 }
 
                 // Optionally record order in Supabase if credentials present
