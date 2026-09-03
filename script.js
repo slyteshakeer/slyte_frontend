@@ -367,9 +367,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const product = Object.assign({}, allProducts.find(p => p.id === pid));
 
             // Get selected fit and price from DOM
-            const selectedFitBox = document.querySelector('.fit-option.selected');
-            const isCustom = selectedFitBox && selectedFitBox.dataset.fit === 'custom';
-            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-option.selected')?.textContent || '32');
+            const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
+            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
             
             const priceEl = document.querySelector('.p-price');
             if (priceEl) product.price = priceEl.textContent;
@@ -389,9 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const pid = parseInt(urlParams.get('id')) || 1;
             const product = Object.assign({}, allProducts.find(p => p.id === pid));
             
-            const selectedFitBox = document.querySelector('.fit-option.selected');
-            const isCustom = selectedFitBox && selectedFitBox.dataset.fit === 'custom';
-            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-option.selected')?.textContent || '32');
+            const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
+            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
             
             const priceEl = document.querySelector('.p-price');
             if (priceEl) product.price = priceEl.textContent;
@@ -454,37 +452,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Fit and Size selection
-    const fitOptions = document.querySelectorAll('.fit-option');
-    const sizeOptions = document.querySelectorAll('.size-option');
-    const standardSizeSection = document.getElementById('standard-size-section');
-    const customFitSection = document.getElementById('custom-fit-section');
+    const sizeBoxes = document.querySelectorAll('.size-box');
+    const customFitBtn = document.getElementById('custom-fit-btn');
     const priceEl = document.querySelector('.p-price');
 
-    // Handle fit selection
-    fitOptions.forEach(box => {
+    // Handle size box click (Standard Fit)
+    sizeBoxes.forEach(box => {
         box.addEventListener('click', () => {
-            fitOptions.forEach(b => b.classList.remove('selected'));
+            if (box.classList.contains('disabled')) return;
+            sizeBoxes.forEach(b => b.classList.remove('selected'));
             box.classList.add('selected');
             
-            if (box.dataset.fit === 'custom') {
-                if (standardSizeSection) standardSizeSection.style.display = 'none';
-                if (customFitSection) customFitSection.style.display = 'block';
-                if (priceEl) priceEl.textContent = '₹1,799';
-            } else {
-                if (standardSizeSection) standardSizeSection.style.display = 'block';
-                if (customFitSection) customFitSection.style.display = 'none';
-                if (priceEl) priceEl.textContent = '₹1,699';
+            if (customFitBtn) {
+                customFitBtn.classList.remove('active');
             }
+            if (priceEl) priceEl.textContent = '₹1,699';
         });
     });
 
-    // Handle size selection
-    sizeOptions.forEach(box => {
-        box.addEventListener('click', () => {
-            sizeOptions.forEach(b => b.classList.remove('selected'));
-            box.classList.add('selected');
+    // Handle Custom Fit button click
+    if (customFitBtn) {
+        customFitBtn.addEventListener('click', () => {
+            sizeBoxes.forEach(b => b.classList.remove('selected'));
+            customFitBtn.classList.add('active');
+            
+            if (priceEl) priceEl.textContent = '₹1,798';
         });
-    }););
+    }
 
     // --- DYNAMIC PRODUCT PAGE ---
     const initCarousel = () => {
@@ -841,6 +835,31 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProductPage();
 });
 
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const headers = document.querySelectorAll('.accordion-header');
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.material-symbols-outlined');
+            if (content && content.classList.contains('accordion-content')) {
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    if(icon) icon.textContent = 'remove';
+                } else {
+                    content.style.display = 'none';
+                    if(icon) icon.textContent = 'add';
+                }
+            }
+        });
+    });
+});
 
 
 
