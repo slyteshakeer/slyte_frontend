@@ -1,4 +1,4 @@
-﻿// Product data - 1 Product with optimized local static image assets
+﻿// Product data - 3 Products with optimized local static image assets
 (function() {
     const productsData = [
         {
@@ -14,6 +14,34 @@
             ],
             tags: ["black", "trouser", "trousers", "straight", "fit", "pant", "pants", "24h"],
             link: "product.html?id=1"
+        },
+        {
+            id: 2,
+            name: "Slyte 24H Beige Trouser",
+            price: "₹1,699",
+            image: "images/products/BEIGE_1.jpeg",
+            images: [
+                "images/products/BEIGE_1.jpeg",
+                "images/products/BEIGE_2.jpeg",
+                "images/products/BEIGE_3.jpeg",
+                "images/products/BEIGE_4.jpeg"
+            ],
+            tags: ["beige", "trouser", "trousers", "straight", "fit", "pant", "pants", "24h"],
+            link: "product.html?id=2"
+        },
+        {
+            id: 3,
+            name: "Slyte 24H Navy Trouser",
+            price: "₹1,699",
+            image: "images/products/NAVY_1.jpeg",
+            images: [
+                "images/products/NAVY_1.jpeg",
+                "images/products/NAVY_2.jpeg",
+                "images/products/NAVY_3.jpeg",
+                "images/products/NAVY_4.jpeg"
+            ],
+            tags: ["navy", "blue", "trouser", "trousers", "straight", "fit", "pant", "pants", "24h"],
+            link: "product.html?id=3"
         }
     ];
 
@@ -24,4 +52,3 @@
         module.exports = productsData;
     }
 })();
-

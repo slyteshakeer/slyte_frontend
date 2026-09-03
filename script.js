@@ -253,8 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </a>
                 <div class="cart-card-details">
                     <div>
-                        <h3>${item.name}</h3>
-                        <div class="variant">${item.size ? `Size: ${item.size}` : 'Standard'}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;"><h3 style="margin:0; font-size:15px; font-weight:600; flex:1; color:#000;">${item.name}</h3><p class="price-text" style="margin:0; font-size:15px; font-weight:700; color:#000; white-space:nowrap;">${item.price}</p></div>
+                        <div class="variant">${item.size === 'Custom Fit' || item.fit === 'Custom Fit' ? 'Fit: Custom Fit' : (item.size ? `Fit: Standard Fit (${item.size})` : 'Fit: Standard Fit')}</div>
                         ${customFitHTML}
                     </div>
                     
@@ -265,12 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${item.quantity}</span>
                             <button class="qty-btn" data-action="increase" data-index="${index}">+</button>
                          </div>
-                         <div style="text-align:right;">
-                            <p class="price-text">${item.price}</p>
-                         </div>
+                         
                     </div>
                     
-                    <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                          <button class="remove-link remove-btn" data-index="${index}">
                             <span class="material-symbols-outlined" style="font-size:16px">delete</span> Remove
                          </button>
@@ -324,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="wishlist-card">
                 <a href="${item.link}"><img src="${item.image}" alt="${item.name}"></a>
                 <div class="wishlist-card-details">
-                    <h3>${item.name}</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;"><h3 style="margin:0; font-size:15px; font-weight:600; flex:1; color:#000;">${item.name}</h3><p class="price-text" style="margin:0; font-size:15px; font-weight:700; color:#000; white-space:nowrap;">${item.price}</p></div>
                     <p class="price">${item.price}</p>
                     <button class="add-to-cart-wishlist" data-id="${item.id}">Add to Cart</button>
                 </div>
@@ -362,16 +360,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToCartBtn = document.querySelector('.add-to-cart-btn');
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', () => {
+            const selectedSizeBox = document.querySelector('.size-box.selected');
+            const isCustomCheck = document.getElementById('custom-fit-btn')?.classList.contains('active');
+            if (!selectedSizeBox && !isCustomCheck) {
+                showToast('Please select a size first');
+                return;
+            }
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
-            const product = Object.assign({}, allProducts.find(p => p.id === pid));
+            const baseProd = allProducts.find(p => p.id === pid) || {};
+            const product = Object.assign({}, baseProd);
 
-            // Get selected fit and price from DOM
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
+            const priceFormatted = isCustom ? '₹1,799' : '₹1,699';
             
+            product.price = priceFormatted;
+            product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
+
             const priceEl = document.querySelector('.p-price');
-            if (priceEl) product.price = priceEl.textContent;
+            if (priceEl) priceEl.textContent = priceFormatted;
 
             if (product) {
                 addToCart(product, size);
@@ -384,6 +392,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const buyNowBtn = document.querySelector('.buy-now-btn');
     if (buyNowBtn) {
         buyNowBtn.addEventListener('click', async () => {
+            const selectedSizeBox = document.querySelector('.size-box.selected');
+            const isCustomCheck = document.getElementById('custom-fit-btn')?.classList.contains('active');
+            if (!selectedSizeBox && !isCustomCheck) {
+                showToast('Please select a size first');
+                return;
+            }
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
             const product = Object.assign({}, allProducts.find(p => p.id === pid));
@@ -395,15 +409,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (priceEl) product.price = priceEl.textContent;
             
             if (product) {
-                // Determine price properly from the updated product object
-                let priceRaw = product.price;
-                let priceNum = 1699; 
-                if (typeof priceRaw === 'string') {
-                    const parsed = parseFloat(priceRaw.replace(/[^\d.]/g, ""));
-                    if (!isNaN(parsed) && parsed > 0) priceNum = parsed;
-                } else if (typeof priceRaw === 'number') {
-                    priceNum = priceRaw;
-                }
+                const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
+                const priceNum = isCustom ? 1799 : 1699;
+                const priceFormatted = isCustom ? '₹1,799' : '₹1,699';
+                product.price = priceFormatted;
+                product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
                 // Add loading state
                 const originalText = buyNowBtn.innerHTML;
@@ -476,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sizeBoxes.forEach(b => b.classList.remove('selected'));
             customFitBtn.classList.add('active');
             
-            if (priceEl) priceEl.textContent = '₹1,798';
+            if (priceEl) priceEl.textContent = '₹1,799';
         });
     }
 
@@ -701,6 +711,26 @@ document.addEventListener('DOMContentLoaded', () => {
             carouselContainer.innerHTML = slidesHTML;
             if (thumbnailsContainer) thumbnailsContainer.innerHTML = '';
         }
+
+        // Explore More rendering
+        const exploreMoreGrid = document.getElementById('explore-more-grid');
+        if (exploreMoreGrid) {
+            const otherProducts = allProducts.filter(p => p.id !== product.id).slice(0, 2);
+            if (otherProducts.length > 0) {
+                exploreMoreGrid.innerHTML = otherProducts.map(p => `
+                    <a href="product.html?id=${p.id}">
+                        <img class="em-img" src="${p.image}" alt="${p.name}">
+                        <div class="em-info">
+                            <p class="em-name">${p.name}</p>
+                            <p class="em-price">${p.price}</p>
+                        </div>
+                    </a>
+                `).join('');
+            } else {
+                const exploreSection = document.querySelector('.explore-more-section');
+                if (exploreSection) exploreSection.style.display = 'none';
+            }
+        }
     };
 
 
@@ -849,17 +879,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = header.nextElementSibling;
             const icon = header.querySelector('.material-symbols-outlined');
             if (content && content.classList.contains('accordion-content')) {
-                if (content.style.display === 'none') {
+                const isHidden = content.style.display === 'none' || getComputedStyle(content).display === 'none';
+                if (isHidden) {
                     content.style.display = 'block';
-                    if(icon) icon.textContent = 'remove';
+                    if (icon) icon.textContent = 'remove';
                 } else {
                     content.style.display = 'none';
-                    if(icon) icon.textContent = 'add';
+                    if (icon) icon.textContent = 'add';
                 }
             }
         });
     });
 });
+
+
+
+
+
+
+
 
 
 

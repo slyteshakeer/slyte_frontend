@@ -1,4 +1,4 @@
-// cart.js
+﻿// cart.js
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById("cart-root");
     const summarySection = document.getElementById("cart-summary");
@@ -59,33 +59,26 @@ document.addEventListener("DOMContentLoaded", () => {
         let subtotal = 0;
 
         const processedItems = items.map((it, idx) => {
+            const size = it.size ?? it.selectedSize ?? it.variant ?? "";
+            const meas = it.measurements || it.customFit || it.customMeasurements || null;
+            const isCustomItem = size === "Custom Fit" || it.fit === "Custom Fit" || (meas && typeof meas === "object");
+
             let price = parsePrice(it.price);
-
-            // Fallback: Fetch correct product price from DB if missing/zero
             if (price === null || price <= 0) {
-                const dbMatch = productsDB.find(p => p.id === it.id || p.name === it.name);
-                if (dbMatch) {
-                    price = parsePrice(dbMatch.price);
-                }
-            }
-
-            // Check validity again
-            if (price === null || price <= 0) {
-                valid = false;
-                price = 0;
+                price = isCustomItem ? 1799 : 1699;
+            } else if (isCustomItem && price === 1699) {
+                price = 1799;
+            } else if (!isCustomItem && price === 1799) {
+                price = 1699;
             }
 
             const quantity = Number(it.quantity) > 0 ? Number(it.quantity) : 1;
             subtotal += price * quantity;
 
-            const size = it.size ?? it.selectedSize ?? it.variant ?? "";
-            const meas = it.measurements || it.customFit || it.customMeasurements || null;
             let measText = "";
-
             if (meas && typeof meas === "object") {
                 const parts = [];
                 if (meas.waist) parts.push(`Waist: ${meas.waist}"`);
-                // Check 'length' or 'outseam' as 'length'
                 const lengthVal = meas.length || meas.outseam;
                 if (lengthVal) parts.push(`Length: ${lengthVal}"`);
                 if (meas.ankle) parts.push(`Ankle: ${meas.ankle}"`);
@@ -97,8 +90,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // If it's a custom fit, show the measurements text preferentially
-            const displaySize = measText ? measText : (size ? `Size: ${size}` : "");
+            let displaySize = "";
+            if (measText) {
+                displayFitText = `Fit: ${measText}`;
+                displaySize = `Fit: ${measText}`;
+            } else if (isCustomItem) {
+                displaySize = "Fit: Custom Fit";
+            } else if (size) {
+                displaySize = `Fit: Standard Fit (${size})`;
+            } else {
+                displaySize = "Fit: Standard Fit";
+            }
             const fallbackImg = (typeof window !== "undefined" && window.SLYTE_CONFIG) ? window.SLYTE_CONFIG.getImageUrl("images/logos/slyte-logo-black.png") : "images/logos/slyte-logo-black.png";
             // Check db match image if item has no image
             let imgSrc = it.image;
@@ -116,9 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="item-details">
                         <div class="item-header">
                             <div class="item-title">${it.name || it.title || "Item"}</div>
-                            <button class="btn-remove" aria-label="Remove item" onclick="handleRemoveItem(${idx})">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                            </button>
+                            <div class="item-price">${price > 0 ? '₹' + price : ''}</div>
                         </div>
                         ${displaySize ? `<div class="item-meta">${displaySize}</div>` : ""}
                         <div class="item-actions">
@@ -127,8 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <span class="qty-val">${quantity}</span>
                                 <button class="qty-btn" onclick="handleChangeQty(${idx}, 1)">+</button>
                             </div>
+                            <button class="btn-remove" aria-label="Remove item" onclick="handleRemoveItem(${idx})">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            </button>
                         </div>
-                        <div class="item-price">${price > 0 ? '₹' + price : '<span style="color:#d32f2f;font-size:0.8rem">Price missing</span>'}</div>
                     </div>
                 </div>
             `;
@@ -202,17 +204,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Auto-fix price data flow before checkout
         items.forEach(it => {
+            const size = it.size ?? it.selectedSize ?? it.variant ?? "";
+            const meas = it.measurements || it.customFit || it.customMeasurements || null;
+            const isCustomItem = size === "Custom Fit" || it.fit === "Custom Fit" || (meas && typeof meas === "object");
+
             let price = parsePrice(it.price);
             if (price === null || price <= 0) {
-                const dbMatch = productsDB.find(p => p.id === it.id || p.name === it.name);
-                if (dbMatch) price = parsePrice(dbMatch.price);
+                price = isCustomItem ? 1799 : 1699;
+            } else if (isCustomItem && price === 1699) {
+                price = 1799;
+            } else if (!isCustomItem && price === 1799) {
+                price = 1699;
             }
-            if (price === null || price <= 0) {
-                valid = false;
-            } else {
-                it.price = price; // Fix the price passing format to backend
-                total += price * (Number(it.quantity) || 1);
-            }
+
+            it.price = price;
+            it.fit = isCustomItem ? "Custom Fit" : "Standard Fit";
+            total += price * (Number(it.quantity) || 1);
         });
 
         // Add shipping
@@ -285,3 +292,5 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("dashcartchange", updateCartUI);
     updateCartUI();
 });
+
+
