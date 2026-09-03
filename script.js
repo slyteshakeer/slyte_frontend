@@ -3,7 +3,8 @@ import { monitorAuthState, logoutUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- SHARED DATA ---
-    const allProducts = (typeof productsData !== 'undefined') ? productsData : [];
+    const getProducts = () => (typeof window !== 'undefined' && Array.isArray(window.productsData) && window.productsData.length > 0) ? window.productsData : ((typeof productsData !== 'undefined') ? productsData : []);
+    const allProducts = getProducts();
 
     // --- SHARED HELPERS ---
     const getWishlist = () => {
@@ -581,21 +582,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadProductPage = () => {
         // Only run on product page
-        if (!window.location.pathname.includes('product.html')) return;
+        if (!document.querySelector('.product-container') && !window.location.pathname.includes('product')) return;
 
         const urlParams = new URLSearchParams(window.location.search);
         const pid = parseInt(urlParams.get('id')); // might be NaN
 
-        // If no ID provided, default to ID=1 (or handle differently)
+        const productsList = getProducts();
         let product = null;
         if (!pid) {
-            product = allProducts[0]; // Default to first product if no ID
+            product = productsList[0]; // Default to first product if no ID
         } else {
-            product = allProducts.find(p => p.id === pid);
+            product = productsList.find(p => p.id === pid);
         }
 
         if (!product) return;
-
         // update title and price
         const titleEl = document.querySelector('.p-title');
         const priceEl = document.querySelector('.p-price');
@@ -715,7 +715,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Explore More rendering
         const exploreMoreGrid = document.getElementById('explore-more-grid');
         if (exploreMoreGrid) {
-            const otherProducts = allProducts.filter(p => p.id !== product.id).slice(0, 2);
+            const productsList = getProducts();
+            const otherProducts = productsList.filter(p => p.id !== product.id).slice(0, 2);
             if (otherProducts.length > 0) {
                 exploreMoreGrid.innerHTML = otherProducts.map(p => `
                     <a href="product.html?id=${p.id}">
@@ -891,6 +892,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
 
 
 
