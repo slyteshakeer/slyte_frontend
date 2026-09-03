@@ -3103,4 +3103,9 @@ html {
     .seo-content-visible h2 {
         font-size: 30px;
     }
-}
+}
+.find-my-size-btn.active {
+    background: var(--primary-blue) !important;
+    color: var(--primary-white) !important;
+    border-color: var(--primary-blue) !important;
+}

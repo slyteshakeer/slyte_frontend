@@ -1,4 +1,4 @@
-
+﻿
 import { monitorAuthState, logoutUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -364,11 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
         addToCartBtn.addEventListener('click', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
-            const product = allProducts.find(p => p.id === pid);
+            const product = Object.assign({}, allProducts.find(p => p.id === pid));
 
-            // Get size
-            const selectedSizeBox = document.querySelector('.size-box.selected');
-            const size = selectedSizeBox ? selectedSizeBox.textContent : '32';
+            // Get selected fit and price from DOM
+            const selectedFitBox = document.querySelector('.fit-option.selected');
+            const isCustom = selectedFitBox && selectedFitBox.dataset.fit === 'custom';
+            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-option.selected')?.textContent || '32');
+            
+            const priceEl = document.querySelector('.p-price');
+            if (priceEl) product.price = priceEl.textContent;
 
             if (product) {
                 addToCart(product, size);
@@ -383,15 +387,19 @@ document.addEventListener('DOMContentLoaded', () => {
         buyNowBtn.addEventListener('click', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
-            const product = allProducts.find(p => p.id === pid);
+            const product = Object.assign({}, allProducts.find(p => p.id === pid));
             
-            const selectedSizeBox = document.querySelector('.size-box.selected');
-            const size = selectedSizeBox ? selectedSizeBox.textContent : '32';
+            const selectedFitBox = document.querySelector('.fit-option.selected');
+            const isCustom = selectedFitBox && selectedFitBox.dataset.fit === 'custom';
+            const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-option.selected')?.textContent || '32');
+            
+            const priceEl = document.querySelector('.p-price');
+            if (priceEl) product.price = priceEl.textContent;
             
             if (product) {
-                // Determine price properly
+                // Determine price properly from the updated product object
                 let priceRaw = product.price;
-                let priceNum = 10; // Default ₹10 fallback based on new architecture
+                let priceNum = 1699; 
                 if (typeof priceRaw === 'string') {
                     const parsed = parseFloat(priceRaw.replace(/[^\d.]/g, ""));
                     if (!isNaN(parsed) && parsed > 0) priceNum = parsed;
@@ -445,79 +453,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Size selection
-    const sizeBoxes = document.querySelectorAll('.size-box');
-    sizeBoxes.forEach(box => {
+    // Fit and Size selection
+    const fitOptions = document.querySelectorAll('.fit-option');
+    const sizeOptions = document.querySelectorAll('.size-option');
+    const standardSizeSection = document.getElementById('standard-size-section');
+    const customFitSection = document.getElementById('custom-fit-section');
+    const priceEl = document.querySelector('.p-price');
+
+    // Handle fit selection
+    fitOptions.forEach(box => {
         box.addEventListener('click', () => {
-            sizeBoxes.forEach(b => b.classList.remove('selected'));
+            fitOptions.forEach(b => b.classList.remove('selected'));
             box.classList.add('selected');
+            
+            if (box.dataset.fit === 'custom') {
+                if (standardSizeSection) standardSizeSection.style.display = 'none';
+                if (customFitSection) customFitSection.style.display = 'block';
+                if (priceEl) priceEl.textContent = '₹1,799';
+            } else {
+                if (standardSizeSection) standardSizeSection.style.display = 'block';
+                if (customFitSection) customFitSection.style.display = 'none';
+                if (priceEl) priceEl.textContent = '₹1,699';
+            }
         });
     });
 
-
-    // --- TOAST NOTIFICATION ---
-
-    // --- NAVBAR AUTH UPDATE ---
-    monitorAuthState((user) => {
-        const menuNav = document.querySelector('.menu-nav');
-        if (!menuNav) return;
-
-        // Clear existing auth items
-        menuNav.querySelectorAll('.auth-item').forEach(el => el.remove());
-
-        // Check for local order-phone login or OTP login if Firebase user is null
-        const localUsername = localStorage.getItem('userName') || localStorage.getItem('username');
-        const localPhone = localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone');
-        const otpToken = localStorage.getItem('slyte_otp_token') || localStorage.getItem('userToken');
-        
-        const effectiveUser = user || (localUsername ? { displayName: localUsername } : (otpToken && localPhone ? { displayName: localPhone } : null));
-
-        if (effectiveUser) {
-            // Logged In
-            const displayName = effectiveUser.displayName || (effectiveUser.email && effectiveUser.email.split('@')[0]) || 'Customer';
-
-            // User Item
-            const userItem = document.createElement('div');
-            userItem.className = 'menu-item auth-item';
-            userItem.style.cursor = 'default';
-            userItem.innerHTML = `<span class="material-symbols-outlined">account_circle</span> <div style="display:flex; flex-direction:column; gap:2px;"><span style="text-transform: capitalize; font-weight:600;">${displayName}</span><span style="font-size:10px; color:#4caf50; font-weight:700; letter-spacing:0.5px;">LOGGED IN</span></div>`;
-
-            // Logout Item
-            const logoutItem = document.createElement('a');
-            logoutItem.href = '#';
-            logoutItem.className = 'menu-item auth-item';
-            logoutItem.innerHTML = `<span class="material-symbols-outlined">logout</span> <span>Logout</span>`;
-            logoutItem.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Clear both auth types
-                localStorage.removeItem('username');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userPhone');
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('slyte_phone');
-                localStorage.removeItem('slyte_otp_token');
-                localStorage.removeItem('slyteUser');
-                localStorage.removeItem('dashUser');
-                if (typeof logoutUser === 'function') logoutUser();
-                location.reload();
-            });
-
-            menuNav.appendChild(userItem);
-            menuNav.appendChild(logoutItem);
-
-        } else {
-            // Logged Out — No manual login allowed as per request
-            const loginPrompt = document.createElement('div');
-            loginPrompt.className = 'auth-item';
-            loginPrompt.style.padding = '20px';
-            loginPrompt.innerHTML = `
-                <div style="font-size: 13px; color: #888; line-height: 1.4;">
-                    Your slyte and orders will appear here automatically after your first purchase.
-                </div>
-            `;
-            menuNav.appendChild(loginPrompt);
-        }
-    });
+    // Handle size selection
+    sizeOptions.forEach(box => {
+        box.addEventListener('click', () => {
+            sizeOptions.forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+        });
+    }););
 
     // --- DYNAMIC PRODUCT PAGE ---
     const initCarousel = () => {
@@ -785,7 +752,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (popularSection) popularSection.style.display = query.length > 0 ? 'none' : '';
 
             if (!query) {
-                // Reset — show all
+                // Reset â€” show all
                 if (searchResultsHeading) searchResultsHeading.textContent = 'All Products';
                 if (resultsCount) resultsCount.textContent = `${allProducts.length} products`;
                 productsGrid.innerHTML = renderProductCards(allProducts);
@@ -873,3 +840,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadProductPage();
 });
+
+
+
+
+
+
+
