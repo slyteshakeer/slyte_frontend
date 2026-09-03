@@ -163,7 +163,7 @@
 
         // ── Auto-login: save checkout phone + name to localStorage ────────
         // No tokens needed — my-orders page queries MongoDB directly by phone.
-        if (data.data && data.data.user && data.data.user.phone) {
+        if (data.data && data.data.user && data.data.user.phone && data.data.user.phone !== "9999999999") {
             try {
                 localStorage.setItem("userPhone", data.data.user.phone);
                 localStorage.setItem("userName",  data.data.user.name || "Customer");
