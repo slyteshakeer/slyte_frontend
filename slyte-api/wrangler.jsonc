@@ -11,6 +11,9 @@
   },
   "vars": {
     "ALLOWED_ORIGIN": "https://slyte.in",
-    "CASHFREE_ENV": "PRODUCTION"
+    "CASHFREE_ENV": "PRODUCTION",
+    "SUPABASE_URL": "https://iqdtfllkdtjypiseklzt.supabase.co",
+    "PORT": "3000",
+    "GOOGLE_CLIENT_ID": "529998054171-r8b812rrog6vec73leabukse393rndmt.apps.googleusercontent.com"
   }
 }
