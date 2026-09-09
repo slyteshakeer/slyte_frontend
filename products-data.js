@@ -1,9 +1,9 @@
-﻿// Product data - 3 Products with optimized local static image assets
+// Product data - 3 Products with optimized local static image assets
 window.productsData = [
     {
         id: 1,
         name: "Slyte 24H Black Trouser",
-        price: "₹1,699",
+        price: "₹10",
         image: "images/products/blackpant_1.jpeg",
         images: [
             "images/products/blackpant_1.jpeg",

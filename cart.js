@@ -1,4 +1,4 @@
-﻿// cart.js
+// cart.js
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById("cart-root");
     const summarySection = document.getElementById("cart-summary");
@@ -65,11 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let price = parsePrice(it.price);
             if (price === null || price <= 0) {
-                price = isCustomItem ? 1799 : 1699;
-            } else if (isCustomItem && price === 1699) {
+                price = isCustomItem ? 1799 : (Number(it.id) === 1 ? 10 : 1699);
+            } else if (isCustomItem && (price === 1699 || price === 10)) {
                 price = 1799;
             } else if (!isCustomItem && price === 1799) {
-                price = 1699;
+                price = Number(it.id) === 1 ? 10 : 1699;
             }
 
             const quantity = Number(it.quantity) > 0 ? Number(it.quantity) : 1;
@@ -210,11 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let price = parsePrice(it.price);
             if (price === null || price <= 0) {
-                price = isCustomItem ? 1799 : 1699;
-            } else if (isCustomItem && price === 1699) {
+                price = isCustomItem ? 1799 : (Number(it.id) === 1 ? 10 : 1699);
+            } else if (isCustomItem && (price === 1699 || price === 10)) {
                 price = 1799;
             } else if (!isCustomItem && price === 1799) {
-                price = 1699;
+                price = Number(it.id) === 1 ? 10 : 1699;
             }
 
             it.price = price;

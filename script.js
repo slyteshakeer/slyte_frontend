@@ -1,4 +1,4 @@
-﻿
+
 import { monitorAuthState, logoutUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
-            const priceFormatted = isCustom ? '₹1,799' : '₹1,699';
+            const priceFormatted = isCustom ? '₹1,799' : (baseProd.price || (pid === 1 ? '₹10' : '₹1,699'));
             
             product.price = priceFormatted;
             product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
@@ -401,7 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
-            const product = Object.assign({}, allProducts.find(p => p.id === pid));
+            const baseProd = allProducts.find(p => p.id === pid) || {};
+            const product = Object.assign({}, baseProd);
             
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
@@ -411,8 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (product) {
                 const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
-                const priceNum = isCustom ? 1799 : 1699;
-                const priceFormatted = isCustom ? '₹1,799' : '₹1,699';
+                const priceNum = isCustom ? 1799 : (pid === 1 ? 10 : 1699);
+                const priceFormatted = isCustom ? '₹1,799' : (pid === 1 ? '₹10' : '₹1,699');
                 product.price = priceFormatted;
                 product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
@@ -477,7 +478,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (customFitBtn) {
                 customFitBtn.classList.remove('active');
             }
-            if (priceEl) priceEl.textContent = '₹1,699';
+            const urlParams = new URLSearchParams(window.location.search);
+            const pid = parseInt(urlParams.get('id')) || 1;
+            const baseProd = allProducts.find(p => p.id === pid) || {};
+            if (priceEl) priceEl.textContent = baseProd.price || (pid === 1 ? '₹10' : '₹1,699');
         });
     });
 
