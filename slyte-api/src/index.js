@@ -589,33 +589,43 @@ async function getShiprocketToken(env) {
 }
 
 async function createShiprocketReturnPickup(order, items, env) {
-    if (order.is_test) return { success: true, message: "Dry-run return pickup for test order" };
     const token = await getShiprocketToken(env);
     if (!token) return null;
 
     try {
+        const addr = order.delivery_address || order.deliveryAddress || {};
+        const isAddrObj = typeof addr === 'object';
+        const addrStr = isAddrObj ? (addr.addressLine1 || "123 Test Street") : String(addr || "123 Test Street");
+        const city = isAddrObj ? (addr.city || "Bengaluru") : "Bengaluru";
+        const state = isAddrObj ? (addr.state || "Karnataka") : "Karnataka";
+        const pincode = isAddrObj ? (addr.pincode || "560034") : "560034";
+        const oId = String(order.id || order.orderId || order.order_id || Date.now()).replace(/^#/, '');
+
         const payload = {
-            order_id: "RET-" + order.id,
+            order_id: "RET-" + oId,
             order_date: new Date().toISOString().split("T")[0],
-            pickup_customer_name: order.customer_name || "Customer",
-            pickup_address: order.delivery_address || "Customer Address",
-            pickup_phone: order.customer_phone || "9999999999",
-            pickup_pincode: "560034",
+            pickup_customer_name: order.customer_name || order.customerName || "Test Customer",
+            pickup_address: addrStr,
+            pickup_city: city,
+            pickup_state: state,
+            pickup_country: "India",
+            pickup_phone: order.customer_phone || order.customerPhone || "9742006683",
+            pickup_pincode: pincode,
             shipping_customer_name: "Slyte Warehousing & Tailoring Hub",
             shipping_address: "123 Slyte D2C Warehouse, HSR Layout",
             shipping_city: "Bengaluru",
             shipping_state: "Karnataka",
             shipping_country: "India",
             shipping_pincode: "560102",
-            order_items: (items || []).map(it => ({
-                name: it.name || "Trouser",
+            order_items: (items || order.cartDetails || order.items || [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]).map(it => ({
+                name: it.name || "Slyte Trouser",
                 sku: it.sku || "SLYTE-TR-001",
                 units: it.quantity || 1,
                 selling_price: it.price || 1699,
                 discount: 0
             })),
             payment_method: "PREPAID",
-            sub_total: order.total_amount || 1699,
+            sub_total: order.total_amount || order.amount || 1699,
             length: 30,
             breadth: 25,
             height: 5,
@@ -631,7 +641,7 @@ async function createShiprocketReturnPickup(order, items, env) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        console.log(`[Shiprocket Return Pickup] Order ${order.id}:`, data);
+        console.log(`[Shiprocket Return Pickup] Order ${oId}:`, data);
         return data;
     } catch (err) {
         console.error(`[Shiprocket Return Pickup Error] Order ${order.id}:`, err);
@@ -640,61 +650,61 @@ async function createShiprocketReturnPickup(order, items, env) {
 }
 
 async function createShiprocketExchangeOrder(order, exchangeRec, env) {
-    if (order.is_test) return { success: true, message: "Dry-run exchange order for test order" };
     const token = await getShiprocketToken(env);
     if (!token) return null;
 
     try {
         const pickupLocId = env?.SHIPROCKET_PICKUP_LOCATION_ID || "5723898";
-        const addr = order.delivery_address || {};
+        const addr = order.delivery_address || order.deliveryAddress || {};
         const isAddrObj = typeof addr === 'object';
         const addrStr = isAddrObj ? (addr.addressLine1 || "Customer Address") : String(addr || "Customer Address");
         const city = isAddrObj ? (addr.city || "Bengaluru") : "Bengaluru";
         const state = isAddrObj ? (addr.state || "Karnataka") : "Karnataka";
         const pincode = isAddrObj ? (addr.pincode || "560034") : "560034";
+        const oId = String(order.id || order.orderId || order.order_id || Date.now()).replace(/^#/, '');
 
         const payload = {
-            exchange_order_id: "EXC-" + order.id,
-            return_order_id: "RET-" + order.id,
+            exchange_order_id: "EXC-" + oId,
+            return_order_id: "RET-" + oId,
             seller_pickup_location_id: String(pickupLocId),
             seller_shipping_location_id: String(pickupLocId),
             order_date: new Date().toISOString().split("T")[0],
             payment_method: "prepaid",
-            buyer_shipping_first_name: order.customer_name || "Customer",
+            buyer_shipping_first_name: order.customer_name || order.customerName || "Customer",
             buyer_shipping_last_name: "",
-            buyer_shipping_email: order.customer_email || "customer@slyte.in",
+            buyer_shipping_email: order.customer_email || order.customerEmail || "customer@slyte.in",
             buyer_shipping_address: addrStr,
             buyer_shipping_address_2: isAddrObj ? (addr.addressLine2 || "") : "",
             buyer_shipping_city: city,
             buyer_shipping_state: state,
             buyer_shipping_country: "India",
             buyer_shipping_pincode: pincode,
-            buyer_shipping_phone: order.customer_phone || "9742006683",
+            buyer_shipping_phone: order.customer_phone || order.customerPhone || "9742006683",
             
-            buyer_pickup_first_name: order.customer_name || "Customer",
+            buyer_pickup_first_name: order.customer_name || order.customerName || "Customer",
             buyer_pickup_last_name: "",
-            buyer_pickup_email: order.customer_email || "customer@slyte.in",
+            buyer_pickup_email: order.customer_email || order.customerEmail || "customer@slyte.in",
             buyer_pickup_address: addrStr,
             buyer_pickup_address_2: isAddrObj ? (addr.addressLine2 || "") : "",
             buyer_pickup_city: city,
             buyer_pickup_state: state,
             buyer_pickup_country: "India",
             buyer_pickup_pincode: pincode,
-            buyer_pickup_phone: order.customer_phone || "9742006683",
+            buyer_pickup_phone: order.customer_phone || order.customerPhone || "9742006683",
             
             order_items: [
                 {
                     name: `${exchangeRec.original_product_name || 'Slyte Trouser'} (Replacement Size ${exchangeRec.replacement_size || 'Requested'})`,
-                    selling_price: String(order.total_amount || 1699),
+                    selling_price: String(order.total_amount || order.amount || 1699),
                     units: 1,
                     hsn: "620342",
                     sku: `SLYTE-TR-EXC-${exchangeRec.replacement_size || 'REQ'}`,
-                    exchange_item_id: String(order.id),
+                    exchange_item_id: String(oId),
                     exchange_item_name: exchangeRec.original_product_name || "Slyte Trouser",
                     exchange_item_sku: "SLYTE-TR-001"
                 }
             ],
-            sub_total: String(order.total_amount || 1699),
+            sub_total: String(order.total_amount || order.amount || 1699),
             shipping_charges: "0",
             giftwrap_charges: "0",
             total_discount: "0",
@@ -720,7 +730,7 @@ async function createShiprocketExchangeOrder(order, exchangeRec, env) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        console.log(`[Shiprocket Create Exchange Order] Order ${order.id}:`, data);
+        console.log(`[Shiprocket Create Exchange Order] Order ${oId}:`, data);
         return data;
     } catch (err) {
         console.error(`[Shiprocket Exchange Error] Order ${order.id}:`, err);
