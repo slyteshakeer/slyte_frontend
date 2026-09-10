@@ -1185,8 +1185,8 @@
                 const action = getCancelAction(order);
                 const parts  = [];
 
-                // Tracking button (always show if AWB available)
-                if (order.trackingNumber) {
+                // Tracking button (show if AWB available and order is NOT delivered)
+                if (order.trackingNumber && lcs !== 'DELIVERED') {
                     parts.push(`<a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
                         target="_blank" class="action-btn btn-track">📦 Track Live</a>`);
                 }
@@ -1445,7 +1445,7 @@
                                     <span class="detail-label">Est. Delivery</span>
                                     <span class="detail-value" style="color:#2e7d32;">${fmtDate(order.estimatedDelivery)}</span>
                                 </div>` : ''}
-                                ${order.trackingNumber ? `
+                                ${(order.trackingNumber && lcs !== 'DELIVERED') ? `
                                 <div class="tracking-card">
                                     <div>
                                         <div class="detail-label" style="font-size:10px;text-transform:uppercase;">AWB</div>
@@ -1586,7 +1586,7 @@
             msg.style.display = 'none';
 
             try {
-                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
                 const res = await fetch(apiBase + '/api/after-sales/alteration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1659,7 +1659,7 @@
             btn.disabled = true;
             btn.innerHTML = 'Submitting...';
             try {
-                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
                 const res = await fetch(apiBase + '/api/after-sales/return', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1739,7 +1739,7 @@
             btn.disabled = true;
             btn.innerHTML = 'Submitting...';
             try {
-                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
                 const res = await fetch(apiBase + '/api/after-sales/exchange', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

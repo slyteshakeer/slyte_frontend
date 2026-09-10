@@ -249,7 +249,7 @@ export default {
             // ----------------------------------------------------
             // CUSTOMER AFTER-SALES ENDPOINTS (Connected to Cashfree & Shiprocket)
             // ----------------------------------------------------
-            if (pathStr === "/api/after-sales/return" && method === "POST") {
+            if ((pathStr === "/api/after-sales/return" || pathStr === "/after-sales/return") && method === "POST") {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const returnRec = backendStore.createReturnRequest(body);
@@ -270,7 +270,7 @@ export default {
                 }
             }
 
-            if (pathStr === "/api/after-sales/exchange" && method === "POST") {
+            if ((pathStr === "/api/after-sales/exchange" || pathStr === "/after-sales/exchange") && method === "POST") {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const exchangeRec = backendStore.createExchangeRequest(body);
@@ -291,7 +291,7 @@ export default {
                 }
             }
 
-            if (pathStr === "/api/after-sales/alteration" && method === "POST") {
+            if ((pathStr === "/api/after-sales/alteration" || pathStr === "/after-sales/alteration") && method === "POST") {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const altRec = backendStore.createAlterationRequest(body);
