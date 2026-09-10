@@ -1721,9 +1721,32 @@
                         <option value="Changed mind">Changed mind</option>
                     </select>
                 </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+                    <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                        🏦 Refund Bank Account Details
+                    </h4>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Account Holder Name *</label>
+                        <input type="text" id="returnAccountName" placeholder="Full name as in bank account" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Bank Account Number *</label>
+                        <input type="password" id="returnAccountNumber" placeholder="Enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Confirm Account Number *</label>
+                        <input type="text" id="returnConfirmAccountNumber" placeholder="Re-enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">IFSC Code *</label>
+                        <input type="text" id="returnIfscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-transform:uppercase; outline:none;">
+                    </div>
+                </div>
+
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Comments / Notes</label>
-                    <textarea id="returnNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                    <textarea id="returnNotes" placeholder="Optional details..." style="width:100%; height:60px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
                 </div>
                 <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
                 <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0369a1; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
@@ -1735,22 +1758,67 @@
             const btn = document.getElementById('btnSubmitRet');
             const msg = document.getElementById('modalMsg');
             const reason = document.getElementById('returnReason').value;
-            const notes = document.getElementById('returnNotes').value.trim();
+            const accountName = (document.getElementById('returnAccountName').value || '').trim();
+            const accountNumber = (document.getElementById('returnAccountNumber').value || '').trim();
+            const confirmAccountNumber = (document.getElementById('returnConfirmAccountNumber').value || '').trim();
+            const ifscCode = (document.getElementById('returnIfscCode').value || '').trim().toUpperCase();
+            const notes = (document.getElementById('returnNotes').value || '').trim();
+
+            if (!accountName) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter Account Holder Name.';
+                return;
+            }
+            if (!accountNumber || accountNumber.length < 8) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter a valid Bank Account Number.';
+                return;
+            }
+            if (accountNumber !== confirmAccountNumber) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Account Numbers do not match.';
+                return;
+            }
+            if (!ifscCode || ifscCode.length !== 11) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter a valid 11-digit IFSC Code (e.g. SBIN0001234).';
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = 'Submitting...';
+            msg.style.display = 'none';
+
             try {
                 const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
                 const res = await fetch(apiBase + '/api/after-sales/return', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: orderId, reason, customer_notes: notes })
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        reason,
+                        customer_notes: notes,
+                        bank_details: {
+                            account_name: accountName,
+                            account_number: accountNumber,
+                            ifsc_code: ifscCode
+                        }
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
                     msg.style.display = 'block';
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
-                    msg.innerHTML = '✓ Return request submitted successfully! Pickup will be scheduled.';
+                    msg.innerHTML = '✓ Return request & bank details submitted! Pickup will be scheduled.';
                     setTimeout(() => {
                         closeAfterSalesModal();
                         location.reload();

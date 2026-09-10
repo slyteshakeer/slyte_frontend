@@ -256,13 +256,12 @@ export default {
                     const order = backendStore.getOrderById(body.order_id);
                     
                     if (order && !returnRec.is_test) {
-                        ctx.waitUntil(processCashfreeRefund(order, returnRec.refund_amount, env));
                         ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
                     }
                     
                     return jsonResponse({
                         success: true,
-                        message: "Return request submitted & logistics initiated",
+                        message: "Return request & bank details submitted; reverse pickup scheduled",
                         return_request: returnRec
                     }, 200, corsHeaders);
                 } catch (err) {
@@ -277,13 +276,12 @@ export default {
                     const order = backendStore.getOrderById(body.order_id);
                     
                     if (order && !exchangeRec.is_test) {
-                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
-                        ctx.waitUntil(createShiprocketForwardShipment(order, { name: exchangeRec.original_product_name, size: exchangeRec.replacement_size }, env));
+                        ctx.waitUntil(createShiprocketExchangeOrder(order, exchangeRec, env));
                     }
 
                     return jsonResponse({
                         success: true,
-                        message: "Exchange request submitted & pickup/replacement initiated",
+                        message: "Exchange request submitted & official Shiprocket exchange order created",
                         exchange_request: exchangeRec
                     }, 200, corsHeaders);
                 } catch (err) {
@@ -641,43 +639,79 @@ async function createShiprocketReturnPickup(order, items, env) {
     }
 }
 
-async function createShiprocketForwardShipment(order, replacementItem, env) {
-    if (order.is_test) return { success: true, message: "Dry-run forward shipment for test order" };
+async function createShiprocketExchangeOrder(order, exchangeRec, env) {
+    if (order.is_test) return { success: true, message: "Dry-run exchange order for test order" };
     const token = await getShiprocketToken(env);
     if (!token) return null;
 
     try {
+        const pickupLocId = env?.SHIPROCKET_PICKUP_LOCATION_ID || "5723898";
+        const addr = order.delivery_address || {};
+        const isAddrObj = typeof addr === 'object';
+        const addrStr = isAddrObj ? (addr.addressLine1 || "Customer Address") : String(addr || "Customer Address");
+        const city = isAddrObj ? (addr.city || "Bengaluru") : "Bengaluru";
+        const state = isAddrObj ? (addr.state || "Karnataka") : "Karnataka";
+        const pincode = isAddrObj ? (addr.pincode || "560034") : "560034";
+
         const payload = {
-            order_id: "EXC-FWD-" + order.id,
+            exchange_order_id: "EXC-" + order.id,
+            return_order_id: "RET-" + order.id,
+            seller_pickup_location_id: String(pickupLocId),
+            seller_shipping_location_id: String(pickupLocId),
             order_date: new Date().toISOString().split("T")[0],
-            pickup_location: "Primary Warehouse",
-            billing_customer_name: order.customer_name || "Customer",
-            billing_last_name: "",
-            billing_address: order.delivery_address || "Customer Address",
-            billing_city: "Bengaluru",
-            billing_pincode: "560034",
-            billing_state: "Karnataka",
-            billing_country: "India",
-            billing_email: order.customer_email || "customer@slyte.in",
-            billing_phone: order.customer_phone || "9999999999",
-            shipping_is_billing: true,
+            payment_method: "prepaid",
+            buyer_shipping_first_name: order.customer_name || "Customer",
+            buyer_shipping_last_name: "",
+            buyer_shipping_email: order.customer_email || "customer@slyte.in",
+            buyer_shipping_address: addrStr,
+            buyer_shipping_address_2: isAddrObj ? (addr.addressLine2 || "") : "",
+            buyer_shipping_city: city,
+            buyer_shipping_state: state,
+            buyer_shipping_country: "India",
+            buyer_shipping_pincode: pincode,
+            buyer_shipping_phone: order.customer_phone || "9742006683",
+            
+            buyer_pickup_first_name: order.customer_name || "Customer",
+            buyer_pickup_last_name: "",
+            buyer_pickup_email: order.customer_email || "customer@slyte.in",
+            buyer_pickup_address: addrStr,
+            buyer_pickup_address_2: isAddrObj ? (addr.addressLine2 || "") : "",
+            buyer_pickup_city: city,
+            buyer_pickup_state: state,
+            buyer_pickup_country: "India",
+            buyer_pickup_pincode: pincode,
+            buyer_pickup_phone: order.customer_phone || "9742006683",
+            
             order_items: [
                 {
-                    name: replacementItem.name || "Slyte Trouser Replacement",
-                    sku: "SLYTE-TR-EXCHANGE",
+                    name: `${exchangeRec.original_product_name || 'Slyte Trouser'} (Replacement Size ${exchangeRec.replacement_size || 'Requested'})`,
+                    selling_price: String(order.total_amount || 1699),
                     units: 1,
-                    selling_price: 0
+                    hsn: "620342",
+                    sku: `SLYTE-TR-EXC-${exchangeRec.replacement_size || 'REQ'}`,
+                    exchange_item_id: String(order.id),
+                    exchange_item_name: exchangeRec.original_product_name || "Slyte Trouser",
+                    exchange_item_sku: "SLYTE-TR-001"
                 }
             ],
-            payment_method: "Prepaid",
-            sub_total: 0,
-            length: 30,
-            breadth: 25,
-            height: 5,
-            weight: 0.5
+            sub_total: String(order.total_amount || 1699),
+            shipping_charges: "0",
+            giftwrap_charges: "0",
+            total_discount: "0",
+            transaction_charges: "0",
+            return_length: "30.00",
+            return_breadth: "25.00",
+            return_height: "5.00",
+            return_weight: "0.500",
+            exchange_length: "30.00",
+            exchange_breadth: "25.00",
+            exchange_height: "5.00",
+            exchange_weight: "0.500",
+            return_reason: exchangeRec.reason || "Size issue",
+            qc_check: "false"
         };
 
-        const res = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
+        const res = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/exchange", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -686,10 +720,10 @@ async function createShiprocketForwardShipment(order, replacementItem, env) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        console.log(`[Shiprocket Forward Shipment] Order ${order.id}:`, data);
+        console.log(`[Shiprocket Create Exchange Order] Order ${order.id}:`, data);
         return data;
     } catch (err) {
-        console.error(`[Shiprocket Forward Error] Order ${order.id}:`, err);
+        console.error(`[Shiprocket Exchange Error] Order ${order.id}:`, err);
         return null;
     }
 }

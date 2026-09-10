@@ -486,6 +486,11 @@ class SlyteBackendStore {
             product_name: order.items?.[0]?.name || "Trouser",
             reason: returnPayload.reason || "Size issue",
             customer_notes: returnPayload.customer_notes || "",
+            bank_details: returnPayload.bank_details || {
+                account_name: returnPayload.account_name || "",
+                account_number: returnPayload.account_number || "",
+                ifsc_code: returnPayload.ifsc_code || ""
+            },
             admin_notes: "",
             status: "REQUESTED",
             eligibility: "Eligible (Standard Fit)",
