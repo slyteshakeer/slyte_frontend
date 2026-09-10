@@ -617,6 +617,7 @@ async function createShiprocketReturnPickup(order, items, env) {
             shipping_state: "Karnataka",
             shipping_country: "India",
             shipping_pincode: "560102",
+            shipping_phone: "9742006683",
             order_items: (items || order.cartDetails || order.items || [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]).map(it => ({
                 name: it.name || "Slyte Trouser",
                 sku: it.sku || "SLYTE-TR-001",
