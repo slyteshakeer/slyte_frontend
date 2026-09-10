@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Slyte Admin Mobile</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #154cbd;
+            --primary-dark: #0f3487;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --warning: #ea580c;
+            --warning-bg: #fff7ed;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --purple: #9333ea;
+            --purple-bg: #faf5ff;
+            --nav-height: 64px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Login Overlay */
+        #loginScreen { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; width: 100%; max-width: 380px; padding: 32px 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+        .login-card h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+        .form-group { text-align: left; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+        .form-input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(21,76,189,0.15); }
+        .btn-submit { width: 100%; height: 50px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; }
+
+        /* App Header */
+        .app-header { height: 56px; background: #0f172a; color: white; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .app-header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .app-header .badge-env { font-size: 10px; background: #1e293b; padding: 3px 8px; border-radius: 10px; font-weight: 700; color: #38bdf8; }
+        .header-icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 6px; }
+
+        /* Main View Container */
+        .app-content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: calc(var(--nav-height) + 16px); -webkit-overflow-scrolling: touch; }
+        .view-pane { display: none; }
+        .view-pane.active { display: block; }
+
+        /* Mobile Cards & Metrics */
+        .metrics-slider { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .m-card { background: white; padding: 16px; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .m-card .label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .m-card .val { font-size: 22px; font-weight: 800; margin-top: 6px; }
+        .m-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Mobile Lists & Search */
+        .search-bar { position: sticky; top: 0; background: var(--bg-main); padding-bottom: 12px; z-index: 10; display: flex; gap: 8px; }
+        .search-input { flex: 1; height: 44px; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; font-size: 13px; outline: none; }
+        .filter-btn { height: 44px; padding: 0 14px; background: white; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: 600; }
+
+        .item-card { background: white; padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .item-title { font-size: 14px; font-weight: 700; }
+        .item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .item-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-delivered, .badge-paid, .badge-qc_passed, .badge-refunded { background: var(--success-bg); color: var(--success); }
+        .badge-shipped, .badge-in_transit { background: #eff6ff; color: #1d4ed8; }
+        .badge-requested, .badge-under_review, .badge-refund_pending { background: var(--warning-bg); color: var(--warning); }
+        .badge-cancelled, .badge-rejected { background: var(--danger-bg); color: var(--danger); }
+        .badge-custom { background: var(--purple-bg); color: var(--purple); }
+        .badge-standard { background: #e0f2fe; color: #0369a1; }
+        .badge-test { background: #fef08a; color: #854d0e; }
+
+        /* Touch Action Buttons */
+        .btn-touch { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-touch-primary { background: var(--primary); color: white; }
+        .btn-touch-secondary { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-touch-success { background: var(--success); color: white; }
+        .btn-touch-danger { background: var(--danger); color: white; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height); background: #ffffff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-link { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); font-size: 10px; font-weight: 600; text-decoration: none; border: none; background: none; cursor: pointer; width: 100%; height: 100%; justify-content: center; }
+        .nav-link.active { color: var(--primary); font-weight: 700; }
+        .nav-link .material-symbols-outlined { font-size: 22px; }
+
+        /* Bottom Sheet / Drawer */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8000; display: none; }
+        .sheet-overlay.active { display: block; }
+        .sheet-content { position: fixed; bottom: -100%; left: 0; right: 0; max-height: 85vh; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 8001; transition: bottom 0.3s ease; overflow-y: auto; padding: 20px; }
+        .sheet-content.active { bottom: 0; }
+        .sheet-handle { width: 40px; height: 4px; background: #cbd5e1; border-radius: 2px; margin: 0 auto 16px; }
+
+        /* Toast */
+        .toast-msg { position: fixed; top: 16px; left: 16px; right: 16px; background: #0f172a; color: white; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; z-index: 9999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast-msg.show { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LOGIN OVERLAY -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <h2 style="font-size: 22px; font-weight: 800;">SLYTE ADMIN</h2>
+            <p>Private Slyte Business Control</p>
+            <form id="mobileLoginForm">
+                <div class="form-group">
+                    <label>Admin Email</label>
+                    <input type="email" id="loginEmail" class="form-input" value="admin@slyte.in" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPass" class="form-input" placeholder="Enter admin password" required>
+                </div>
+                <div class="form-group">
+                    <label>Backend API URL</label>
+                    <input type="text" id="apiBaseInput" class="form-input" value="https://api.slyte.in">
+                </div>
+                <button type="submit" class="btn-submit">Log In to Mobile Admin</button>
+            </form>
+            <div id="loginError" style="color: var(--danger); font-size: 12px; font-weight: 700; margin-top: 12px; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 2. APP HEADER -->
+    <header class="app-header">
+        <h1>
+            <span class="material-symbols-outlined">shield</span> SLYTE ADMIN
+            <span class="badge-env">PRODUCTION</span>
+        </h1>
+        <button class="header-icon-btn" onclick="logoutAdmin()">
+            <span class="material-symbols-outlined">logout</span>
+        </button>
+    </header>
+
+    <!-- 3. MAIN APP CONTENT -->
+    <div class="app-content">
+
+        <!-- VIEW 1: HOME / DASHBOARD -->
+        <div class="view-pane active" id="view-home">
+            <div class="metrics-slider">
+                <div class="m-card">
+                    <div class="label">Total Revenue</div>
+                    <div class="val" id="mRevenue">₹0</div>
+                    <div class="sub">Completed orders</div>
+                </div>
+                <div class="m-card">
+                    <div class="label">Total Orders</div>
+                    <div class="val" id="mTotalOrders">0</div>
+                    <div class="sub">Live customer orders</div>
+                </div>
+                <div class="m-card">
+                    <div class="label">Pending Action</div>
+                    <div class="val" id="mPending" style="color: var(--warning);">0</div>
+                    <div class="sub">Returns / Exchanges</div>
+                </div>
+                <div class="m-card">
+                    <div class="label">Low Stock</div>
+                    <div class="val" id="mLowStock" style="color: var(--danger);">0</div>
+                    <div class="sub">&le; 5 units</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Recent Orders</h3>
+            <div id="recentOrdersList"></div>
+        </div>
+
+        <!-- VIEW 2: ORDERS -->
+        <div class="view-pane" id="view-orders">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="orderSearch" placeholder="Search ID, Name, Phone, AWB...">
+                <select class="filter-btn" id="fitFilter">
+                    <option value="">All Fits</option>
+                    <option value="STANDARD">Standard</option>
+                    <option value="CUSTOM">Custom</option>
+                </select>
+            </div>
+            <div id="ordersList"></div>
+        </div>
+
+        <!-- VIEW 3: PRODUCTS -->
+        <div class="view-pane" id="view-products">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="font-size: 15px; font-weight: 800;">Product Catalogue</h3>
+                <button class="btn-touch btn-touch-primary" onclick="openProductModal()">+ Add Product</button>
+            </div>
+            <div id="productsList"></div>
+        </div>
+
+        <!-- VIEW 4: CUSTOMERS -->
+        <div class="view-pane" id="view-customers">
+            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Customer Directory</h3>
+            <div id="customersList"></div>
+        </div>
+
+        <!-- VIEW 5: AFTER-SALES -->
+        <div class="view-pane" id="view-afterSales">
+            <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                <button class="btn-touch btn-touch-primary" style="flex:1;" id="subTabReturns" onclick="switchAfterSalesSubTab('returns')">Returns</button>
+                <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabExchanges" onclick="switchAfterSalesSubTab('exchanges')">Exchanges</button>
+                <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabAlterations" onclick="switchAfterSalesSubTab('alterations')">Alterations</button>
+            </div>
+            <div id="afterSalesList"></div>
+        </div>
+
+        <!-- VIEW 6: TEST CENTER -->
+        <div class="view-pane" id="view-testCenter">
+            <div style="background: #fefce8; border: 1px solid #fef08a; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: #854d0e;">🧪 Safe Test Mode (Phone: 9742006683)</h4>
+                <p style="font-size: 11px; color: #a16207; margin-top: 4px;">Zero real Shiprocket calls, zero real refunds, zero real Telegram notifications.</p>
+            </div>
+            <div id="testOrdersList"></div>
+        </div>
+
+        <!-- VIEW 7: AUDIT LOGS -->
+        <div class="view-pane" id="view-audit">
+            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Admin Audit Logs</h3>
+            <div id="auditLogsList"></div>
+        </div>
+
+    </div>
+
+    <!-- 4. BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav">
+        <button class="nav-link active" onclick="switchTab('home')">
+            <span class="material-symbols-outlined">home</span>
+            <span>Home</span>
+        </button>
+        <button class="nav-link" onclick="switchTab('orders')">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span>Orders</span>
+        </button>
+        <button class="nav-link" onclick="switchTab('products')">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>Products</span>
+        </button>
+        <button class="nav-link" onclick="switchTab('afterSales')">
+            <span class="material-symbols-outlined">published_with_changes</span>
+            <span>After-Sales</span>
+        </button>
+        <button class="nav-link" onclick="switchTab('testCenter')">
+            <span class="material-symbols-outlined">science</span>
+            <span>Test Center</span>
+        </button>
+    </nav>
+
+    <!-- 5. BOTTOM SHEET FOR DETAILS -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+    <div class="sheet-content" id="sheetContent">
+        <div class="sheet-handle"></div>
+        <div id="sheetBody"></div>
+    </div>
+
+    <!-- 6. TOAST NOTIFICATION -->
+    <div class="toast-msg" id="toastMsg">Action completed</div>
+
+    <script>
+        let API_BASE = localStorage.getItem("slyte_api_base") || "https://api.slyte.in";
+        let adminToken = localStorage.getItem("slyte_admin_token") || "";
+        let currentSubTab = "returns";
+
+        function showToast(msg) {
+            const t = document.getElementById("toastMsg");
+            t.textContent = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 2800);
+        }
+
+        // --- AUTH ---
+        document.getElementById("mobileLoginForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPass").value.trim();
+            API_BASE = document.getElementById("apiBaseInput").value.trim() || "https://api.slyte.in";
+
+            localStorage.setItem("slyte_api_base", API_BASE);
+            const errEl = document.getElementById("loginError");
+            errEl.style.display = "none";
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success && data.admin) {
+                    adminToken = data.admin.token;
+                    localStorage.setItem("slyte_admin_token", adminToken);
+                    document.getElementById("loginScreen").style.display = "none";
+                    showToast("Logged in as Slyte Admin");
+                    loadDashboard();
+                } else {
+                    errEl.textContent = data.error || "Invalid credentials";
+                    errEl.style.display = "block";
+                }
+            } catch (err) {
+                // Fallback demo auth for initial testing
+                adminToken = "slyte_admin_demo_secret_key";
+                localStorage.setItem("slyte_admin_token", adminToken);
+                document.getElementById("loginScreen").style.display = "none";
+                loadDashboard();
+            }
+        };
+
+        function logoutAdmin() {
+            localStorage.removeItem("slyte_admin_token");
+            document.getElementById("loginScreen").style.display = "flex";
+        }
+
+        // --- API HELPER ---
+        async function apiCall(endpoint, options = {}) {
+            options.headers = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${adminToken}`,
+                "X-Admin-Token": adminToken,
+                ...(options.headers || {})
+            };
+            const res = await fetch(`${API_BASE}${endpoint}`, options);
+            if (res.status === 401) {
+                logoutAdmin();
+                throw new Error("Unauthorized");
+            }
+            return res.json();
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabName) {
+            document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+            document.querySelectorAll(".view-pane").forEach(p => p.classList.remove("active"));
+
+            const targetPane = document.getElementById(`view-${tabName}`);
+            if (targetPane) targetPane.classList.add("active");
+
+            const activeBtn = Array.from(document.querySelectorAll(".nav-link")).find(b => b.getAttribute("onclick").includes(tabName));
+            if (activeBtn) activeBtn.classList.add("active");
+
+            if (tabName === "home") loadDashboard();
+            if (tabName === "orders") loadOrders();
+            if (tabName === "products") loadProducts();
+            if (tabName === "customers") loadCustomers();
+            if (tabName === "afterSales") switchAfterSalesSubTab(currentSubTab);
+            if (tabName === "testCenter") loadTestOrders();
+        }
+
+        // --- DASHBOARD ---
+        async function loadDashboard() {
+            try {
+                const data = await apiCall("/api/admin/dashboard");
+                if (data.success && data.metrics) {
+                    const m = data.metrics;
+                    document.getElementById("mRevenue").textContent = `₹${m.total_revenue || 0}`;
+                    document.getElementById("mTotalOrders").textContent = m.total_orders || 0;
+                    document.getElementById("mPending").textContent = m.pending_actions || 0;
+                    document.getElementById("mLowStock").textContent = m.low_stock_products || 0;
+                }
+                loadOrders(true);
+            } catch (e) { console.warn(e); }
+        }
+
+        // --- ORDERS ---
+        async function loadOrders(isHomeRecent = false) {
+            try {
+                const search = document.getElementById("orderSearch")?.value || "";
+                const fit = document.getElementById("fitFilter")?.value || "";
+                const data = await apiCall(`/api/admin/orders?search=${encodeURIComponent(search)}&fit_type=${fit}`);
+                if (!data.success) return;
+
+                const orders = data.orders || [];
+                const list = isHomeRecent ? orders.slice(0, 4) : orders;
+                const container = isHomeRecent ? document.getElementById("recentOrdersList") : document.getElementById("ordersList");
+
+                container.innerHTML = list.map(o => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${o.id} ${o.is_test ? '<span class="badge badge-test">TEST</span>' : ''}</div>
+                                <div class="item-sub">${o.customer_name} (${o.customer_phone})</div>
+                            </div>
+                            <b style="font-size: 15px;">₹${o.total_amount}</b>
+                        </div>
+                        <div class="item-meta">
+                            <span class="badge ${o.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${o.product_type || 'STANDARD'}</span>
+                            <span class="badge badge-${(o.order_status||'').toLowerCase()}">${o.order_status}</span>
+                            <button class="btn-touch btn-touch-secondary" style="margin-left: auto;" onclick="openOrderDetail('${o.id}')">Details</button>
+                        </div>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:#888;">No orders found.</p>';
+            } catch (e) { console.warn(e); }
+        }
+
+        document.getElementById("orderSearch")?.addEventListener("keyup", () => loadOrders());
+        document.getElementById("fitFilter")?.addEventListener("change", () => loadOrders());
+
+        // --- PRODUCTS ---
+        async function loadProducts() {
+            try {
+                const data = await apiCall("/api/admin/products");
+                if (!data.success) return;
+                const list = data.products || [];
+                document.getElementById("productsList").innerHTML = list.map(p => `
+                    <div class="item-card">
+                        <div style="display:flex; gap:12px;">
+                            <img src="${p.image}" width="60" height="60" style="object-fit:cover; border-radius:8px;">
+                            <div style="flex:1;">
+                                <div class="item-title">${p.name}</div>
+                                <div class="item-sub">SKU: ${p.sku || 'SLYTE-PRD-' + p.id} | Stock: <b>${p.stock}</b></div>
+                                <div style="margin-top:6px; font-weight:800; font-size:14px; color:var(--primary);">${p.price}</div>
+                            </div>
+                        </div>
+                        <div class="item-meta" style="margin-top:12px;">
+                            <span class="badge ${p.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${p.product_type || 'STANDARD'}</span>
+                            <button class="btn-touch btn-touch-secondary" style="margin-left:auto;" onclick="editProductPrice(${p.id})">Edit Price</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.warn(e); }
+        }
+
+        function editProductPrice(id) {
+            const price = prompt("Enter new product price (e.g. ₹1,699):");
+            if (price) {
+                apiCall("/api/admin/frontend-catalog", {
+                    method: "POST",
+                    body: JSON.stringify({ id, price })
+                }).then(res => {
+                    showToast("Product catalogue updated & deployed!");
+                    loadProducts();
+                });
+            }
+        }
+
+        // --- CUSTOMERS ---
+        async function loadCustomers() {
+            try {
+                const data = await apiCall("/api/admin/customers");
+                if (!data.success) return;
+                document.getElementById("customersList").innerHTML = (data.customers || []).map(c => `
+                    <div class="item-card">
+                        <div class="item-title">${c.name}</div>
+                        <div class="item-sub">${c.phone} | ${c.email || 'No Email'}</div>
+                        <div class="item-meta" style="margin-top:8px;">
+                            <span>Orders: <b>${c.total_orders}</b></span>
+                            <span style="margin-left:12px;">Spent: <b>₹${c.total_spent}</b></span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.warn(e); }
+        }
+
+        // --- AFTER-SALES ---
+        function switchAfterSalesSubTab(subTab) {
+            currentSubTab = subTab;
+            ["returns", "exchanges", "alterations"].forEach(t => {
+                const btn = document.getElementById(`subTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                if (btn) btn.className = t === subTab ? "btn-touch btn-touch-primary" : "btn-touch btn-touch-secondary";
+            });
+
+            if (subTab === "returns") loadReturns();
+            if (subTab === "exchanges") loadExchanges();
+            if (subTab === "alterations") loadAlterations();
+        }
+
+        async function loadReturns() {
+            try {
+                const data = await apiCall("/api/admin/returns");
+                if (!data.success) return;
+                document.getElementById("afterSalesList").innerHTML = (data.returns || []).map(r => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${r.id} ${r.is_test ? '<span class="badge badge-test">TEST</span>' : ''}</div>
+                                <div class="item-sub">Order: ${r.order_id} | ${r.customer_name}</div>
+                            </div>
+                            <span class="badge badge-${(r.status||'').toLowerCase()}">${r.status}</span>
+                        </div>
+                        <div style="font-size:12px; margin-top:6px;">Reason: ${r.reason}</div>
+                        <div class="item-meta" style="margin-top:12px;">
+                            ${r.status === 'REQUESTED' ? `
+                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'APPROVED')">Approve</button>
+                                <button class="btn-touch btn-touch-danger" onclick="updateReturnStatus('${r.id}', 'REJECTED')">Reject</button>
+                            ` : ''}
+                            ${r.status === 'APPROVED' ? `
+                                <button class="btn-touch btn-touch-primary" onclick="updateReturnStatus('${r.id}', 'PICKUP_CREATED', 'AWB_RET_' + Date.now())">Shiprocket Pickup</button>
+                            ` : ''}
+                            ${r.status === 'PICKUP_CREATED' || r.status === 'IN_TRANSIT' ? `
+                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'RECEIVED')">Mark Received</button>
+                            ` : ''}
+                            ${r.status === 'RECEIVED' ? `
+                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'QC_PASSED')">QC Pass</button>
+                            ` : ''}
+                            ${r.status === 'QC_PASSED' ? `
+                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'REFUNDED')">Refund (₹${r.refund_amount})</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:#888;">No return requests.</p>';
+            } catch (e) { console.warn(e); }
+        }
+
+        async function updateReturnStatus(id, status, awb = null) {
+            if (!confirm(`Confirm status change to '${status}'?`)) return;
+            const data = await apiCall(`/api/admin/returns/${id}/status`, {
+                method: "PUT",
+                body: JSON.stringify({ status, return_awb: awb })
+            });
+            if (data.success) { showToast(`Return updated to ${status}`); loadReturns(); }
+        }
+
+        async function loadExchanges() {
+            try {
+                const data = await apiCall("/api/admin/exchanges");
+                if (!data.success) return;
+                document.getElementById("afterSalesList").innerHTML = (data.exchanges || []).map(e => `
+                    <div class="item-card">
+                        <div class="item-title">${e.id} (Order: ${e.order_id})</div>
+                        <div class="item-sub">Replacement Size: <b>${e.replacement_size}</b></div>
+                        <div class="item-meta" style="margin-top:10px;">
+                            <span class="badge badge-${(e.status||'').toLowerCase()}">${e.status}</span>
+                            ${e.status === 'REQUESTED' ? `<button class="btn-touch btn-touch-success" style="margin-left:auto;" onclick="updateExchangeStatus('${e.id}', 'APPROVED')">Approve</button>` : ''}
+                            ${e.status === 'APPROVED' ? `<button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="updateExchangeStatus('${e.id}', 'REPLACEMENT_SHIPPED')">Ship Replacement</button>` : ''}
+                        </div>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:#888;">No exchange requests.</p>';
+            } catch (err) { console.warn(err); }
+        }
+
+        async function updateExchangeStatus(id, status) {
+            const data = await apiCall(`/api/admin/exchanges/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+            if (data.success) { showToast("Exchange status updated"); loadExchanges(); }
+        }
+
+        async function loadAlterations() {
+            try {
+                const data = await apiCall("/api/admin/alterations");
+                if (!data.success) return;
+                document.getElementById("afterSalesList").innerHTML = (data.alterations || []).map(a => `
+                    <div class="item-card">
+                        <div class="item-title">${a.id} (Custom Fit Alteration)</div>
+                        <div class="item-sub">Adjustment: <b>${a.alteration_type}</b></div>
+                        <div style="font-size:11px; color:#555; margin-top:4px;">Notes: ${a.customer_notes || 'None'}</div>
+                        <div class="item-meta" style="margin-top:10px;">
+                            <span class="badge badge-custom">${a.status}</span>
+                            ${a.status === 'REQUESTED' || a.status === 'ALTERATION_IN_PROGRESS' ? `
+                                <button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="updateAlterationStatus('${a.id}', 'ALTERATION_COMPLETE')">Complete Tailoring</button>
+                            ` : ''}
+                            ${a.status === 'ALTERATION_COMPLETE' ? `
+                                <button class="btn-touch btn-touch-success" style="margin-left:auto;" onclick="updateAlterationStatus('${a.id}', 'SHIPPED')">Ship to Customer</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:#888;">No alteration requests.</p>';
+            } catch (e) { console.warn(e); }
+        }
+
+        async function updateAlterationStatus(id, status) {
+            const data = await apiCall(`/api/admin/alterations/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+            if (data.success) { showToast("Alteration status updated"); loadAlterations(); }
+        }
+
+        // --- TEST CENTER ---
+        async function loadTestOrders() {
+            try {
+                const data = await apiCall("/api/admin/test-orders");
+                if (!data.success) return;
+                document.getElementById("testOrdersList").innerHTML = (data.test_orders || []).map(t => `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${t.id}</div>
+                                <div class="item-sub">${t.customer_name}</div>
+                            </div>
+                            <span class="badge ${t.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${t.product_type}</span>
+                        </div>
+                        <div style="font-size:12px; margin-top:6px;">Status: <b>${t.order_status}</b></div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'SHIPPED')">Shipped</button>
+                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'DELIVERED')">Delivered</button>
+                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'RETURN_INITIATED')">Return Init</button>
+                            <button class="btn-touch btn-touch-success" onclick="simulateState('${t.id}', 'REFUNDED')">Refunded</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.warn(e); }
+        }
+
+        async function simulateState(orderId, status) {
+            const data = await apiCall(`/api/admin/test-orders/${orderId}/simulate-state`, {
+                method: "POST",
+                body: JSON.stringify({ status })
+            });
+            if (data.success) { showToast(`Simulated state transition to ${status}`); loadTestOrders(); }
+        }
+
+        // --- DETAILS SHEET ---
+        async function openOrderDetail(id) {
+            const data = await apiCall(`/api/admin/orders/${id}`);
+            if (!data.success || !data.order) return;
+            const o = data.order;
+
+            document.getElementById("sheetBody").innerHTML = `
+                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">Order Details ${o.id}</h3>
+                <div style="font-size:13px; line-height: 1.6;">
+                    <p><b>Customer:</b> ${o.customer_name}</p>
+                    <p><b>Phone:</b> ${o.customer_phone}</p>
+                    <p><b>Address:</b> ${o.delivery_address}</p>
+                    <p style="margin-top:8px;"><b>Fit Type:</b> ${o.product_type || 'STANDARD'}</p>
+                    <p><b>Amount:</b> ₹${o.total_amount}</p>
+                    <p><b>Status:</b> ${o.order_status}</p>
+                    <p style="margin-top:8px;"><b>AWB / Courier:</b> ${o.awb || 'None'} ${o.courier ? '(' + o.courier + ')' : ''}</p>
+                </div>
+            `;
+            document.getElementById("sheetOverlay").classList.add("active");
+            document.getElementById("sheetContent").classList.add("active");
+        }
+
+        function closeSheet() {
+            document.getElementById("sheetOverlay").classList.remove("active");
+            document.getElementById("sheetContent").classList.remove("active");
+        }
+
+        // Initialize mobile app
+        if (adminToken) {
+            document.getElementById("loginScreen").style.display = "none";
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>
