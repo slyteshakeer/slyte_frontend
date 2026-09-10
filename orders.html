@@ -936,73 +936,6 @@
                 }, 1000);
             }
 
-            const TEST_ORDERS_DATA = [
-                {
-                    orderId: "SLYTE-TEST-RETURN-001",
-                    displayId: "#SLYTE-TEST-RETURN-001",
-                    productName: "Slyte 24H Beige Trouser",
-                    productType: "STANDARD",
-                    fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1699,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-01",
-                    deliveryAddress: { addressLine1: "123 Test Street, Koramangala", city: "Bengaluru", pincode: "560034" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-EXCHANGE-001",
-                    displayId: "#SLYTE-TEST-EXCHANGE-001",
-                    productName: "Slyte 24H Navy Trouser",
-                    productType: "STANDARD",
-                    fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1699,
-                    paymentGroup: "CASHFREE_CARD",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-02",
-                    deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
-                    displayId: "#SLYTE-TEST-CUSTOM-ALTER-001",
-                    productName: "Slyte 24H Black Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1799,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-03",
-                    deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-ALTERATION-002",
-                    displayId: "#SLYTE-TEST-ALTERATION-002",
-                    productName: "Slyte 24H Beige Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1799,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-04",
-                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
-                    is_test: true
-                }
-            ];
-
             function normalizeOrder(o) {
                 const isCod = o.isCodOrder === true ||
                     (o.paymentGroup || o.payment_method || '').toUpperCase() === 'COD' ||
@@ -1061,17 +994,6 @@
                 .then(data => {
                     setLoading(false);
                     let list = (data.orders || []).map(normalizeOrder);
-                    
-                    // If phone is 9742006683 or token matches, ensure all 4 DELIVERED test orders are included
-                    if (userPhone === '9742006683' || token.includes('9742006683')) {
-                        const existingIds = new Set(list.map(o => o.orderId));
-                        TEST_ORDERS_DATA.forEach(t => {
-                            if (!existingIds.has(t.orderId)) {
-                                list.unshift(normalizeOrder(t));
-                            }
-                        });
-                    }
-
                     if (!list.length) {
                         showError('No orders found.');
                         return;
@@ -1080,9 +1002,7 @@
                 })
                 .catch((e) => {
                     setLoading(false);
-                    if (userPhone === '9742006683' || token.includes('9742006683')) {
-                        renderOrders(TEST_ORDERS_DATA.map(normalizeOrder));
-                    } else if (e.message === 'Unauthorized') {
+                    if (e.message === 'Unauthorized') {
                         localStorage.removeItem('slyte_otp_token');
                         showMobileStep();
                         showError('Session expired. Please verify mobile again.');

@@ -247,13 +247,24 @@ export default {
             }
 
             // ----------------------------------------------------
-            // CUSTOMER AFTER-SALES ENDPOINTS
+            // CUSTOMER AFTER-SALES ENDPOINTS (Connected to Cashfree & Shiprocket)
             // ----------------------------------------------------
             if (pathStr === "/api/after-sales/return" && method === "POST") {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const returnRec = backendStore.createReturnRequest(body);
-                    return jsonResponse({ success: true, message: "Return request submitted successfully", return_request: returnRec }, 200, corsHeaders);
+                    const order = backendStore.getOrderById(body.order_id);
+                    
+                    if (order && !returnRec.is_test) {
+                        ctx.waitUntil(processCashfreeRefund(order, returnRec.refund_amount, env));
+                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+                    }
+                    
+                    return jsonResponse({
+                        success: true,
+                        message: "Return request submitted & logistics initiated",
+                        return_request: returnRec
+                    }, 200, corsHeaders);
                 } catch (err) {
                     return jsonResponse({ success: false, error: err.message }, 400, corsHeaders);
                 }
@@ -263,7 +274,18 @@ export default {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const exchangeRec = backendStore.createExchangeRequest(body);
-                    return jsonResponse({ success: true, message: "Exchange request submitted successfully", exchange_request: exchangeRec }, 200, corsHeaders);
+                    const order = backendStore.getOrderById(body.order_id);
+                    
+                    if (order && !exchangeRec.is_test) {
+                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+                        ctx.waitUntil(createShiprocketForwardShipment(order, { name: exchangeRec.original_product_name, size: exchangeRec.replacement_size }, env));
+                    }
+
+                    return jsonResponse({
+                        success: true,
+                        message: "Exchange request submitted & pickup/replacement initiated",
+                        exchange_request: exchangeRec
+                    }, 200, corsHeaders);
                 } catch (err) {
                     return jsonResponse({ success: false, error: err.message }, 400, corsHeaders);
                 }
@@ -273,7 +295,17 @@ export default {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const altRec = backendStore.createAlterationRequest(body);
-                    return jsonResponse({ success: true, message: "Alteration request submitted successfully", alteration_request: altRec }, 200, corsHeaders);
+                    const order = backendStore.getOrderById(body.order_id);
+                    
+                    if (order && !altRec.is_test) {
+                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+                    }
+
+                    return jsonResponse({
+                        success: true,
+                        message: "Alteration request submitted & pickup to tailoring hub initiated",
+                        alteration_request: altRec
+                    }, 200, corsHeaders);
                 } catch (err) {
                     return jsonResponse({ success: false, error: err.message }, 400, corsHeaders);
                 }
@@ -501,3 +533,163 @@ export default {
         }
     }
 };
+
+// ============================================================================
+// CASHFREE REFUND & SHIPROCKET LOGISTICS API INTEGRATIONS
+// ============================================================================
+
+async function processCashfreeRefund(order, refundAmount, env) {
+    const appId = env?.CASHFREE_APP_ID;
+    const secretKey = env?.CASHFREE_SECRET_KEY;
+    if (!appId || !secretKey || order.is_test) return null;
+
+    try {
+        const cashfreeHost = (env?.CASHFREE_ENV === "PRODUCTION") 
+            ? "https://api.cashfree.com/pg" 
+            : "https://sandbox.cashfree.com/pg";
+
+        const res = await fetch(`${cashfreeHost}/orders/${order.id}/refunds`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-client-id": appId,
+                "x-client-secret": secretKey,
+                "x-api-version": "2023-08-01"
+            },
+            body: JSON.stringify({
+                refund_amount: Number(refundAmount || order.total_amount || 0),
+                refund_id: "REF_" + order.id + "_" + Date.now(),
+                refund_note: "Customer return refund for order " + order.id
+            })
+        });
+        const data = await res.json();
+        console.log(`[Cashfree Refund] Order ${order.id}:`, data);
+        return data;
+    } catch (err) {
+        console.error(`[Cashfree Refund Error] Order ${order.id}:`, err);
+        return null;
+    }
+}
+
+async function getShiprocketToken(env) {
+    const email = env?.SHIPROCKET_EMAIL;
+    const password = env?.SHIPROCKET_PASSWORD;
+    if (!email || !password) return null;
+
+    try {
+        const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password })
+        });
+        const data = await res.json();
+        return data.token || null;
+    } catch (err) {
+        console.error("[Shiprocket Auth Error]:", err);
+        return null;
+    }
+}
+
+async function createShiprocketReturnPickup(order, items, env) {
+    if (order.is_test) return { success: true, message: "Dry-run return pickup for test order" };
+    const token = await getShiprocketToken(env);
+    if (!token) return null;
+
+    try {
+        const payload = {
+            order_id: "RET-" + order.id,
+            order_date: new Date().toISOString().split("T")[0],
+            pickup_customer_name: order.customer_name || "Customer",
+            pickup_address: order.delivery_address || "Customer Address",
+            pickup_phone: order.customer_phone || "9999999999",
+            pickup_pincode: "560034",
+            shipping_customer_name: "Slyte Warehousing & Tailoring Hub",
+            shipping_address: "123 Slyte D2C Warehouse, HSR Layout",
+            shipping_city: "Bengaluru",
+            shipping_state: "Karnataka",
+            shipping_country: "India",
+            shipping_pincode: "560102",
+            order_items: (items || []).map(it => ({
+                name: it.name || "Trouser",
+                sku: it.sku || "SLYTE-TR-001",
+                units: it.quantity || 1,
+                selling_price: it.price || 1699,
+                discount: 0
+            })),
+            payment_method: "PREPAID",
+            sub_total: order.total_amount || 1699,
+            length: 30,
+            breadth: 25,
+            height: 5,
+            weight: 0.5
+        };
+
+        const res = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/return", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        console.log(`[Shiprocket Return Pickup] Order ${order.id}:`, data);
+        return data;
+    } catch (err) {
+        console.error(`[Shiprocket Return Pickup Error] Order ${order.id}:`, err);
+        return null;
+    }
+}
+
+async function createShiprocketForwardShipment(order, replacementItem, env) {
+    if (order.is_test) return { success: true, message: "Dry-run forward shipment for test order" };
+    const token = await getShiprocketToken(env);
+    if (!token) return null;
+
+    try {
+        const payload = {
+            order_id: "EXC-FWD-" + order.id,
+            order_date: new Date().toISOString().split("T")[0],
+            pickup_location: "Primary Warehouse",
+            billing_customer_name: order.customer_name || "Customer",
+            billing_last_name: "",
+            billing_address: order.delivery_address || "Customer Address",
+            billing_city: "Bengaluru",
+            billing_pincode: "560034",
+            billing_state: "Karnataka",
+            billing_country: "India",
+            billing_email: order.customer_email || "customer@slyte.in",
+            billing_phone: order.customer_phone || "9999999999",
+            shipping_is_billing: true,
+            order_items: [
+                {
+                    name: replacementItem.name || "Slyte Trouser Replacement",
+                    sku: "SLYTE-TR-EXCHANGE",
+                    units: 1,
+                    selling_price: 0
+                }
+            ],
+            payment_method: "Prepaid",
+            sub_total: 0,
+            length: 30,
+            breadth: 25,
+            height: 5,
+            weight: 0.5
+        };
+
+        const res = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        console.log(`[Shiprocket Forward Shipment] Order ${order.id}:`, data);
+        return data;
+    } catch (err) {
+        console.error(`[Shiprocket Forward Error] Order ${order.id}:`, err);
+        return null;
+    }
+}

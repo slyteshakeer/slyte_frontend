@@ -379,7 +379,37 @@ class SlyteBackendStore {
             const cleanPhone = String(query.phone).replace(/\D/g, '').slice(-10);
             list = list.filter(o => o.customer_phone && o.customer_phone.replace(/\D/g, '').slice(-10) === cleanPhone);
         }
-        return list;
+
+        // Map list to include normalized fields expected by customer frontend & admin portal
+        return list.map(o => {
+            const isCod = o.isCodOrder === true ||
+                (o.payment_method || '').toUpperCase().includes('COD') ||
+                (o.payment_method || '').toLowerCase().includes('cash');
+
+            const pType = (o.product_type || o.productType || (o.items?.[0]?.fit_type) || 'STANDARD').toUpperCase();
+            const fType = o.fit_type || o.fitType || (pType === 'CUSTOM' ? 'Custom Fit' : 'Standard Fit');
+
+            return {
+                ...o,
+                orderId: o.id || o.orderId,
+                displayId: o.displayId || (o.id ? (o.id.startsWith('#') ? o.id : '#' + o.id) : '#SLYTE-ORD-001'),
+                productName: o.items?.[0]?.name || o.product_name || o.productName || 'Slyte Trouser',
+                productType: pType,
+                fitType: fType,
+                orderLifecycleStatus: o.orderLifecycleStatus || o.order_status || 'DELIVERED',
+                fulfillmentStatus: o.tracking_status || o.fulfillmentStatus || o.order_status || 'DELIVERED',
+                amount: o.total_amount || o.amount || 1699,
+                paymentGroup: o.payment_method || o.paymentGroup || (isCod ? 'COD' : 'CASHFREE'),
+                isCodOrder: isCod,
+                createdAt: o.created_at || o.createdAt || new Date().toISOString(),
+                trackingNumber: o.awb || o.trackingNumber || null,
+                deliveryAddress: typeof o.delivery_address === 'object' ? o.delivery_address : {
+                    addressLine1: o.delivery_address || 'Delivery Address',
+                    city: 'Bengaluru',
+                    pincode: '560034'
+                }
+            };
+        });
     }
 
     getOrderById(id) {
