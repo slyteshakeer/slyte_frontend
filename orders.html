@@ -1271,9 +1271,9 @@
                         target="_blank" class="action-btn btn-track">📦 Track Live</a>`);
                 }
 
-                // ── CASE 1: CUSTOM → no cancel ─────────────────────────────
-                if (order.productType === 'CUSTOM') {
-                    parts.push(`<div class="msg-banner msg-purple">✂️ Custom fit orders cannot be cancelled.</div>`);
+                // ── CASE 1: CUSTOM → no cancel (alteration available once delivered) ─────
+                if (order.productType === 'CUSTOM' && lcs !== 'DELIVERED') {
+                    parts.push(`<div class="msg-banner msg-purple">✂️ Custom fit orders cannot be cancelled. (Free alteration available upon delivery)</div>`);
                     return parts.join('');
                 }
 
