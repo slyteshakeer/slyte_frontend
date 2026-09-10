@@ -42,6 +42,25 @@
             --transition: 0.3s ease;
         }
 
+        .adjustment-pill {
+            padding: 8px 4px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .adjustment-pill.active {
+            background: #154cbd;
+            color: #ffffff;
+            border-color: #154cbd;
+            box-shadow: 0 2px 8px rgba(21, 76, 189, 0.3);
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text-primary);
@@ -1181,6 +1200,23 @@
                 }
                 if (lcs === 'DELIVERED') {
                     parts.push(`<div class="msg-banner msg-success">✓ Delivered! Enjoy your order.</div>`);
+
+                    const isCustom = order.productType === 'CUSTOM' ||
+                        (order.fitType || '').toLowerCase().includes('custom') ||
+                        (order.items || []).some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit');
+
+                    if (isCustom) {
+                        parts.push(`<div class="msg-banner msg-purple" style="margin-top:8px;">✂️ Custom Fit: Returns/Exchanges not applicable. Includes free alteration (up to ±1.5").</div>`);
+                        parts.push(`<button class="action-btn" style="background:#673ab7; color:#fff; margin-top:8px; width:100%; font-weight:700; border:none; padding:12px; border-radius:10px; cursor:pointer;"
+                            onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName || 'Trouser')}')">✂️ Request Alteration</button>`);
+                    } else {
+                        parts.push(`<div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="action-btn" style="flex:1; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                                onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
+                            <button class="action-btn" style="flex:1; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                                onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
+                        </div>`);
+                    }
                     return parts.join('');
                 }
                 if (lcs === 'RTO_DELIVERED') {
@@ -1429,7 +1465,291 @@
             }
 
         })();
+
+        // ── AFTER-SALES MODAL HANDLERS ───────────────────────────────────────
+        let selectedWaistVal = "0.0";
+        let selectedLengthVal = "0.0";
+
+        window.selectWaist = function(btn, val) {
+            document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedWaistVal = val;
+        };
+
+        window.selectLength = function(btn, val) {
+            document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedLengthVal = val;
+        };
+
+        window.closeAfterSalesModal = function() {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            if (overlay) overlay.style.display = 'none';
+        };
+
+        window.openAlterationModal = function(orderId, productName) {
+            selectedWaistVal = "0.0";
+            selectedLengthVal = "0.0";
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">✂️ Request Custom Alteration</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • ${productName}<br><span style="color:#673ab7; font-weight:600;">Free alteration up to ±1.5 inches</span></p>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Waist Adjustment</label>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.5" onclick="selectWaist(this, '-1.5')">-1.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.0" onclick="selectWaist(this, '-1.0')">-1.0"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-0.5" onclick="selectWaist(this, '-0.5')">-0.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill active" data-val="0.0" onclick="selectWaist(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+0.5" onclick="selectWaist(this, '+0.5')">+0.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.0" onclick="selectWaist(this, '+1.0')">+1.0"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.5" onclick="selectWaist(this, '+1.5')">+1.5"</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Length Adjustment</label>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                        <button type="button" class="adjustment-pill length-pill" data-val="-1.5" onclick="selectLength(this, '-1.5')">-1.5"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="-1.0" onclick="selectLength(this, '-1.0')">-1.0"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="-0.5" onclick="selectLength(this, '-0.5')">-0.5"</button>
+                        <button type="button" class="adjustment-pill length-pill active" data-val="0.0" onclick="selectLength(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+0.5" onclick="selectLength(this, '+0.5')">+0.5"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+1.0" onclick="selectLength(this, '+1.0')">+1.0"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+1.5" onclick="selectLength(this, '+1.5')">+1.5"</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Fitting / Tailoring Notes (Optional)</label>
+                    <textarea id="alterationNotes" placeholder="e.g. Taper slightly around calves..." style="width:100%; height:75px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+                <button id="btnSubmitAlt" onclick="submitAlterationRequest('${orderId}')" style="width:100%; background:#673ab7; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Alteration Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitAlterationRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitAlt');
+            const msg = document.getElementById('modalMsg');
+            const notes = document.getElementById('alterationNotes').value.trim();
+            
+            if (selectedWaistVal === "0.0" && selectedLengthVal === "0.0" && !notes) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please select a Waist/Length adjustment or enter fitting notes.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            msg.style.display = 'none';
+
+            try {
+                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/alteration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
+                        measurements: { waist_diff: selectedWaistVal, length_diff: selectedLengthVal },
+                        customer_notes: notes
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        location.reload();
+                    }, 1800);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit alteration request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Alteration Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting alteration request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Alteration Request';
+            }
+        };
+
+        window.openReturnModal = function(orderId) {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">↩ Request Return</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Return</p>
+                
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Return</label>
+                    <select id="returnReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="Size issue">Size issue / fit not comfortable</option>
+                        <option value="Fabric / Quality">Fabric or quality issue</option>
+                        <option value="Color difference">Color different than expected</option>
+                        <option value="Changed mind">Changed mind</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Comments / Notes</label>
+                    <textarea id="returnNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0369a1; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitReturnRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitRet');
+            const msg = document.getElementById('modalMsg');
+            const reason = document.getElementById('returnReason').value;
+            const notes = document.getElementById('returnNotes').value.trim();
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            try {
+                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/return', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, reason, customer_notes: notes })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Return request submitted successfully! Pickup will be scheduled.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        location.reload();
+                    }, 1800);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit return request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Return Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting return request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Return Request';
+            }
+        };
+
+        window.openExchangeModal = function(orderId) {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">🔄 Request Exchange</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Exchange</p>
+                
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Select Replacement Size</label>
+                    <select id="exchangeSize" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="28">Size 28</option>
+                        <option value="30">Size 30</option>
+                        <option value="32">Size 32</option>
+                        <option value="34" selected>Size 34</option>
+                        <option value="36">Size 36</option>
+                        <option value="38">Size 38</option>
+                        <option value="40">Size 40</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Exchange</label>
+                    <select id="exchangeReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="Too small">Too small / Tight fit</option>
+                        <option value="Too large">Too large / Loose fit</option>
+                        <option value="Length incorrect">Length incorrect</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
+                    <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitExchangeRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitExc');
+            const msg = document.getElementById('modalMsg');
+            const replacement_size = document.getElementById('exchangeSize').value;
+            const reason = document.getElementById('exchangeReason').value;
+            const notes = document.getElementById('exchangeNotes').value.trim();
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            try {
+                const apiBase = (window.CONFIG?.API_URL || '').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/exchange', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Exchange request submitted successfully! Replacement item will be dispatched.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        location.reload();
+                    }, 1800);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit exchange request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Exchange Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting exchange request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Exchange Request';
+            }
+        };
     </script>
+
+    <!-- After-Sales Modal Overlay -->
+    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#fff; border-radius:20px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
+            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
+            <div id="afterSalesModalContent">
+                <!-- Dynamic Modal Content Injection -->
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

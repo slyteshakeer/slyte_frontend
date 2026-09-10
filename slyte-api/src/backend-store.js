@@ -569,6 +569,15 @@ class SlyteBackendStore {
         const order = this.getOrderById(alterationPayload.order_id);
         if (!order) throw new Error("Order not found");
 
+        // Enforce CUSTOM FIT ONLY rule for Alterations (Standard Fit cannot request alteration)
+        const isCustom = order.product_type === 'CUSTOM' ||
+            order.fit_type === 'Custom Fit' ||
+            order.items?.some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit' || it.measurements);
+
+        if (!isCustom) {
+            throw new Error("Alterations are strictly NOT allowed for Standard Fit orders. Standard Fit orders support Return or Exchange.");
+        }
+
         const alterationRecord = {
             id: "ALT-" + Date.now(),
             order_id: order.id,
