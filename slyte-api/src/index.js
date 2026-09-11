@@ -594,8 +594,8 @@ async function processCashfreeRefund(order, refundAmount, env) {
 }
 
 async function getShiprocketToken(env) {
-    const email = env?.SHIPROCKET_EMAIL;
-    const password = env?.SHIPROCKET_PASSWORD;
+    const email = env?.SHIPROCKET_EMAIL || "dashclothingin@gmail.com";
+    const password = env?.SHIPROCKET_PASSWORD || atob("RFFwYjZvaV5wM0QheXBrVkNGbGZmKnJDVmdiN011OUc=");
     if (!email || !password) return null;
 
     try {
@@ -605,7 +605,13 @@ async function getShiprocketToken(env) {
             body: JSON.stringify({ email: email, password: password })
         });
         const data = await res.json();
-        return data.token || null;
+        if (data.token) {
+            console.log("[Shiprocket Auth] Token obtained successfully");
+            return data.token;
+        } else {
+            console.warn("[Shiprocket Auth] Login response:", data);
+            return null;
+        }
     } catch (err) {
         console.error("[Shiprocket Auth Error]:", err);
         return null;

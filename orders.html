@@ -1161,6 +1161,10 @@
                 const pType = (o.productType || o.product_type || (o.items?.[0]?.fit_type) || (o.productName?.includes('Custom') ? 'CUSTOM' : 'STANDARD')).toUpperCase();
                 const fType = o.fitType || o.fit_type || (pType === 'CUSTOM' ? 'Custom Fit' : 'Standard Fit');
                 const rawId = o.orderId || o.id || o.order_id || 'SLYTE-ORD-001';
+                const cleanId = String(rawId).replace(/^#/, '');
+
+                const localOverride = localStorage.getItem('slyte_order_status_' + rawId) || localStorage.getItem('slyte_order_status_' + cleanId);
+                const lcsStatus = localOverride || o.orderLifecycleStatus || o.order_status || 'DELIVERED';
 
                 return {
                     orderId: rawId,
@@ -1168,8 +1172,12 @@
                     productName: o.productName || o.items?.[0]?.name || o.product_name || 'Slyte Trouser',
                     productType: pType,
                     fitType: fType,
-                    orderLifecycleStatus: o.orderLifecycleStatus || o.order_status || 'DELIVERED',
-                    fulfillmentStatus: o.fulfillmentStatus || o.tracking_status || o.order_status || 'DELIVERED',
+                    orderLifecycleStatus: lcsStatus,
+                    fulfillmentStatus: localOverride ? (
+                        localOverride === 'EXCHANGE_REQUESTED' ? 'Exchange Requested' :
+                        localOverride === 'ALTERATION_REQUESTED' ? 'Alteration Requested' :
+                        localOverride === 'RETURN_INITIATED' ? 'Return Requested' : localOverride
+                    ) : (o.fulfillmentStatus || o.tracking_status || o.order_status || 'DELIVERED'),
                     amount: o.amount || o.total_amount || 1699,
                     paymentGroup: o.paymentGroup || o.payment_method || (isCod ? 'COD' : 'CASHFREE'),
                     isCodOrder: isCod,
@@ -1188,6 +1196,38 @@
             }
 
             const TEST_ORDERS_FALLBACK = [
+                {
+                    orderId: "SLYTE-TEST-DELIVERED-001",
+                    displayId: "#SLYTE-TEST-DELIVERED-001",
+                    productName: "Slyte 24H Olive Trouser",
+                    productType: "STANDARD",
+                    fitType: "Standard Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1699,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-05",
+                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
+                    is_test: true
+                },
+                {
+                    orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
+                    displayId: "#SLYTE-TEST-CUSTOM-ALTER-001",
+                    productName: "Slyte 24H Black Trouser (Custom Fit)",
+                    productType: "CUSTOM",
+                    fitType: "Custom Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1799,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-04",
+                    deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
+                    is_test: true
+                },
                 {
                     orderId: "SLYTE-ORD-8821",
                     displayId: "#SLYTE-ORD-8821",
@@ -1234,38 +1274,6 @@
                     createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
                     trackingNumber: "AWB9742006683-03",
                     deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
-                    displayId: "#SLYTE-TEST-CUSTOM-ALTER-001",
-                    productName: "Slyte 24H Black Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
-                    orderLifecycleStatus: "ALTERATION_REQUESTED",
-                    fulfillmentStatus: "Alteration Requested",
-                    amount: 1799,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-04",
-                    deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-DELIVERED-001",
-                    displayId: "#SLYTE-TEST-DELIVERED-001",
-                    productName: "Slyte 24H Olive Trouser",
-                    productType: "STANDARD",
-                    fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1699,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-05",
-                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
                     is_test: true
                 }
             ];
@@ -1955,10 +1963,14 @@
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
+                    try {
+                        localStorage.setItem('slyte_order_status_' + orderId, 'ALTERATION_REQUESTED');
+                        localStorage.setItem('slyte_order_status_' + String(orderId).replace(/^#/, ''), 'ALTERATION_REQUESTED');
+                    } catch(e) {}
                     setTimeout(() => {
                         closeAfterSalesModal();
                         location.reload();
-                    }, 1800);
+                    }, 1500);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
@@ -2091,10 +2103,14 @@
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Return request & bank details submitted! Pickup will be scheduled.';
+                    try {
+                        localStorage.setItem('slyte_order_status_' + orderId, 'RETURN_INITIATED');
+                        localStorage.setItem('slyte_order_status_' + String(orderId).replace(/^#/, ''), 'RETURN_INITIATED');
+                    } catch(e) {}
                     setTimeout(() => {
                         closeAfterSalesModal();
                         location.reload();
-                    }, 1800);
+                    }, 1500);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
@@ -2171,10 +2187,14 @@
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Exchange request submitted successfully! Replacement item will be dispatched.';
+                    try {
+                        localStorage.setItem('slyte_order_status_' + orderId, 'EXCHANGE_REQUESTED');
+                        localStorage.setItem('slyte_order_status_' + String(orderId).replace(/^#/, ''), 'EXCHANGE_REQUESTED');
+                    } catch(e) {}
                     setTimeout(() => {
                         closeAfterSalesModal();
                         location.reload();
-                    }, 1800);
+                    }, 1500);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
