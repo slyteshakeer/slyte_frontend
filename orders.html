@@ -1589,6 +1589,18 @@
                     return parts.join('');
                 }
 
+                // ── CASE 4B: Exchange in progress ──────────────────────────
+                if (lcs.startsWith('EXCHANGE_')) {
+                    parts.push(`<div class="msg-banner msg-purple">🔄 Exchange in progress. Replacement item will be dispatched once pickup is complete.</div>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 4C: Alteration in progress ────────────────────────
+                if (lcs.startsWith('ALTERATION_')) {
+                    parts.push(`<div class="msg-banner msg-purple">✂️ Alteration in progress. Garment is at our tailoring hub for custom alterations.</div>`);
+                    return parts.join('');
+                }
+
                 // ── CASE 5: Terminal states ────────────────────────────────
                 if (lcs === 'CANCELLED' || lcs === 'REFUNDED') {
                     parts.push(`<div class="msg-banner msg-error">✕ Order cancelled.</div>`);
