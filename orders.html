@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Orders & After-Sales — Slyte</title>
-    <meta name="description" content="Manage your Slyte trouser orders, track delivery, request returns, exchanges, or custom fit alterations." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Orders — Slyte</title>
+    <meta name="description" content="Look up all your Slyte custom trouser orders by entering your mobile number." />
     <meta name="robots" content="noindex, follow">
 
     <!-- Central Application Config -->
@@ -17,273 +17,198 @@
 
     <style>
         :root {
-            --bg-body: #fafafa;
+            --bg: #ffffff;
             --surface: #ffffff;
-            --surface-subtle: #f8fafc;
-            --border: #e2e8f0;
+            --surface-2: #f8fafc;
+            --border: #eeeeee;
             --border-light: #f1f5f9;
-            
-            --navy-primary: #0f172a;
-            --navy-secondary: #1e293b;
-            --navy-accent: #2563eb;
-            --navy-muted: #64748b;
-            
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --text-muted: #94a3b8;
-
-            /* Journey Colors */
-            --return-theme: #dc2626;
-            --return-bg: #fef2f2;
-            --return-icon-bg: #fee2e2;
-
-            --exchange-theme: #2563eb;
-            --exchange-bg: #eff6ff;
-            --exchange-icon-bg: #dbeafe;
-
-            --alteration-theme: #16a34a;
-            --alteration-bg: #f0fdf4;
-            --alteration-icon-bg: #dcfce7;
-
-            --radius-card: 20px;
-            --radius-inner: 14px;
-            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
-            --shadow-modal: 0 24px 48px -12px rgba(15, 23, 42, 0.2);
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --text-primary: #000000;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --accent: #154cbd;
+            --accent-light: #0d3a95;
+            --paid-bg: #e8f5e9;
+            --paid-color: #2e7d32;
+            --pending-pay-bg: #fff8e1;
+            --pending-pay-color: #e65100;
+            --error: #c62828;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: 0.3s ease;
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
+            background-color: var(--bg);
+            color: var(--text-primary);
+            padding-bottom: 100px;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            padding-bottom: 90px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Header Navbar (Preserved) */
-        .brand-header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 16px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: var(--navy-primary);
-        }
-
-        .brand-logo img {
-            height: 24px;
-            width: auto;
-        }
-
-        .header-help-btn {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--navy-muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: var(--surface-subtle);
-            border: 1px solid var(--border-light);
-        }
-
-        .container {
+        .page-container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 24px 16px;
         }
 
-        /* Phone Lookup Hero */
+        .lookup-hero {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .lookup-hero .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .lookup-hero h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .lookup-hero p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+        }
+
         .lookup-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-card);
+            border-radius: var(--radius);
             padding: 20px;
-            box-shadow: var(--shadow-subtle);
-            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
         }
 
-        .lookup-card h1 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--navy-primary);
-            margin-bottom: 4px;
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
         }
 
-        .lookup-card p {
-            font-size: 13px;
-            color: var(--text-sub);
-            margin-bottom: 14px;
-        }
-
-        .input-group {
+        .input-row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .phone-input-wrap {
+        .phone-wrapper {
             flex: 1;
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
         .phone-prefix {
             position: absolute;
-            left: 14px;
-            font-size: 14px;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
             font-weight: 700;
-            color: var(--navy-primary);
-            pointer-events: none;
+            color: var(--text-primary);
         }
 
         #mobileInput {
             width: 100%;
-            height: 46px;
+            height: 48px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-inner);
-            padding: 0 12px 0 46px;
+            border-radius: var(--radius-sm);
+            padding: 0 16px 0 50px;
             font-size: 15px;
             font-weight: 600;
+            font-family: inherit;
             outline: none;
-            background: var(--surface-subtle);
+            background: #fafafa;
         }
 
         #trackBtn {
-            height: 46px;
-            padding: 0 18px;
-            background: var(--navy-primary);
-            color: #ffffff;
+            height: 48px;
+            padding: 0 20px;
+            background: #0f172a;
+            color: #fff;
             border: none;
-            border-radius: var(--radius-inner);
+            border-radius: var(--radius-sm);
+            font-weight: 700;
             font-size: 14px;
-            font-weight: 700;
             cursor: pointer;
         }
 
-        /* Test Journey Simulator Bar */
-        .scenario-bar {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--radius-inner);
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .scenario-bar label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .scenario-select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #0f172a;
-            background: #ffffff;
-            outline: none;
-            cursor: pointer;
-        }
-
-        /* Order Details Card (Main Wrapper matching Mockup) */
+        /* Order Details Card (Matching Mockup Images 1:1) */
         .order-card {
-            background: #ffffff;
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-card);
-            padding: 20px;
-            box-shadow: var(--shadow-subtle);
+            border-radius: var(--radius);
             margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow);
         }
 
-        /* Order Header Row */
-        .order-top-header {
+        .card-top-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 16px;
         }
 
-        .order-top-header .title {
+        .card-top-header .title {
             font-size: 18px;
             font-weight: 800;
-            color: var(--navy-primary);
+            color: #0f172a;
         }
 
-        .order-top-header .code {
+        .card-top-header .code {
             font-size: 13px;
             font-weight: 600;
-            color: var(--navy-muted);
+            color: #64748b;
         }
 
-        /* Product Header Block (Mockup matching) */
-        .product-hero-block {
+        /* Product Hero Row */
+        .product-hero-row {
             display: flex;
             gap: 16px;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .product-thumb {
-            width: 90px;
-            height: 90px;
-            border-radius: 14px;
+        .product-img-thumb {
+            width: 84px;
+            height: 84px;
+            border-radius: 12px;
             background: #f1f5f9;
             object-fit: cover;
             flex-shrink: 0;
             border: 1px solid #e2e8f0;
         }
 
-        .product-info-col {
+        .product-details-col {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .product-title {
-            font-size: 18px;
+        .product-name-txt {
+            font-size: 17px;
             font-weight: 800;
-            color: var(--navy-primary);
+            color: #0f172a;
             line-height: 1.25;
         }
 
-        .fit-label {
-            font-size: 14px;
+        .fit-spec-txt {
+            font-size: 13.5px;
             font-weight: 500;
-            color: var(--navy-muted);
+            color: #64748b;
         }
 
-        .type-badge {
+        .type-badge-pill {
             display: inline-block;
             align-self: flex-start;
             font-size: 10px;
@@ -295,11 +220,11 @@
             text-transform: uppercase;
         }
 
-        .badge-standard { background: #eff6ff; color: #1d4ed8; }
-        .badge-custom { background: #f3e8ff; color: #6b21a8; }
+        .badge-std { background: #eff6ff; color: #1d4ed8; }
+        .badge-cst { background: #f3e8ff; color: #6b21a8; }
 
-        /* Timeline Stepper (Mockup matching exact layout & icons) */
-        .timeline-stepper {
+        /* Timeline Stepper Component */
+        .stepper-timeline {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
@@ -308,26 +233,26 @@
             padding: 0 4px;
         }
 
-        .timeline-line-bg {
+        .stepper-track-bg {
             position: absolute;
             top: 18px;
-            left: 24px;
-            right: 24px;
+            left: 20px;
+            right: 20px;
             height: 2px;
             background: #e2e8f0;
             z-index: 1;
         }
 
-        .timeline-line-progress {
+        .stepper-track-fill {
             position: absolute;
             top: 18px;
-            left: 24px;
+            left: 20px;
             height: 2px;
             z-index: 2;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
 
-        .step-node {
+        .step-item-node {
             position: relative;
             z-index: 3;
             display: flex;
@@ -337,36 +262,24 @@
             text-align: center;
         }
 
-        .node-circle {
+        .node-circle-icon {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: #f1f5f9;
+            background: #ffffff;
             border: 2px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #94a3b8;
             margin-bottom: 8px;
-            transition: var(--transition);
         }
 
-        .node-circle .material-symbols-outlined {
+        .node-circle-icon .material-symbols-outlined {
             font-size: 18px;
         }
 
-        .step-node.done .node-circle {
-            color: #ffffff;
-            border-color: transparent;
-        }
-
-        .step-node.active .node-circle {
-            color: #ffffff;
-            border-color: transparent;
-            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
-        }
-
-        .node-label {
+        .step-label-txt {
             font-size: 11px;
             font-weight: 700;
             color: #0f172a;
@@ -374,20 +287,20 @@
             max-width: 76px;
         }
 
-        .step-node:not(.done):not(.active) .node-label {
+        .step-item-node:not(.done):not(.active) .step-label-txt {
             color: #94a3b8;
             font-weight: 600;
         }
 
-        .node-date {
+        .step-date-txt {
             font-size: 10px;
             color: #94a3b8;
             font-weight: 500;
             margin-top: 2px;
         }
 
-        /* Status Banner Card (Soft Colored background with circular icon) */
-        .status-card {
+        /* Status Banner Card (Red / Blue / Green matching Mockups) */
+        .status-banner-card {
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 20px;
@@ -396,7 +309,7 @@
             align-items: flex-start;
         }
 
-        .status-icon-box {
+        .status-avatar-wrap {
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -406,11 +319,11 @@
             flex-shrink: 0;
         }
 
-        .status-icon-box .material-symbols-outlined {
+        .status-avatar-wrap .material-symbols-outlined {
             font-size: 22px;
         }
 
-        .status-card-content {
+        .status-txt-col {
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -435,52 +348,48 @@
             margin-top: 2px;
         }
 
-        /* Theme Variants for Banner */
-        .theme-return { background: var(--return-bg); }
-        .theme-return .status-icon-box { background: var(--return-icon-bg); color: var(--return-theme); }
-        .theme-return .status-card-title { color: var(--return-theme); }
+        /* Color Schemes from Mockups */
+        .theme-red-card { background: #fef2f2; }
+        .theme-red-card .status-avatar-wrap { background: #fee2e2; color: #dc2626; }
+        .theme-red-card .status-card-title { color: #dc2626; }
 
-        .theme-exchange { background: var(--exchange-bg); }
-        .theme-exchange .status-icon-box { background: var(--exchange-icon-bg); color: var(--exchange-theme); }
-        .theme-exchange .status-card-title { color: var(--exchange-theme); }
+        .theme-blue-card { background: #eff6ff; }
+        .theme-blue-card .status-avatar-wrap { background: #dbeafe; color: #2563eb; }
+        .theme-blue-card .status-card-title { color: #2563eb; }
 
-        .theme-alteration { background: var(--alteration-bg); }
-        .theme-alteration .status-icon-box { background: var(--alteration-icon-bg); color: var(--alteration-theme); }
-        .theme-alteration .status-card-title { color: var(--alteration-theme); }
+        .theme-green-card { background: #f0fdf4; }
+        .theme-green-card .status-avatar-wrap { background: #dcfce7; color: #16a34a; }
+        .theme-green-card .status-card-title { color: #15803d; }
 
-        .theme-delivered { background: #f0fdf4; }
-        .theme-delivered .status-icon-box { background: #dcfce7; color: #16a34a; }
-        .theme-delivered .status-card-title { color: #15803d; }
-
-        /* Details Card (Return Details / Exchange Details / Alteration Details) */
-        .details-card {
+        /* Details Card */
+        .details-summary-card {
             background: #ffffff;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
         }
 
-        .details-card-title {
+        .details-summary-title {
             font-size: 15px;
             font-weight: 800;
-            color: var(--navy-primary);
+            color: #0f172a;
             margin-bottom: 12px;
         }
 
-        .detail-row-item {
+        .detail-row-line {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #f8fafc;
         }
 
-        .detail-row-item:last-child {
+        .detail-row-line:last-child {
             border-bottom: none;
         }
 
-        .detail-row-left {
+        .detail-left-label {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -489,33 +398,31 @@
             color: #64748b;
         }
 
-        .detail-row-left .material-symbols-outlined {
+        .detail-left-label .material-symbols-outlined {
             font-size: 18px;
             color: #64748b;
         }
 
-        .detail-row-val {
+        .detail-right-val {
             font-size: 13px;
             font-weight: 700;
-            color: var(--navy-primary);
+            color: #0f172a;
             text-align: right;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
-        .copy-btn {
+        .btn-copy {
             background: none;
             border: none;
             cursor: pointer;
             color: #64748b;
             font-size: 14px;
-            display: flex;
-            align-items: center;
         }
 
-        /* Info Blue Banner */
-        .info-blue-box {
+        /* Info Blue Notice Box */
+        .info-notice-box {
             background: #eff6ff;
             border: 1px solid #dbeafe;
             border-radius: 12px;
@@ -526,84 +433,24 @@
             align-items: flex-start;
         }
 
-        .info-blue-box .material-symbols-outlined {
+        .info-notice-box .material-symbols-outlined {
             font-size: 18px;
             color: #1d4ed8;
             flex-shrink: 0;
             margin-top: 1px;
         }
 
-        .info-blue-box span {
+        .info-notice-box span {
             font-size: 12.5px;
             font-weight: 500;
             color: #1e40af;
             line-height: 1.4;
         }
 
-        /* Bank Details Warning Card */
-        .bank-warning-card {
-            background: #fffbe6;
-            border: 1px dashed #d97706;
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .bank-warning-info h4 {
-            font-size: 13px;
-            font-weight: 800;
-            color: #92400e;
-            margin-bottom: 2px;
-        }
-
-        .bank-warning-info p {
-            font-size: 12px;
-            color: #b45309;
-        }
-
-        .btn-add-bank {
-            background: #d97706;
-            color: #ffffff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        /* Masked Bank Account Display Box */
-        .masked-acc-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .masked-acc-info {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--navy-primary);
-        }
-
-        .masked-acc-sub {
-            font-size: 11px;
-            color: var(--navy-muted);
-        }
-
-        /* Support Contact Card */
-        .support-card {
+        /* Support Row Card */
+        .support-contact-row {
             background: #ffffff;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 14px 16px;
             margin-bottom: 16px;
@@ -611,16 +458,16 @@
             align-items: center;
             justify-content: space-between;
             text-decoration: none;
-            color: var(--navy-primary);
+            color: #0f172a;
         }
 
-        .support-left {
+        .support-contact-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .support-icon-wrap {
+        .support-headset-circle {
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -631,48 +478,43 @@
             color: #0f172a;
         }
 
-        .support-text h4 {
+        .support-contact-text h4 {
             font-size: 13.5px;
             font-weight: 800;
-            color: var(--navy-primary);
+            color: #0f172a;
         }
 
-        .support-text p {
+        .support-contact-text p {
             font-size: 12px;
             color: #64748b;
         }
 
-        /* Action Buttons */
-        .btn-tracking {
+        /* Full Width Action Buttons */
+        .btn-tracking-link {
             background: #f1f5f9;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 14px;
             width: 100%;
             text-align: center;
             font-size: 14px;
             font-weight: 800;
-            color: var(--navy-primary);
+            color: #0f172a;
             text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             cursor: pointer;
-            transition: var(--transition);
         }
 
-        .btn-tracking:active {
-            background: #e2e8f0;
-        }
-
-        .btn-row {
+        .btn-action-row {
             display: flex;
             gap: 10px;
             margin-bottom: 12px;
         }
 
-        .btn-action-primary {
+        .btn-act {
             flex: 1;
             padding: 12px 16px;
             border-radius: 10px;
@@ -687,17 +529,15 @@
             text-decoration: none;
         }
 
-        .btn-bg-navy { background: var(--navy-primary); color: #ffffff; }
-        .btn-bg-blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
-        .btn-bg-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
-        .btn-bg-purple { background: #673ab7; color: #ffffff; }
+        .btn-act-blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+        .btn-act-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+        .btn-act-purple { background: #673ab7; color: #ffffff; }
 
-        /* Expand Details Section Toggle */
-        .btn-details-toggle {
+        .btn-show-more-toggle {
             width: 100%;
             background: none;
-            border: 1px dashed var(--border);
-            color: var(--navy-muted);
+            border: 1px dashed #e2e8f0;
+            color: #64748b;
             padding: 10px;
             border-radius: 10px;
             font-size: 12px;
@@ -708,77 +548,21 @@
             margin-top: 8px;
         }
 
-        .details-expand-panel {
+        .expanded-details-block {
             display: none;
             margin-top: 14px;
             padding-top: 14px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #e2e8f0;
         }
 
-        /* Modal Overlay & Styling */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        .modal-card {
-            background: #ffffff;
-            border-radius: 20px;
-            max-width: 480px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 24px;
-            box-shadow: var(--shadow-modal);
-            position: relative;
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            background: #f1f5f9;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-title { font-size: 18px; font-weight: 800; color: var(--navy-primary); margin-bottom: 4px; }
-        .modal-subtitle { font-size: 13px; color: var(--navy-muted); margin-bottom: 20px; }
-        .form-group { margin-bottom: 14px; }
-        .form-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-sub); margin-bottom: 6px; }
-        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; background: #ffffff; }
-
-        .adj-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
-        .adj-pill { padding: 10px 4px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--navy-primary); cursor: pointer; text-align: center; }
-        .adj-pill.active { background: var(--navy-primary); color: #ffffff; border-color: var(--navy-primary); }
-
-        /* Bottom Fixed Navigation (Preserved) */
+        /* Preserved Fixed Bottom Navbar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: #ffffff;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-around;
             padding: 10px 0 12px 0;
@@ -797,76 +581,58 @@
         }
 
         .nav-item.active {
-            color: var(--navy-primary);
+            color: #0f172a;
             font-weight: 800;
         }
 
         .nav-item .material-symbols-outlined {
             font-size: 22px;
         }
+
+        /* Adjustment Pills */
+        .adjustment-pill {
+            padding: 8px 4px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            text-align: center;
+        }
+        .adjustment-pill.active {
+            background: #154cbd;
+            color: #ffffff;
+            border-color: #154cbd;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Header Navbar (Preserved Top Bar) -->
-    <header class="brand-header">
-        <a href="index.html" class="brand-logo">
-            <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo">
+    <!-- Preserved Header Navbar -->
+    <header class="brand-header" style="background:#fff; border-bottom:1px solid #e2e8f0; padding:16px; position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between;">
+        <a href="index.html" class="brand-logo" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#0f172a;">
+            <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" style="height:24px;">
         </a>
-        <a href="https://wa.me/916363887497" target="_blank" class="header-help-btn">
+        <a href="https://wa.me/916363887497" target="_blank" class="header-help-btn" style="font-size:13px; font-weight:600; color:#64748b; text-decoration:none; display:flex; align-items:center; gap:4px; padding:6px 12px; border-radius:20px; background:#f8fafc; border:1px solid #f1f5f9;">
             <span class="material-symbols-outlined" style="font-size:16px">help_outline</span> Need Help?
         </a>
     </header>
 
-    <div class="container">
+    <div class="page-container">
         <!-- Phone Lookup Card -->
         <div class="lookup-card">
-            <h1>Look Up Your Orders</h1>
-            <p>Enter the mobile number used during checkout to view order details & status.</p>
-            <div class="input-group">
-                <div class="phone-input-wrap">
+            <div class="field-label">Lookup Orders</div>
+            <p style="font-size:13px; color:#555; margin-bottom:14px;">Enter your 10-digit mobile number to track orders and manage returns/exchanges/alterations.</p>
+            <div class="input-row">
+                <div class="phone-wrapper">
                     <span class="phone-prefix">+91</span>
                     <input type="tel" id="mobileInput" placeholder="97420 06683" maxlength="10">
                 </div>
                 <button id="trackBtn" onclick="fetchOrders()">Look Up</button>
             </div>
-        </div>
-
-        <!-- Scenario Tester / Simulator Bar -->
-        <div class="scenario-bar">
-            <label>
-                <span>🧪 Test Journey Simulator (Mobile 9742006683)</span>
-                <span style="font-size:10px; color:#64748b;">Live Preview</span>
-            </label>
-            <select id="scenarioSelect" class="scenario-select" onchange="applyScenarioSimulation()">
-                <option value="REAL">Standard Live Order Flow (Default)</option>
-                <optgroup label="1. Normal Delivered">
-                    <option value="SIM_DELIVERED">1. Delivered Order (Standard / Custom)</option>
-                </optgroup>
-                <optgroup label="2. Return Journey Scenarios">
-                    <option value="SIM_RET_REQ">2. Return Requested (With Bank Warning)</option>
-                    <option value="SIM_RET_PICKED">3. Return Picked Up (In Transit)</option>
-                    <option value="SIM_RET_REC">4. Return Received at Slyte</option>
-                    <option value="SIM_RET_REFUNDED">5. Refund Processed (Completed)</option>
-                </optgroup>
-                <optgroup label="3. Exchange Journey Scenarios">
-                    <option value="SIM_EXC_REQ">6. Exchange Requested</option>
-                    <option value="SIM_EXC_PICKED">7. Exchange Item Picked Up</option>
-                    <option value="SIM_EXC_REC">8. Exchange Item Received</option>
-                    <option value="SIM_EXC_SHIPPED">9. Exchange Shipped (Replacement En Route)</option>
-                    <option value="SIM_EXC_DELIVERED">10. Exchange Delivered (Completed)</option>
-                </optgroup>
-                <optgroup label="4. Alteration Journey Scenarios">
-                    <option value="SIM_ALT_REQ">11. Alteration Requested</option>
-                    <option value="SIM_ALT_PICKED">12. Alteration Picked Up</option>
-                    <option value="SIM_ALT_REC">13. Alteration Received at Slyte</option>
-                    <option value="SIM_ALT_INPROG">14. Alteration in Progress</option>
-                    <option value="SIM_ALT_DONE">15. Alteration Completed</option>
-                    <option value="SIM_ALT_SHIPPED">16. Alteration Shipped</option>
-                    <option value="SIM_ALT_DELIVERED">17. Alteration Delivered (Completed)</option>
-                </optgroup>
-            </select>
         </div>
 
         <!-- Orders Results Container -->
@@ -877,7 +643,7 @@
         </div>
     </div>
 
-    <!-- Bottom Fixed Navigation (Preserved Navbar) -->
+    <!-- Preserved Bottom Fixed Navigation Bar -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item">
             <span class="material-symbols-outlined">home</span>
@@ -885,7 +651,7 @@
         </a>
         <a href="custom-clothing.html" class="nav-item">
             <span class="material-symbols-outlined">search</span>
-            <span>Catalog</span>
+            <span>Shop</span>
         </a>
         <a href="orders.html" class="nav-item active">
             <span class="material-symbols-outlined">local_shipping</span>
@@ -898,10 +664,12 @@
     </nav>
 
     <!-- Modal Overlay -->
-    <div id="modalOverlay" class="modal-overlay">
-        <div class="modal-card">
-            <button class="modal-close-btn" onclick="closeModal()">✕</button>
-            <div id="modalBody"></div>
+    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#fff; border-radius:20px; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
+            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
+            <div id="afterSalesModalContent">
+                <!-- Modal Content Injected Dynamically -->
+            </div>
         </div>
     </div>
 
@@ -909,7 +677,6 @@
         (function () {
             const API_BASE = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
             let currentOrders = [];
-            let activeSimulationKey = "REAL";
 
             function esc(s) {
                 return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -926,12 +693,12 @@
                 const rawPhone = phoneInput.value.replace(/\D/g, '').slice(-10);
 
                 if (rawPhone.length < 10) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:20px; color:var(--return-theme); font-weight:600;">Please enter a valid 10-digit mobile number.</div>`;
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:20px; color:#c62828; font-weight:600;">Please enter a valid 10-digit mobile number.</div>`;
                     return;
                 }
 
                 localStorage.setItem('slyte_phone', rawPhone);
-                resultsArea.innerHTML = `<div style="text-align:center; padding:40px; color:var(--navy-muted); font-size:14px;">Loading your orders...</div>`;
+                resultsArea.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b; font-size:14px;">Loading your orders...</div>`;
 
                 try {
                     const token = localStorage.getItem('slyte_otp_token');
@@ -948,52 +715,117 @@
                         currentOrders = data.orders;
                         renderOrders(currentOrders);
                     } else {
-                        resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--navy-muted); font-size:14px;">No orders found for +91 ${rawPhone}.</div>`;
+                        resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#64748b; font-size:14px;">No orders found for +91 ${rawPhone}.</div>`;
                     }
                 } catch (err) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--return-theme); font-size:14px;">Could not connect to server. Please try again.</div>`;
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#c62828; font-size:14px;">Could not connect to server. Please try again.</div>`;
                 }
             };
 
-            window.applyScenarioSimulation = function() {
-                activeSimulationKey = document.getElementById('scenarioSelect').value;
-                if (currentOrders && currentOrders.length > 0) {
-                    renderOrders(currentOrders);
+            function resolveOrderJourney(order) {
+                const lcs = (order.orderLifecycleStatus || 'DELIVERED').toUpperCase();
+                const isCustom = order.productType === 'CUSTOM' || (order.fitType || '').toLowerCase().includes('custom');
+                
+                let mode = 'NORMAL';
+                if (['RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED', 'REFUNDED'].includes(lcs)) mode = 'RETURN';
+                else if (lcs.startsWith('EXCHANGE_')) mode = 'EXCHANGE';
+                else if (lcs.startsWith('ALTERATION_')) mode = 'ALTERATION';
+
+                let stepperSteps = [];
+                let stepIndex = 0;
+                let themeClass = 'theme-delivered';
+                let statusIcon = 'check_circle';
+                let bannerTitle = 'Delivered';
+                let bannerMessage = 'Enjoy your order.';
+                let infoText = 'Includes 7-day return/exchange window and custom alterations.';
+                let trackingId = order.trackingNumber || 'SR123456789';
+
+                if (mode === 'RETURN') {
+                    themeClass = 'theme-red-card';
+                    stepperSteps = [
+                        { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
+                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
+                        { label: 'Refund Processing', date: '', icon: 'currency_rupee' },
+                        { label: 'Refunded', date: '', icon: 'check' }
+                    ];
+                    infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
+
+                    if (lcs === 'RETURN_INITIATED') {
+                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Return Requested'; bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
+                    } else if (lcs === 'RTO_IN_TRANSIT') {
+                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your return has been picked up and is on its way to our warehouse.';
+                    } else if (lcs === 'RTO_DELIVERED') {
+                        stepIndex = 2; statusIcon = 'inventory_2'; bannerTitle = 'Return Received'; bannerMessage = 'Your return has reached us. Your refund is now being processed.';
+                    } else if (lcs === 'REFUNDED') {
+                        stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Refund Processed'; bannerMessage = `₹${order.amount || 1699} has been refunded successfully to your bank account.`;
+                    }
+                } else if (mode === 'EXCHANGE') {
+                    themeClass = 'theme-blue-card';
+                    stepperSteps = [
+                        { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
+                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
+                        { label: 'Exchange Shipped', date: '', icon: 'warehouse' },
+                        { label: 'Delivered', date: '', icon: 'check' }
+                    ];
+                    infoText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
+
+                    if (lcs === 'EXCHANGE_REQUESTED') {
+                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Exchange Requested'; bannerMessage = 'Exchange confirmed. Replacement size will be prepared upon pickup.';
+                    } else if (lcs === 'EXCHANGE_PICKED_UP') {
+                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your exchange item has been picked up and is on its way to our warehouse.';
+                    } else if (lcs === 'EXCHANGE_RECEIVED' || lcs === 'EXCHANGE_SHIPPED') {
+                        stepIndex = 2; statusIcon = 'warehouse'; bannerTitle = 'Exchange Shipped'; bannerMessage = 'Your replacement trousers are on the way.';
+                    } else if (lcs === 'EXCHANGE_DELIVERED') {
+                        stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Your replacement trousers have been delivered.';
+                    }
+                } else if (mode === 'ALTERATION') {
+                    themeClass = 'theme-green-card';
+                    stepperSteps = [
+                        { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
+                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
+                        { label: 'Under Alteration', date: '', icon: 'content_cut' },
+                        { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
+                        { label: 'Delivered', date: '', icon: 'check' }
+                    ];
+                    infoText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
+
+                    if (lcs === 'ALTERATION_REQUESTED') {
+                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Alteration Requested'; bannerMessage = "We'll arrange a pickup for your trousers.";
+                    } else if (lcs === 'ALTERATION_PICKED_UP') {
+                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your item for alteration has been picked up and is on its way to our warehouse.';
+                    } else if (lcs === 'ALTERATION_RECEIVED' || lcs === 'ALTERATION_IN_PROGRESS') {
+                        stepIndex = 2; statusIcon = 'content_cut'; bannerTitle = 'Under Alteration'; bannerMessage = 'Our master tailors are working on your custom trousers.';
+                    } else if (lcs === 'ALTERATION_SHIPPED') {
+                        stepIndex = 3; statusIcon = 'local_shipping'; bannerTitle = 'Out for Delivery'; bannerMessage = 'Your altered trousers are out for delivery.';
+                    } else if (lcs === 'ALTERATION_DELIVERED') {
+                        stepIndex = 4; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.';
+                    }
                 } else {
-                    currentOrders = [{
-                        orderId: "SLYTE-TEST-ORDER-001",
-                        displayId: "#SLY12589",
-                        productName: "Slyte 24H Navy Trouser",
-                        fitType: "Standard Fit",
-                        productType: "STANDARD",
-                        amount: 1699,
-                        paymentGroup: "Cashfree UPI",
-                        createdAt: new Date().toISOString(),
-                        deliveryAddress: {
-                            fullName: "Valued Customer",
-                            addressLine1: "123 Test Street, Koramangala",
-                            city: "Bengaluru",
-                            state: "Karnataka",
-                            pincode: "560034"
-                        },
-                        orderLifecycleStatus: "DELIVERED"
-                    }];
-                    renderOrders(currentOrders);
+                    // Normal Delivered Forward Order
+                    stepperSteps = [
+                        { label: 'Order Placed', date: '12 Sep', icon: 'package_2' },
+                        { label: 'Dispatched', date: '13 Sep', icon: 'warehouse' },
+                        { label: 'Out for Delivery', date: '14 Sep', icon: 'local_shipping' },
+                        { label: 'Delivered', date: '14 Sep', icon: 'check' }
+                    ];
+                    stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Enjoy your order.';
                 }
-            };
+
+                return {
+                    mode, isCustom, stepperSteps, stepIndex, themeClass, statusIcon, bannerTitle, bannerMessage, infoText, trackingId
+                };
+            }
 
             function renderOrders(ordersList) {
                 const resultsArea = document.getElementById('resultsArea');
                 if (!ordersList || !ordersList.length) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--navy-muted);">No orders found.</div>`;
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#64748b;">No orders found.</div>`;
                     return;
                 }
 
-                resultsArea.innerHTML = ordersList.map((rawOrder) => {
-                    const order = applyStateTransformation(rawOrder, activeSimulationKey);
-                    const mode = order.journeyMode; // NORMAL, RETURN, EXCHANGE, ALTERATION
+                resultsArea.innerHTML = ordersList.map((order) => {
+                    const j = resolveOrderJourney(order);
 
-                    // Image map for product thumbnail
                     let imgSrc = "images/homepage/ai-output-placeholder.webp";
                     if (order.productName && order.productName.toLowerCase().includes('beige')) imgSrc = "beigegurkha.webp";
                     else if (order.productName && order.productName.toLowerCase().includes('black')) imgSrc = "DeepBlackPleatedGurkhaPant.jpg";
@@ -1001,74 +833,54 @@
                     return `
                     <div class="order-card" id="card-${esc(order.orderId)}">
                         <!-- Top Order Details Header -->
-                        <div class="order-top-header">
+                        <div class="card-top-header">
                             <span class="title">Order Details</span>
                             <span class="code">${esc(order.displayId || '#' + order.orderId)}</span>
                         </div>
 
-                        <!-- Product Hero Card Header -->
-                        <div class="product-hero-block">
-                            <img src="${imgSrc}" class="product-thumb" alt="Product Thumbnail">
-                            <div class="product-info-col">
-                                <div class="product-title">${esc(order.productName || 'Slyte 24H Navy Trouser')}</div>
-                                <div class="fit-label">${esc(order.fitType || 'Standard Fit')}</div>
-                                <span class="type-badge ${order.productType === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">
-                                    ${order.productType === 'CUSTOM' ? 'Custom' : 'Standard'}
+                        <!-- Product Hero Block -->
+                        <div class="product-hero-row">
+                            <img src="${imgSrc}" class="product-img-thumb" alt="Trouser Thumbnail">
+                            <div class="product-details-col">
+                                <div class="product-name-txt">${esc(order.productName || 'Slyte 24H Navy Trouser')}</div>
+                                <div class="fit-spec-txt">${esc(order.fitType || 'Standard Fit')}</div>
+                                <span class="type-badge-pill ${j.isCustom ? 'badge-cst' : 'badge-std'}">
+                                    ${j.isCustom ? 'Custom' : 'Standard'}
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Stepper Timeline -->
-                        ${renderJourneyStepper(mode, order.stepIndex, order.stepperConfig)}
+                        <!-- Stepper Timeline (Exact Color & Line match) -->
+                        ${renderStepperTimeline(j.mode, j.stepIndex, j.stepperSteps)}
 
                         <!-- Status Banner Card -->
-                        <div class="status-card ${order.themeClass}">
-                            <div class="status-icon-box">
-                                <span class="material-symbols-outlined">${order.statusIcon}</span>
+                        <div class="status-banner-card ${j.themeClass}">
+                            <div class="status-avatar-wrap">
+                                <span class="material-symbols-outlined">${j.statusIcon}</span>
                             </div>
-                            <div class="status-card-content">
-                                <div class="status-card-title">${order.bannerTitle}</div>
-                                <div class="status-card-desc">${order.bannerMessage}</div>
-                                <div class="status-card-time">${order.timestampStr || '15 Sep, 4:20 PM'}</div>
+                            <div class="status-txt-col">
+                                <div class="status-card-title">${j.bannerTitle}</div>
+                                <div class="status-card-desc">${j.bannerMessage}</div>
+                                <div class="status-card-time">15 Sep, 4:20 PM</div>
                             </div>
                         </div>
 
-                        <!-- Bank Details Warning Card if Return & Bank Details missing -->
-                        ${(mode === 'RETURN' && order.needsBankDetails) ? `
-                        <div class="bank-warning-card">
-                            <div class="bank-warning-info">
-                                <h4>Refund details required</h4>
-                                <p>Add your bank account details so we can process your refund.</p>
-                            </div>
-                            <button class="btn-add-bank" onclick="openBankDetailsModal('${esc(order.orderId)}')">Add Bank Details</button>
-                        </div>` : ''}
-
-                        <!-- Masked Bank Display Box -->
-                        ${(mode === 'RETURN' && order.bankDetailsSaved) ? `
-                        <div class="masked-acc-box">
-                            <div>
-                                <div class="masked-acc-info">Account ending •••• ${esc(order.bankDetailsSaved.maskedAcc)}</div>
-                                <div class="masked-acc-sub">IFSC: ${esc(order.bankDetailsSaved.ifsc)}</div>
-                            </div>
-                            <button class="btn-action-primary btn-bg-blue" style="padding:6px 12px; font-size:11px;" onclick="openBankDetailsModal('${esc(order.orderId)}')">Edit</button>
-                        </div>` : ''}
-
-                        <!-- Journey Details Card (Exact Mockup Match) -->
-                        ${renderJourneyDetailsCard(mode, order)}
+                        <!-- Specific Journey Details Block (Matching Mockups 1:1) -->
+                        ${renderJourneyDetailsBlock(j.mode, order, j.trackingId)}
 
                         <!-- Info Blue Banner -->
-                        <div class="info-blue-box">
+                        <div class="info-notice-box">
                             <span class="material-symbols-outlined">info</span>
-                            <span>${order.infoBannerText}</span>
+                            <span>${j.infoText}</span>
                         </div>
 
                         <!-- Support Card (Need Help?) -->
-                        <a href="https://wa.me/916363887497" target="_blank" class="support-card">
-                            <div class="support-left">
-                                <div class="support-icon-wrap">
+                        <a href="https://wa.me/916363887497" target="_blank" class="support-contact-row">
+                            <div class="support-contact-left">
+                                <div class="support-headset-circle">
                                     <span class="material-symbols-outlined">headset_mic</span>
                                 </div>
-                                <div class="support-text">
+                                <div class="support-contact-text">
                                     <h4>Need Help?</h4>
                                     <p>Contact our support team</p>
                                 </div>
@@ -1077,15 +889,15 @@
                         </a>
 
                         <!-- Action Buttons -->
-                        ${renderActionButtons(mode, order)}
+                        ${renderActionButtons(j.mode, order, j.isCustom, j.trackingId)}
 
-                        <!-- Show Details Toggle -->
-                        <button class="btn-details-toggle" id="btn-toggle-${esc(order.orderId)}" onclick="toggleDetails('${esc(order.orderId)}')">
-                            Show Order Info ▼
+                        <!-- Show Order Info Toggle -->
+                        <button class="btn-show-more-toggle" id="btn-toggle-${esc(order.orderId)}" onclick="toggleExpand('${esc(order.orderId)}')">
+                            Show Order Details ▼
                         </button>
 
-                        <div class="details-expand-panel" id="expand-${esc(order.orderId)}">
-                            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#94a3b8; margin-bottom:8px;">Order Summary</div>
+                        <div class="expanded-details-block" id="expand-${esc(order.orderId)}">
+                            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#94a3b8; margin-bottom:8px;">Order Details</div>
                             <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
                                 <span style="color:#64748b;">Order Amount</span>
                                 <span style="font-weight:700;">₹${order.amount || 1699}</span>
@@ -1103,378 +915,59 @@
                 }).join('');
             }
 
-            // State Resolver & Simulator Engine
-            function applyStateTransformation(order, simKey) {
-                const o = JSON.parse(JSON.stringify(order));
-                const lcs = (o.orderLifecycleStatus || 'DELIVERED').toUpperCase();
-                o.size = o.size || '32';
-                o.productType = o.productType || (o.fitType && o.fitType.toLowerCase().includes('custom') ? 'CUSTOM' : 'STANDARD');
-
-                const storedBank = localStorage.getItem(`bank_${o.orderId}`);
-                if (storedBank) {
-                    try {
-                        const parsed = JSON.parse(storedBank);
-                        o.bankDetailsSaved = {
-                            maskedAcc: parsed.account_number.slice(-4) || '4821',
-                            ifsc: parsed.ifsc_code || 'HDFC0001234'
-                        };
-                    } catch(e){}
-                }
-
-                if (simKey && simKey !== 'REAL') {
-                    return getSimulatedState(o, simKey);
-                }
-
-                // Default Real Backend Journey Resolver
-                if (['RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED', 'REFUNDED'].includes(lcs)) {
-                    o.journeyMode = 'RETURN';
-                    o.themeClass = 'theme-return';
-                    o.stepperConfig = [
-                        { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Refund Processing', date: '', icon: 'currency_rupee' },
-                        { label: 'Refunded', date: '', icon: 'check' }
-                    ];
-                    o.infoBannerText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-                    o.trackingId = 'SR123456789';
-
-                    if (lcs === 'RETURN_INITIATED') {
-                        o.stepIndex = 0; o.statusIcon = 'package_2'; o.bannerTitle = 'Return Requested'; o.bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
-                        if (!o.bankDetailsSaved) o.needsBankDetails = true;
-                    } else if (lcs === 'RTO_IN_TRANSIT') {
-                        o.stepIndex = 1; o.statusIcon = 'local_shipping'; o.bannerTitle = 'Picked Up'; o.bannerMessage = 'Your return has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'RTO_DELIVERED') {
-                        o.stepIndex = 2; o.statusIcon = 'inventory_2'; o.bannerTitle = 'Return Received'; o.bannerMessage = 'Your return has reached us. Your refund is now being processed.';
-                    } else if (lcs === 'REFUNDED') {
-                        o.stepIndex = 3; o.statusIcon = 'check_circle'; o.bannerTitle = 'Refund Processed'; o.bannerMessage = `₹${o.amount || 1699} has been refunded successfully.`;
-                    }
-                } else if (lcs.startsWith('EXCHANGE_')) {
-                    o.journeyMode = 'EXCHANGE';
-                    o.themeClass = 'theme-exchange';
-                    o.stepperConfig = [
-                        { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Exchange Shipped', date: '', icon: 'warehouse' },
-                        { label: 'Delivered', date: '', icon: 'check' }
-                    ];
-                    o.infoBannerText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
-                    o.trackingId = 'SR123456789';
-                    o.exchangeNewSize = '34';
-
-                    if (lcs === 'EXCHANGE_REQUESTED') {
-                        o.stepIndex = 0; o.statusIcon = 'package_2'; o.bannerTitle = 'Exchange Requested'; o.bannerMessage = 'Exchange confirmed. Replacement size will be prepared upon pickup.';
-                    } else if (lcs === 'EXCHANGE_PICKED_UP') {
-                        o.stepIndex = 1; o.statusIcon = 'local_shipping'; o.bannerTitle = 'Picked Up'; o.bannerMessage = 'Your exchange item has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'EXCHANGE_RECEIVED') {
-                        o.stepIndex = 2; o.statusIcon = 'inventory_2'; o.bannerTitle = 'Exchange Item Received'; o.bannerMessage = 'We have received your item. Preparing replacement size 34.';
-                    } else if (lcs === 'EXCHANGE_SHIPPED') {
-                        o.stepIndex = 2; o.statusIcon = 'warehouse'; o.bannerTitle = 'Exchange Shipped'; o.bannerMessage = 'Your replacement trousers are on the way.';
-                    } else if (lcs === 'EXCHANGE_DELIVERED') {
-                        o.stepIndex = 3; o.statusIcon = 'check_circle'; o.bannerTitle = 'Delivered'; o.bannerMessage = 'Your replacement trousers have been delivered.';
-                    }
-                } else if (lcs.startsWith('ALTERATION_')) {
-                    o.journeyMode = 'ALTERATION';
-                    o.themeClass = 'theme-alteration';
-                    o.stepperConfig = [
-                        { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Under Alteration', date: '', icon: 'content_cut' },
-                        { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
-                        { label: 'Delivered', date: '', icon: 'check' }
-                    ];
-                    o.infoBannerText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
-                    o.trackingId = 'SR123456789';
-
-                    if (lcs === 'ALTERATION_REQUESTED') {
-                        o.stepIndex = 0; o.statusIcon = 'package_2'; o.bannerTitle = 'Alteration Requested'; o.bannerMessage = "We'll arrange a pickup for your trousers.";
-                    } else if (lcs === 'ALTERATION_PICKED_UP') {
-                        o.stepIndex = 1; o.statusIcon = 'local_shipping'; o.bannerTitle = 'Picked Up'; o.bannerMessage = 'Your item for alteration has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'ALTERATION_RECEIVED' || lcs === 'ALTERATION_IN_PROGRESS') {
-                        o.stepIndex = 2; o.statusIcon = 'content_cut'; o.bannerTitle = 'Under Alteration'; o.bannerMessage = 'Our master tailors are working on your custom trousers.';
-                    } else if (lcs === 'ALTERATION_SHIPPED') {
-                        o.stepIndex = 3; o.statusIcon = 'local_shipping'; o.bannerTitle = 'Out for Delivery'; o.bannerMessage = 'Your altered trousers are out for delivery.';
-                    } else if (lcs === 'ALTERATION_DELIVERED') {
-                        o.stepIndex = 4; o.statusIcon = 'check_circle'; o.bannerTitle = 'Delivered'; o.bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.';
-                    }
-                } else {
-                    // Normal Forward Delivered
-                    o.journeyMode = 'NORMAL';
-                    o.themeClass = 'theme-delivered';
-                    o.stepperConfig = [
-                        { label: 'Order Placed', date: '12 Sep', icon: 'package_2' },
-                        { label: 'Dispatched', date: '13 Sep', icon: 'warehouse' },
-                        { label: 'Out for Delivery', date: '14 Sep', icon: 'local_shipping' },
-                        { label: 'Delivered', date: '14 Sep', icon: 'check' }
-                    ];
-                    o.stepIndex = 3; o.statusIcon = 'check_circle'; o.bannerTitle = 'Delivered'; o.bannerMessage = 'Enjoy your order.';
-                    o.infoBannerText = 'Need a return, exchange, or alteration? Choose an option below within 7 days.';
-                }
-
-                return o;
-            }
-
-            // Scenario Simulator Mapping (Matches Mockups 1:1)
-            function getSimulatedState(o, key) {
-                const copy = JSON.parse(JSON.stringify(o));
-                copy.trackingId = 'SR123456789';
-                copy.timestampStr = '15 Sep, 4:20 PM';
-
-                switch(key) {
-                    case 'SIM_DELIVERED':
-                        copy.journeyMode = 'NORMAL'; copy.themeClass = 'theme-delivered';
-                        copy.stepperConfig = [
-                            { label: 'Order Placed', date: '12 Sep', icon: 'package_2' },
-                            { label: 'Dispatched', date: '13 Sep', icon: 'warehouse' },
-                            { label: 'Out for Delivery', date: '14 Sep', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '14 Sep', icon: 'check' }
-                        ];
-                        copy.stepIndex = 3; copy.statusIcon = 'check_circle'; copy.bannerTitle = 'Delivered'; copy.bannerMessage = 'Enjoy your order.';
-                        copy.infoBannerText = 'Includes 7-day return/exchange window and custom alterations.';
-                        break;
-
-                    case 'SIM_RET_REQ':
-                        copy.journeyMode = 'RETURN'; copy.themeClass = 'theme-return';
-                        copy.stepperConfig = [
-                            { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '', icon: 'local_shipping' },
-                            { label: 'Refund Processing', date: '', icon: 'currency_rupee' },
-                            { label: 'Refunded', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 0; copy.statusIcon = 'package_2'; copy.bannerTitle = 'Return Requested'; copy.bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
-                        copy.infoBannerText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-                        if (!copy.bankDetailsSaved) copy.needsBankDetails = true;
-                        break;
-
-                    case 'SIM_RET_PICKED':
-                        copy.journeyMode = 'RETURN'; copy.themeClass = 'theme-return';
-                        copy.stepperConfig = [
-                            { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Refund Processing', date: '', icon: 'currency_rupee' },
-                            { label: 'Refunded', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 1; copy.statusIcon = 'local_shipping'; copy.bannerTitle = 'Picked Up'; copy.bannerMessage = 'Your return has been picked up and is on its way to our warehouse.';
-                        copy.infoBannerText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-                        break;
-
-                    case 'SIM_RET_REC':
-                        copy.journeyMode = 'RETURN'; copy.themeClass = 'theme-return';
-                        copy.stepperConfig = [
-                            { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Refund Processing', date: '16 Sep', icon: 'currency_rupee' },
-                            { label: 'Refunded', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 2; copy.statusIcon = 'inventory_2'; copy.bannerTitle = 'Return Received'; copy.bannerMessage = 'Your return has reached us. Your refund is now being processed.';
-                        copy.infoBannerText = 'Refund processing initiated to your bank account.';
-                        break;
-
-                    case 'SIM_RET_REFUNDED':
-                        copy.journeyMode = 'RETURN'; copy.themeClass = 'theme-delivered';
-                        copy.stepperConfig = [
-                            { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Refund Processing', date: '16 Sep', icon: 'currency_rupee' },
-                            { label: 'Refunded', date: '16 Sep', icon: 'check' }
-                        ];
-                        copy.stepIndex = 3; copy.statusIcon = 'check_circle'; copy.bannerTitle = 'Refund Processed'; copy.bannerMessage = '₹1,699 has been refunded successfully to your bank account.';
-                        copy.infoBannerText = 'Refund completed to Bank Account ending •••• 4821.';
-                        copy.bankDetailsSaved = { maskedAcc: '4821', ifsc: 'HDFC0001234' };
-                        break;
-
-                    case 'SIM_EXC_REQ':
-                        copy.journeyMode = 'EXCHANGE'; copy.themeClass = 'theme-exchange';
-                        copy.stepperConfig = [
-                            { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '', icon: 'local_shipping' },
-                            { label: 'Exchange Shipped', date: '', icon: 'warehouse' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 0; copy.statusIcon = 'package_2'; copy.bannerTitle = 'Exchange Requested'; copy.bannerMessage = 'Exchange confirmed. Pickup will be arranged soon.';
-                        copy.infoBannerText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
-                        copy.exchangeNewSize = '34';
-                        break;
-
-                    case 'SIM_EXC_PICKED':
-                        copy.journeyMode = 'EXCHANGE'; copy.themeClass = 'theme-exchange';
-                        copy.stepperConfig = [
-                            { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Exchange Shipped', date: '', icon: 'warehouse' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 1; copy.statusIcon = 'local_shipping'; copy.bannerTitle = 'Picked Up'; copy.bannerMessage = 'Your exchange item has been picked up and is on its way to our warehouse.';
-                        copy.infoBannerText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
-                        copy.exchangeNewSize = '34';
-                        break;
-
-                    case 'SIM_EXC_REC':
-                        copy.journeyMode = 'EXCHANGE'; copy.themeClass = 'theme-exchange';
-                        copy.stepperConfig = [
-                            { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Exchange Shipped', date: '16 Sep', icon: 'warehouse' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 2; copy.statusIcon = 'inventory_2'; copy.bannerTitle = 'Exchange Item Received'; copy.bannerMessage = 'We have received your item. Replacement size 34 is ready to ship.';
-                        copy.infoBannerText = "Replacement item is being dispatched.";
-                        copy.exchangeNewSize = '34';
-                        break;
-
-                    case 'SIM_EXC_SHIPPED':
-                        copy.journeyMode = 'EXCHANGE'; copy.themeClass = 'theme-exchange';
-                        copy.stepperConfig = [
-                            { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Exchange Shipped', date: '16 Sep', icon: 'warehouse' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 2; copy.statusIcon = 'warehouse'; copy.bannerTitle = 'Exchange Shipped'; copy.bannerMessage = 'Your replacement trousers are on the way.';
-                        copy.infoBannerText = "Replacement item is in transit.";
-                        copy.exchangeNewSize = '34';
-                        break;
-
-                    case 'SIM_EXC_DELIVERED':
-                        copy.journeyMode = 'EXCHANGE'; copy.themeClass = 'theme-delivered';
-                        copy.stepperConfig = [
-                            { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Exchange Shipped', date: '16 Sep', icon: 'warehouse' },
-                            { label: 'Delivered', date: '17 Sep', icon: 'check' }
-                        ];
-                        copy.stepIndex = 3; copy.statusIcon = 'check_circle'; copy.bannerTitle = 'Delivered'; copy.bannerMessage = 'Your replacement trousers have been delivered.';
-                        copy.infoBannerText = 'Exchange process completed successfully.';
-                        copy.exchangeNewSize = '34';
-                        break;
-
-                    case 'SIM_ALT_REQ':
-                        copy.journeyMode = 'ALTERATION'; copy.themeClass = 'theme-alteration';
-                        copy.stepperConfig = [
-                            { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '', icon: 'local_shipping' },
-                            { label: 'Under Alteration', date: '', icon: 'content_cut' },
-                            { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 0; copy.statusIcon = 'package_2'; copy.bannerTitle = 'Alteration Requested'; copy.bannerMessage = "We'll arrange a pickup for your trousers.";
-                        copy.infoBannerText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
-                        break;
-
-                    case 'SIM_ALT_PICKED':
-                        copy.journeyMode = 'ALTERATION'; copy.themeClass = 'theme-alteration';
-                        copy.stepperConfig = [
-                            { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Under Alteration', date: '', icon: 'content_cut' },
-                            { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 1; copy.statusIcon = 'local_shipping'; copy.bannerTitle = 'Picked Up'; copy.bannerMessage = 'Your item for alteration has been picked up and is on its way to our warehouse.';
-                        copy.infoBannerText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
-                        break;
-
-                    case 'SIM_ALT_REC':
-                    case 'SIM_ALT_INPROG':
-                        copy.journeyMode = 'ALTERATION'; copy.themeClass = 'theme-alteration';
-                        copy.stepperConfig = [
-                            { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Under Alteration', date: '16 Sep', icon: 'content_cut' },
-                            { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 2; copy.statusIcon = 'content_cut'; copy.bannerTitle = 'Under Alteration'; copy.bannerMessage = 'Our master tailors are working on your custom trousers. Expected completion: 3 business days.';
-                        copy.infoBannerText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
-                        break;
-
-                    case 'SIM_ALT_DONE':
-                    case 'SIM_ALT_SHIPPED':
-                        copy.journeyMode = 'ALTERATION'; copy.themeClass = 'theme-alteration';
-                        copy.stepperConfig = [
-                            { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Under Alteration', date: '16 Sep', icon: 'content_cut' },
-                            { label: 'Out for Delivery', date: '17 Sep', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '', icon: 'check' }
-                        ];
-                        copy.stepIndex = 3; copy.statusIcon = 'local_shipping'; copy.bannerTitle = 'Out for Delivery'; copy.bannerMessage = 'Your altered trousers are out for delivery.';
-                        copy.infoBannerText = "Out for delivery to your address.";
-                        break;
-
-                    case 'SIM_ALT_DELIVERED':
-                        copy.journeyMode = 'ALTERATION'; copy.themeClass = 'theme-delivered';
-                        copy.stepperConfig = [
-                            { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                            { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                            { label: 'Under Alteration', date: '16 Sep', icon: 'content_cut' },
-                            { label: 'Out for Delivery', date: '17 Sep', icon: 'local_shipping' },
-                            { label: 'Delivered', date: '17 Sep', icon: 'check' }
-                        ];
-                        copy.stepIndex = 4; copy.statusIcon = 'check_circle'; copy.bannerTitle = 'Delivered'; copy.bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.';
-                        copy.infoBannerText = 'Alteration completed successfully.';
-                        break;
-                }
-                return copy;
-            }
-
-            // Stepper Component Renderer (Mockup Exact Line & Circle Match)
-            function renderJourneyStepper(mode, activeIndex, steps) {
+            function renderStepperTimeline(mode, activeIndex, steps) {
                 if (!steps || !steps.length) return '';
                 const total = steps.length;
                 const percent = Math.min(100, Math.max(0, (activeIndex / (total - 1)) * 100));
 
-                let color = '#dc2626';
-                if (mode === 'EXCHANGE') color = '#2563eb';
-                else if (mode === 'ALTERATION') color = '#16a34a';
-                else if (mode === 'NORMAL') color = '#16a34a';
+                let themeColor = '#dc2626';
+                if (mode === 'EXCHANGE') themeColor = '#2563eb';
+                else if (mode === 'ALTERATION') themeColor = '#16a34a';
+                else if (mode === 'NORMAL') themeColor = '#16a34a';
 
                 return `
-                <div class="timeline-stepper">
-                    <div class="timeline-line-bg"></div>
-                    <div class="timeline-line-progress" style="width: calc(${percent}% - 20px); background: ${color};"></div>
+                <div class="stepper-timeline">
+                    <div class="stepper-track-bg"></div>
+                    <div class="stepper-track-fill" style="width: calc(${percent}% - 20px); background: ${themeColor};"></div>
                     ${steps.map((s, idx) => {
-                        let stateCls = '';
-                        if (idx < activeIndex) stateCls = 'done';
-                        else if (idx === activeIndex) stateCls = 'active';
-
-                        const circleBg = (idx <= activeIndex) ? color : '#ffffff';
-                        const iconColor = (idx <= activeIndex) ? '#ffffff' : '#94a3b8';
+                        const isDoneOrActive = idx <= activeIndex;
+                        const circleBg = isDoneOrActive ? themeColor : '#ffffff';
+                        const iconColor = isDoneOrActive ? '#ffffff' : '#94a3b8';
 
                         return `
-                        <div class="step-node ${stateCls}">
-                            <div class="node-circle" style="background:${circleBg}; border-color:${idx <= activeIndex ? 'transparent' : '#e2e8f0'}; color:${iconColor};">
+                        <div class="step-item-node ${idx < activeIndex ? 'done' : idx === activeIndex ? 'active' : ''}">
+                            <div class="node-circle-icon" style="background:${circleBg}; border-color:${isDoneOrActive ? 'transparent' : '#e2e8f0'}; color:${iconColor};">
                                 <span class="material-symbols-outlined">${s.icon || 'check'}</span>
                             </div>
-                            <div class="node-label">${s.label}</div>
-                            ${s.date ? `<div class="node-date">${s.date}</div>` : ''}
+                            <div class="step-label-txt">${s.label}</div>
+                            ${s.date ? `<div class="step-date-txt">${s.date}</div>` : ''}
                         </div>`;
                     }).join('')}
                 </div>`;
             }
 
-            // Render Specific Details Card (Return Details / Exchange Details / Alteration Details)
-            function renderJourneyDetailsCard(mode, order) {
+            function renderJourneyDetailsBlock(mode, order, trackingId) {
                 if (mode === 'RETURN') {
                     return `
-                    <div class="details-card">
-                        <div class="details-card-title">Return Details</div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">package_2</span>Return Reason</div>
-                            <div class="detail-row-val">${esc(order.returnReason || "Size didn't fit")}</div>
+                    <div class="details-summary-card">
+                        <div class="details-summary-title">Return Details</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">package_2</span>Return Reason</div>
+                            <div class="detail-right-val">Size didn't fit</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">calendar_today</span>Return Requested On</div>
-                            <div class="detail-row-val">14 Sep 2025</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Return Requested On</div>
+                            <div class="detail-right-val">14 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-row-val">${order.stepIndex >= 1 ? '15 Sep 2025' : 'Pending'}</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
+                            <div class="detail-right-val">15 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-row-val">
-                                ${esc(order.trackingId || 'SR123456789')}
-                                <button class="copy-btn" onclick="navigator.clipboard.writeText('${esc(order.trackingId || 'SR123456789')}')">📋</button>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
+                            <div class="detail-right-val">
+                                ${esc(trackingId)}
+                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
                             </div>
                         </div>
                     </div>`;
@@ -1482,281 +975,218 @@
 
                 if (mode === 'EXCHANGE') {
                     return `
-                    <div class="details-card">
-                        <div class="details-card-title">Exchange Details</div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">package_2</span>Exchange Reason</div>
-                            <div class="detail-row-val">Size change (${esc(order.size || '32')} → ${esc(order.exchangeNewSize || '34')})</div>
+                    <div class="details-summary-card">
+                        <div class="details-summary-title">Exchange Details</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">package_2</span>Exchange Reason</div>
+                            <div class="detail-right-val">Size change (32 → 34)</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">calendar_today</span>Exchange Requested On</div>
-                            <div class="detail-row-val">14 Sep 2025</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Exchange Requested On</div>
+                            <div class="detail-right-val">14 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-row-val">${order.stepIndex >= 1 ? '15 Sep 2025' : 'Pending'}</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
+                            <div class="detail-right-val">15 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-row-val">
-                                ${esc(order.trackingId || 'SR123456789')}
-                                <button class="copy-btn" onclick="navigator.clipboard.writeText('${esc(order.trackingId || 'SR123456789')}')">📋</button>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
+                            <div class="detail-right-val">
+                                ${esc(trackingId)}
+                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
                             </div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">swap_horiz</span>Exchange Item</div>
-                            <div class="detail-row-val">Same Product (Size ${esc(order.exchangeNewSize || '34')})</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">swap_horiz</span>Exchange Item</div>
+                            <div class="detail-right-val">Same Product (Size 34)</div>
                         </div>
                     </div>`;
                 }
 
                 if (mode === 'ALTERATION') {
                     return `
-                    <div class="details-card">
-                        <div class="details-card-title">Alteration Details</div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">content_cut</span>Alteration Reason</div>
-                            <div class="detail-row-val">Minor waist adjustment</div>
+                    <div class="details-summary-card">
+                        <div class="details-summary-title">Alteration Details</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">content_cut</span>Alteration Reason</div>
+                            <div class="detail-right-val">Minor waist adjustment</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">calendar_today</span>Alteration Requested On</div>
-                            <div class="detail-row-val">14 Sep 2025</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Alteration Requested On</div>
+                            <div class="detail-right-val">14 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-row-val">${order.stepIndex >= 1 ? '15 Sep 2025' : 'Pending'}</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
+                            <div class="detail-right-val">15 Sep 2025</div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-row-val">
-                                ${esc(order.trackingId || 'SR123456789')}
-                                <button class="copy-btn" onclick="navigator.clipboard.writeText('${esc(order.trackingId || 'SR123456789')}')">📋</button>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
+                            <div class="detail-right-val">
+                                ${esc(trackingId)}
+                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
                             </div>
                         </div>
-                        <div class="detail-row-item">
-                            <div class="detail-row-left"><span class="material-symbols-outlined">checkroom</span>Alteration Type</div>
-                            <div class="detail-row-val">Waist adjustment (-1 inch)</div>
+                        <div class="detail-row-line">
+                            <div class="detail-left-label"><span class="material-symbols-outlined">checkroom</span>Alteration Type</div>
+                            <div class="detail-right-val">Waist adjustment (-1 inch)</div>
                         </div>
                     </div>`;
                 }
 
-                // Normal Forward Delivered Details Card
+                // Normal Forward Delivered Summary
                 return `
-                <div class="details-card">
-                    <div class="details-card-title">Delivery Summary</div>
-                    <div class="detail-row-item">
-                        <div class="detail-row-left"><span class="material-symbols-outlined">calendar_today</span>Order Date</div>
-                        <div class="detail-row-val">${fmtDate(order.createdAt)}</div>
+                <div class="details-summary-card">
+                    <div class="details-summary-title">Delivery Summary</div>
+                    <div class="detail-row-line">
+                        <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Order Date</div>
+                        <div class="detail-right-val">${fmtDate(order.createdAt)}</div>
                     </div>
-                    <div class="detail-row-item">
-                        <div class="detail-row-left"><span class="material-symbols-outlined">payments</span>Total Amount</div>
-                        <div class="detail-row-val">₹${order.amount || 1699}</div>
+                    <div class="detail-row-line">
+                        <div class="detail-left-label"><span class="material-symbols-outlined">payments</span>Total Amount</div>
+                        <div class="detail-right-val">₹${order.amount || 1699}</div>
                     </div>
-                    <div class="detail-row-item">
-                        <div class="detail-row-left"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                        <div class="detail-row-val">
-                            ${esc(order.trackingNumber || 'SR123456789')}
-                            <button class="copy-btn" onclick="navigator.clipboard.writeText('${esc(order.trackingNumber || 'SR123456789')}')">📋</button>
+                    <div class="detail-row-line">
+                        <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
+                        <div class="detail-right-val">
+                            ${esc(trackingId)}
+                            <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
                         </div>
                     </div>
                 </div>`;
             }
 
-            // Render Bottom Action Buttons
-            function renderActionButtons(mode, order) {
+            function renderActionButtons(mode, order, isCustom, trackingId) {
                 if (mode === 'NORMAL') {
-                    const isCustom = order.productType === 'CUSTOM' || (order.fitType || '').toLowerCase().includes('custom');
                     if (isCustom) {
                         return `
-                        <button class="btn-action-primary btn-bg-purple" style="width:100%;" onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName)}')">
+                        <button class="btn-act btn-act-purple" style="width:100%;" onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName)}')">
                             ✂️ Request Custom Alteration
                         </button>`;
                     }
                     return `
-                    <div class="btn-row">
-                        <button class="btn-action-primary btn-bg-blue" onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
-                        <button class="btn-action-primary btn-bg-green" onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
+                    <div class="btn-action-row">
+                        <button class="btn-act btn-act-blue" onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
+                        <button class="btn-act btn-act-green" onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
                     </div>`;
                 }
 
-                // In-progress Return/Exchange/Alteration -> Show View Tracking Button
+                // Active Return/Exchange/Alteration -> View Tracking Button (Matching Mockup 1:1)
                 return `
-                <a href="https://shiprocket.co/tracking/${esc(order.trackingId || 'SR123456789')}" target="_blank" class="btn-tracking">
+                <a href="https://shiprocket.co/tracking/${esc(trackingId)}" target="_blank" class="btn-tracking-link">
                     View Tracking <span class="material-symbols-outlined" style="font-size:16px;">open_in_new</span>
                 </a>`;
             }
 
-            window.toggleDetails = function(orderId) {
-                const panel = document.getElementById(`expand-${orderId}`);
-                const btn = document.getElementById(`btn-toggle-${orderId}`);
-                if (panel.style.display === 'block') {
-                    panel.style.display = 'none';
-                    btn.textContent = 'Show Order Info ▼';
+            window.toggleExpand = function(orderId) {
+                const p = document.getElementById(`expand-${orderId}`);
+                const b = document.getElementById(`btn-toggle-${orderId}`);
+                if (p.style.display === 'block') {
+                    p.style.display = 'none';
+                    b.textContent = 'Show Order Details ▼';
                 } else {
-                    panel.style.display = 'block';
-                    btn.textContent = 'Hide Order Info ▲';
+                    p.style.display = 'block';
+                    b.textContent = 'Hide Order Details ▲';
                 }
             };
 
-            window.closeModal = function() {
-                document.getElementById('modalOverlay').style.display = 'none';
+            window.closeAfterSalesModal = function() {
+                document.getElementById('afterSalesModalOverlay').style.display = 'none';
             };
 
             // Modal Handlers
-            window.openBankDetailsModal = function(orderId) {
-                const overlay = document.getElementById('modalOverlay');
-                const body = document.getElementById('modalBody');
-                const saved = localStorage.getItem(`bank_${orderId}`);
-                let existingName = '', existingAcc = '', existingIfsc = '';
-                if (saved) {
-                    try {
-                        const p = JSON.parse(saved);
-                        existingName = p.account_name || '';
-                        existingAcc = p.account_number || '';
-                        existingIfsc = p.ifsc_code || '';
-                    } catch(e){}
-                }
-
-                body.innerHTML = `
-                    <div class="modal-title">Refund Bank Details</div>
-                    <div class="modal-subtitle">Add your bank account details so we can process your refund once the return is received.</div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Account Holder Name *</label>
-                        <input type="text" id="bankName" class="form-input" placeholder="Full name as in bank account" value="${esc(existingName)}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Bank Account Number *</label>
-                        <input type="password" id="bankAcc" class="form-input" placeholder="Enter account number" value="${esc(existingAcc)}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Confirm Account Number *</label>
-                        <input type="text" id="bankAccConfirm" class="form-input" placeholder="Re-enter account number" value="${esc(existingAcc)}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">IFSC Code *</label>
-                        <input type="text" id="bankIfsc" class="form-input" style="text-transform:uppercase;" placeholder="e.g. HDFC0001234" maxlength="11" value="${esc(existingIfsc)}">
-                    </div>
-
-                    <div id="modalErr" style="display:none; color:var(--return-theme); font-size:13px; font-weight:700; margin-top:12px;"></div>
-
-                    <button class="btn-action-primary btn-bg-navy" style="width:100%; margin-top:16px;" onclick="saveBankDetails('${esc(orderId)}')">
-                        Save Bank Details
-                    </button>`;
-                overlay.style.display = 'flex';
-            };
-
-            window.saveBankDetails = async function(orderId) {
-                const name = document.getElementById('bankName').value.trim();
-                const acc = document.getElementById('bankAcc').value.trim();
-                const confirmAcc = document.getElementById('bankAccConfirm').value.trim();
-                const ifsc = document.getElementById('bankIfsc').value.trim().toUpperCase();
-                const errBox = document.getElementById('modalErr');
-
-                if (!name) { errBox.textContent = 'Account holder name is required.'; errBox.style.display = 'block'; return; }
-                if (!acc || acc.length < 8) { errBox.textContent = 'Please enter a valid bank account number.'; errBox.style.display = 'block'; return; }
-                if (acc !== confirmAcc) { errBox.textContent = 'Confirm Account Number does not match.'; errBox.style.display = 'block'; return; }
-                if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) { errBox.textContent = 'Please enter a valid 11-digit IFSC code (e.g. HDFC0001234).'; errBox.style.display = 'block'; return; }
-
-                errBox.style.display = 'none';
-                const bankObj = { account_name: name, account_number: acc, ifsc_code: ifsc };
-                localStorage.setItem(`bank_${orderId}`, JSON.stringify(bankObj));
-
-                try {
-                    await fetch(`${API_BASE}/api/after-sales/return`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order_id: orderId, bank_details: bankObj })
-                    });
-                } catch(e){}
-
-                closeModal();
-                fetchOrders();
-            };
-
             window.openReturnModal = function(orderId) {
-                const overlay = document.getElementById('modalOverlay');
-                const body = document.getElementById('modalBody');
-                body.innerHTML = `
-                    <div class="modal-title">Request Return</div>
-                    <div class="modal-subtitle">Order #${orderId} • Standard Fit Return</div>
+                const overlay = document.getElementById('afterSalesModalOverlay');
+                const content = document.getElementById('afterSalesModalContent');
+                content.innerHTML = `
+                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">↩ Request Return</h2>
+                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Return</p>
                     
-                    <div class="form-group">
-                        <label class="form-label">Reason for Return</label>
-                        <select id="retReason" class="form-select">
-                            <option value="Size didn't fit">Size didn't fit / Tight fit</option>
-                            <option value="Fabric quality">Fabric or quality issue</option>
-                            <option value="Color mismatch">Color different than expected</option>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Return</label>
+                        <select id="returnReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                            <option value="Size issue">Size issue / fit not comfortable</option>
+                            <option value="Fabric / Quality">Fabric or quality issue</option>
+                            <option value="Color difference">Color different than expected</option>
                             <option value="Changed mind">Changed mind</option>
                         </select>
                     </div>
 
-                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:14px;">
-                        <div style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px;">Refund Bank Details</div>
-                        <div class="form-group">
-                            <label class="form-label">Account Holder Name *</label>
-                            <input type="text" id="retAccName" class="form-input" placeholder="Full name">
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+                        <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px;">🏦 Refund Bank Account Details</h4>
+                        <div style="margin-bottom:10px;">
+                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Account Holder Name *</label>
+                            <input type="text" id="returnAccountName" placeholder="Full name as in bank account" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Account Number *</label>
-                            <input type="password" id="retAccNum" class="form-input" placeholder="Account number">
+                        <div style="margin-bottom:10px;">
+                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Bank Account Number *</label>
+                            <input type="password" id="returnAccountNumber" placeholder="Enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirm Account Number *</label>
-                            <input type="text" id="retConfirmAccNum" class="form-input" placeholder="Confirm account number">
+                        <div style="margin-bottom:10px;">
+                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Confirm Account Number *</label>
+                            <input type="text" id="returnConfirmAccountNumber" placeholder="Re-enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">IFSC Code *</label>
-                            <input type="text" id="retIfsc" class="form-input" style="text-transform:uppercase;" placeholder="e.g. HDFC0001234" maxlength="11">
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">IFSC Code *</label>
+                            <input type="text" id="returnIfscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-transform:uppercase; outline:none;">
                         </div>
                     </div>
 
-                    <div id="modalErr" style="display:none; color:var(--return-theme); font-size:13px; font-weight:700; margin-bottom:12px;"></div>
-
-                    <button class="btn-action-primary btn-bg-navy" style="width:100%;" onclick="submitReturn('${esc(orderId)}')">
-                        Submit Return Request
-                    </button>`;
+                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                    <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
+                `;
                 overlay.style.display = 'flex';
             };
 
-            window.submitReturn = async function(orderId) {
-                const reason = document.getElementById('retReason').value;
-                const name = document.getElementById('retAccName').value.trim();
-                const acc = document.getElementById('retAccNum').value.trim();
-                const confirmAcc = document.getElementById('retConfirmAccNum').value.trim();
-                const ifsc = document.getElementById('retIfsc').value.trim().toUpperCase();
-                const errBox = document.getElementById('modalErr');
+            window.submitReturnRequest = async function(orderId) {
+                const btn = document.getElementById('btnSubmitRet');
+                const msg = document.getElementById('modalMsg');
+                const reason = document.getElementById('returnReason').value;
+                const accountName = (document.getElementById('returnAccountName').value || '').trim();
+                const accountNumber = (document.getElementById('returnAccountNumber').value || '').trim();
+                const confirmAccountNumber = (document.getElementById('returnConfirmAccountNumber').value || '').trim();
+                const ifscCode = (document.getElementById('returnIfscCode').value || '').trim().toUpperCase();
 
-                if (!name) { errBox.textContent = 'Account holder name is required.'; errBox.style.display = 'block'; return; }
-                if (!acc || acc.length < 8) { errBox.textContent = 'Please enter a valid bank account number.'; errBox.style.display = 'block'; return; }
-                if (acc !== confirmAcc) { errBox.textContent = 'Confirm Account Number does not match.'; errBox.style.display = 'block'; return; }
-                if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) { errBox.textContent = 'Please enter a valid 11-digit IFSC code.'; errBox.style.display = 'block'; return; }
+                if (!accountName) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter Account Holder Name.'; return; }
+                if (!accountNumber || accountNumber.length < 8) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter a valid Account Number.'; return; }
+                if (accountNumber !== confirmAccountNumber) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Account Numbers do not match.'; return; }
+                if (!ifscCode || ifscCode.length !== 11) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter a valid 11-digit IFSC Code.'; return; }
 
-                const bankObj = { account_name: name, account_number: acc, ifsc_code: ifsc };
-                localStorage.setItem(`bank_${orderId}`, JSON.stringify(bankObj));
-
+                btn.disabled = true; btn.innerHTML = 'Submitting...';
                 try {
-                    await fetch(`${API_BASE}/api/after-sales/return`, {
+                    const res = await fetch(API_BASE + '/api/after-sales/return', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order_id: orderId, reason, bank_details: bankObj })
+                        body: JSON.stringify({
+                            order_id: orderId, reason, bank_details: { account_name: accountName, account_number: accountNumber, ifsc_code: ifscCode }
+                        })
                     });
-                } catch(e){}
-
-                closeModal();
-                fetchOrders();
+                    const data = await res.json();
+                    if (data.success) {
+                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
+                        msg.innerHTML = '✓ Return request submitted! Pickup will be scheduled.';
+                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
+                    } else {
+                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit return request.');
+                        btn.disabled = false; btn.innerHTML = 'Submit Return Request';
+                    }
+                } catch (err) {
+                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ Network error submitting return request.';
+                    btn.disabled = false; btn.innerHTML = 'Submit Return Request';
+                }
             };
 
             window.openExchangeModal = function(orderId) {
-                const overlay = document.getElementById('modalOverlay');
-                const body = document.getElementById('modalBody');
-                body.innerHTML = `
-                    <div class="modal-title">Request Exchange</div>
-                    <div class="modal-subtitle">Order #${orderId} • Standard Fit Exchange</div>
+                const overlay = document.getElementById('afterSalesModalOverlay');
+                const content = document.getElementById('afterSalesModalContent');
+                content.innerHTML = `
+                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">🔄 Request Exchange</h2>
+                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Exchange</p>
                     
-                    <div class="form-group">
-                        <label class="form-label">Select Replacement Size</label>
-                        <select id="excSize" class="form-select">
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Select Replacement Size</label>
+                        <select id="exchangeSize" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
                             <option value="28">Size 28</option>
                             <option value="30">Size 30</option>
                             <option value="32">Size 32</option>
@@ -1765,109 +1195,131 @@
                             <option value="38">Size 38</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Reason for Exchange</label>
-                        <select id="excReason" class="form-select">
-                            <option value="Size change (32 → 34)">Size change (32 → 34)</option>
-                            <option value="Too tight">Too tight / fit issue</option>
-                            <option value="Too loose">Too loose / large</option>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Exchange</label>
+                        <select id="exchangeReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                            <option value="Too small">Too small / Tight fit</option>
+                            <option value="Too large">Too large / Loose fit</option>
+                            <option value="Length incorrect">Length incorrect</option>
                         </select>
                     </div>
-
-                    <button class="btn-action-primary btn-bg-navy" style="width:100%;" onclick="submitExchange('${esc(orderId)}')">
-                        Submit Exchange Request
-                    </button>`;
+                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                    <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
+                `;
                 overlay.style.display = 'flex';
             };
 
-            window.submitExchange = async function(orderId) {
-                const replacement_size = document.getElementById('excSize').value;
-                const reason = document.getElementById('excReason').value;
-
+            window.submitExchangeRequest = async function(orderId) {
+                const btn = document.getElementById('btnSubmitExc');
+                const msg = document.getElementById('modalMsg');
+                const replacement_size = document.getElementById('exchangeSize').value;
+                const reason = document.getElementById('exchangeReason').value;
+                btn.disabled = true; btn.innerHTML = 'Submitting...';
                 try {
-                    await fetch(`${API_BASE}/api/after-sales/exchange`, {
+                    const res = await fetch(API_BASE + '/api/after-sales/exchange', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ order_id: orderId, replacement_size, reason })
                     });
-                } catch(e){}
-
-                closeModal();
-                fetchOrders();
+                    const data = await res.json();
+                    if (data.success) {
+                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
+                        msg.innerHTML = '✓ Exchange request submitted! Replacement will be dispatched.';
+                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
+                    } else {
+                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit exchange request.');
+                        btn.disabled = false; btn.innerHTML = 'Submit Exchange Request';
+                    }
+                } catch (err) {
+                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ Network error submitting exchange request.';
+                    btn.disabled = false; btn.innerHTML = 'Submit Exchange Request';
+                }
             };
 
-            let selWaist = "0.0";
-            let selLength = "0.0";
+            let selectedWaistVal = "0.0";
+            let selectedLengthVal = "0.0";
 
             window.openAlterationModal = function(orderId, productName) {
-                selWaist = "0.0"; selLength = "0.0";
-                const overlay = document.getElementById('modalOverlay');
-                const body = document.getElementById('modalBody');
-
-                body.innerHTML = `
-                    <div class="modal-title">Alter Your Trousers</div>
-                    <div class="modal-subtitle">We'll alter your existing Slyte trousers and send them back to you.<br><span style="color:#16a34a; font-weight:700;">Alteration included (Free up to ±1.5")</span></div>
+                selectedWaistVal = "0.0"; selectedLengthVal = "0.0";
+                const overlay = document.getElementById('afterSalesModalOverlay');
+                const content = document.getElementById('afterSalesModalContent');
+                content.innerHTML = `
+                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">✂️ Request Custom Alteration</h2>
+                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Free alteration up to ±1.5"</p>
                     
-                    <div class="form-group">
-                        <label class="form-label">Waist Adjustment</label>
-                        <div class="adj-grid">
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-1.5')">-1.5"</button>
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-1.0')">-1.0"</button>
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-0.5')">-0.5"</button>
-                            <button type="button" class="adj-pill waist-pill active" onclick="setWaist(this,'0.0')">0" (Current)</button>
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+0.5')">+0.5"</button>
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+1.0')">+1.0"</button>
-                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+1.5')">+1.5"</button>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Waist Adjustment</label>
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-1.5')">-1.5"</button>
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-1.0')">-1.0"</button>
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-0.5')">-0.5"</button>
+                            <button type="button" class="adjustment-pill waist-pill active" onclick="selectWaist(this,'0.0')">0"</button>
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+0.5')">+0.5"</button>
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+1.0')">+1.0"</button>
+                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+1.5')">+1.5"</button>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Length Adjustment</label>
-                        <div class="adj-grid">
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-1.5')">-1.5"</button>
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-1.0')">-1.0"</button>
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-0.5')">-0.5"</button>
-                            <button type="button" class="adj-pill length-pill active" onclick="setLength(this,'0.0')">0" (Current)</button>
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+0.5')">+0.5"</button>
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+1.0')">+1.0"</button>
-                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+1.5')">+1.5"</button>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Length Adjustment</label>
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-1.5')">-1.5"</button>
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-1.0')">-1.0"</button>
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-0.5')">-0.5"</button>
+                            <button type="button" class="adjustment-pill length-pill active" onclick="selectLength(this,'0.0')">0"</button>
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+0.5')">+0.5"</button>
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+1.0')">+1.0"</button>
+                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+1.5')">+1.5"</button>
                         </div>
                     </div>
 
-                    <button class="btn-action-primary btn-bg-purple" style="width:100%;" onclick="submitAlteration('${esc(orderId)}')">
-                        Submit Alteration Request
-                    </button>`;
+                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                    <button id="btnSubmitAlt" onclick="submitAlterationRequest('${orderId}')" style="width:100%; background:#673ab7; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Alteration Request</button>
+                `;
                 overlay.style.display = 'flex';
             };
 
-            window.setWaist = function(btn, val) {
+            window.selectWaist = function(btn, val) {
                 document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selWaist = val;
+                btn.classList.add('active'); selectedWaistVal = val;
             };
 
-            window.setLength = function(btn, val) {
+            window.selectLength = function(btn, val) {
                 document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selLength = val;
+                btn.classList.add('active'); selectedLengthVal = val;
             };
 
-            window.submitAlteration = async function(orderId) {
+            window.submitAlterationRequest = async function(orderId) {
+                const btn = document.getElementById('btnSubmitAlt');
+                const msg = document.getElementById('modalMsg');
+                btn.disabled = true; btn.innerHTML = 'Submitting...';
                 try {
-                    await fetch(`${API_BASE}/api/after-sales/alteration`, {
+                    const res = await fetch(API_BASE + '/api/after-sales/alteration', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             order_id: orderId,
-                            alteration_type: `Waist: ${selWaist}", Length: ${selLength}"`,
-                            measurements: { waist_diff: selWaist, length_diff: selLength }
+                            alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
+                            measurements: { waist_diff: selectedWaistVal, length_diff: selectedLengthVal }
                         })
                     });
-                } catch(e){}
-
-                closeModal();
-                fetchOrders();
+                    const data = await res.json();
+                    if (data.success) {
+                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
+                        msg.innerHTML = '✓ Alteration request submitted! Pickup will be arranged.';
+                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
+                    } else {
+                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit alteration request.');
+                        btn.disabled = false; btn.innerHTML = 'Submit Alteration Request';
+                    }
+                } catch (err) {
+                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ Network error submitting alteration request.';
+                    btn.disabled = false; btn.innerHTML = 'Submit Alteration Request';
+                }
             };
 
             const savedPhone = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
