@@ -10,18 +10,22 @@
 
     <!-- Central Application Config -->
     <script src="js/config.js"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
 
     <style>
         :root {
             --bg: #ffffff;
             --surface: #ffffff;
-            --surface-2: #f8fafc;
+            --surface-2: #f8f8f8;
             --border: #eeeeee;
-            --border-light: #f1f5f9;
             --text-primary: #000000;
             --text-secondary: #555555;
             --text-muted: #999999;
@@ -38,23 +42,489 @@
             --transition: 0.3s ease;
         }
 
+        .adjustment-pill {
+            padding: 8px 4px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .adjustment-pill.active {
+            background: #154cbd;
+            color: #ffffff;
+            border-color: #154cbd;
+            box-shadow: 0 2px 8px rgba(21, 76, 189, 0.3);
+        }
+
+        /* ── AFTER-SALES PREMIUM UI/UX STYLES ────────────────────────── */
+        .after-sales-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            font-family: 'Inter', -apple-system, sans-serif;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .as-top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .as-title-box {
+            text-align: left;
+        }
+
+        .as-title-main {
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.3px;
+        }
+
+        .as-order-id-sub {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .as-more-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+        }
+
+        .as-product-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .as-product-thumb {
+            width: 72px;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .as-product-info {
+            flex: 1;
+        }
+
+        .as-product-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 2px;
+            line-height: 1.25;
+        }
+
+        .as-product-fit {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .as-tag-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .as-tag-badge.standard {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .as-tag-badge.custom {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        /* Stepper Bar */
+        .as-stepper-container {
+            position: relative;
+            margin: 28px 0 32px;
+            padding: 0 4px;
+        }
+
+        .as-stepper-track {
+            position: absolute;
+            top: 17px;
+            left: 28px;
+            right: 28px;
+            height: 3px;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+
+        .as-stepper-fill {
+            position: absolute;
+            top: 17px;
+            left: 28px;
+            height: 3px;
+            z-index: 1;
+            transition: width 0.4s ease;
+        }
+
+        .as-stepper-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .as-step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .as-step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 1px #e5e7eb;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .as-step-item.active .as-step-circle,
+        .as-step-item.completed .as-step-circle {
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .as-step-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 72px;
+        }
+
+        .as-step-item.active .as-step-title {
+            color: #111827;
+            font-weight: 800;
+        }
+
+        .as-step-subdate {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+
+        /* Workflow Themes */
+        .as-theme-return .as-stepper-fill { background: #dc2626; }
+        .as-theme-return .as-step-item.completed .as-step-circle,
+        .as-theme-return .as-step-item.active .as-step-circle {
+            background: #dc2626;
+        }
+
+        .as-banner-return {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+        }
+
+        .as-banner-return .as-banner-icon-bg {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .as-banner-return .as-banner-head { color: #991b1b; }
+
+        .as-theme-exchange .as-stepper-fill { background: #2563eb; }
+        .as-theme-exchange .as-step-item.completed .as-step-circle,
+        .as-theme-exchange .as-step-item.active .as-step-circle {
+            background: #2563eb;
+        }
+
+        .as-banner-exchange {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+        }
+
+        .as-banner-exchange .as-banner-icon-bg {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .as-banner-exchange .as-banner-head { color: #1e40af; }
+
+        .as-theme-alteration .as-stepper-fill { background: #16a34a; }
+        .as-theme-alteration .as-step-item.completed .as-step-circle,
+        .as-theme-alteration .as-step-item.active .as-step-circle {
+            background: #16a34a;
+        }
+
+        .as-banner-alteration {
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+        }
+
+        .as-banner-alteration .as-banner-icon-bg {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .as-banner-alteration .as-banner-head { color: #166534; }
+
+        /* Status Highlight Card */
+        .as-status-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .as-banner-icon-bg {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .as-banner-content {
+            flex: 1;
+        }
+
+        .as-banner-head {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .as-banner-sub {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.35;
+            margin-bottom: 4px;
+        }
+
+        .as-banner-time {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* Details Section */
+        .as-details-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .as-details-head-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 14px;
+        }
+
+        .as-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+        }
+
+        .as-row:last-child {
+            border-bottom: none;
+        }
+
+        .as-row-label-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .as-row-icon {
+            font-size: 16px;
+            color: #374151;
+            width: 20px;
+            text-align: center;
+        }
+
+        .as-row-val {
+            font-weight: 700;
+            color: #111827;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .as-copy-btn {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #374151;
+        }
+
+        .as-copy-btn:hover { background: #e5e7eb; }
+
+        /* Info Callout */
+        .as-notice-box {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.4;
+        }
+
+        .as-notice-icon {
+            font-size: 18px;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* Support Button Card */
+        .as-support-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            margin-bottom: 20px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .as-support-card:hover {
+            border-color: #cbd5e1;
+            background: #f9fafb;
+        }
+
+        .as-support-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .as-support-icon-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #111827;
+        }
+
+        .as-support-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .as-support-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .as-support-arrow {
+            font-size: 18px;
+            color: #9ca3af;
+        }
+
+        /* Primary Tracking Action Button */
+        .as-primary-track-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: #eef2ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .as-primary-track-btn:hover {
+            background: #e0e7ff;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text-primary);
             padding-bottom: 100px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-font-smoothing: antialiased;
         }
 
         .page-container {
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 24px 16px;
         }
 
         .lookup-hero {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
         .lookup-hero .tag {
@@ -64,18 +534,18 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--accent);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .lookup-hero h1 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
 
         .lookup-hero p {
-            font-size: 13.5px;
+            font-size: 14px;
             color: var(--text-secondary);
         }
 
@@ -83,24 +553,24 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
+            padding: 24px;
             box-shadow: var(--shadow);
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
         .field-label {
             display: block;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             color: var(--text-secondary);
         }
 
         .input-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .phone-wrapper {
@@ -119,1217 +589,2117 @@
 
         #mobileInput {
             width: 100%;
-            height: 48px;
+            height: 52px;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 0 16px 0 50px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             font-family: inherit;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
             background: #fafafa;
         }
 
+        #mobileInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.1);
+            background: #fff;
+        }
+
         #trackBtn {
-            height: 48px;
-            padding: 0 20px;
-            background: #0f172a;
+            height: 52px;
+            padding: 0 24px;
+            background: var(--primary-black);
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
             font-weight: 700;
-            font-size: 14px;
             cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
         }
 
-        /* Order Details Card (Matching Mockup Images 1:1) */
+        #trackBtn:active {
+            transform: scale(0.98);
+        }
+
+        /* Results Area */
         .order-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             margin-bottom: 20px;
-            padding: 20px;
+            overflow: hidden;
             box-shadow: var(--shadow);
+            animation: slideUp 0.4s ease forwards;
         }
 
-        .card-top-header {
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            align-items: flex-start;
         }
 
-        .card-top-header .title {
-            font-size: 18px;
-            font-weight: 800;
-            color: #0f172a;
+        .order-id-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
-        .card-top-header .code {
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
+        .product-name {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.3;
         }
 
-        /* Product Hero Row */
-        .product-hero-row {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .product-img-thumb {
-            width: 84px;
-            height: 84px;
-            border-radius: 12px;
-            background: #f1f5f9;
-            object-fit: cover;
-            flex-shrink: 0;
-            border: 1px solid #e2e8f0;
-        }
-
-        .product-details-col {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .product-name-txt {
-            font-size: 17px;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.25;
-        }
-
-        .fit-spec-txt {
-            font-size: 13.5px;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .type-badge-pill {
-            display: inline-block;
-            align-self: flex-start;
+        .payment-badge {
             font-size: 10px;
             font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 12px;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .badge-std { background: #eff6ff; color: #1d4ed8; }
-        .badge-cst { background: #f3e8ff; color: #6b21a8; }
+        .payment-badge.paid { background: #e8f5e9; color: #2e7d32; }
+        .payment-badge.pending { background: #fff8e1; color: #e65100; }
+        .payment-badge.cancelled { background: #ffebee; color: #c62828; }
 
-        /* Timeline Stepper Component */
-        .stepper-timeline {
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Stepper */
+        .stepper {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            position: relative;
-            margin: 20px 0 24px 0;
-            padding: 0 4px;
+            margin-bottom: 24px;
+            padding-top: 10px;
         }
 
-        .stepper-track-bg {
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
             position: absolute;
-            top: 18px;
-            left: 20px;
-            right: 20px;
+            top: 11px;
+            left: 50%;
+            width: 100%;
             height: 2px;
-            background: #e2e8f0;
+            background: #eee;
             z-index: 1;
         }
 
-        .stepper-track-fill {
-            position: absolute;
-            top: 18px;
-            left: 20px;
-            height: 2px;
-            z-index: 2;
-            transition: all 0.3s ease;
+        .step.done:not(:last-child)::after {
+            background: var(--accent);
         }
 
-        .step-item-node {
+        .step-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #eee;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ccc;
             position: relative;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            text-align: center;
+            z-index: 2;
         }
 
-        .node-circle-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            margin-bottom: 8px;
+        .step.active .step-dot {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
-        .node-circle-icon .material-symbols-outlined {
-            font-size: 18px;
+        .step.done .step-dot {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
         }
 
-        .step-label-txt {
-            font-size: 11px;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.2;
-            max-width: 76px;
-        }
-
-        .step-item-node:not(.done):not(.active) .step-label-txt {
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .step-date-txt {
+        .step-text {
             font-size: 10px;
-            color: #94a3b8;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-
-        /* Status Banner Card (Red / Blue / Green matching Mockups) */
-        .status-banner-card {
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-        }
-
-        .status-avatar-wrap {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .status-avatar-wrap .material-symbols-outlined {
-            font-size: 22px;
-        }
-
-        .status-txt-col {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .status-card-title {
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        .status-card-desc {
-            font-size: 13px;
-            font-weight: 500;
-            color: #475569;
-            line-height: 1.4;
-        }
-
-        .status-card-time {
-            font-size: 12px;
-            font-weight: 500;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-
-        /* Color Schemes from Mockups */
-        .theme-red-card { background: #fef2f2; }
-        .theme-red-card .status-avatar-wrap { background: #fee2e2; color: #dc2626; }
-        .theme-red-card .status-card-title { color: #dc2626; }
-
-        .theme-blue-card { background: #eff6ff; }
-        .theme-blue-card .status-avatar-wrap { background: #dbeafe; color: #2563eb; }
-        .theme-blue-card .status-card-title { color: #2563eb; }
-
-        .theme-green-card { background: #f0fdf4; }
-        .theme-green-card .status-avatar-wrap { background: #dcfce7; color: #16a34a; }
-        .theme-green-card .status-card-title { color: #15803d; }
-
-        /* Details Card */
-        .details-summary-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .details-summary-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 12px;
-        }
-
-        .detail-row-line {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f8fafc;
-        }
-
-        .detail-row-line:last-child {
-            border-bottom: none;
-        }
-
-        .detail-left-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .detail-left-label .material-symbols-outlined {
-            font-size: 18px;
-            color: #64748b;
-        }
-
-        .detail-right-val {
-            font-size: 13px;
             font-weight: 700;
-            color: #0f172a;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-copy {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* Info Blue Notice Box */
-        .info-notice-box {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-        }
-
-        .info-notice-box .material-symbols-outlined {
-            font-size: 18px;
-            color: #1d4ed8;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .info-notice-box span {
-            font-size: 12.5px;
-            font-weight: 500;
-            color: #1e40af;
-            line-height: 1.4;
-        }
-
-        /* Support Row Card */
-        .support-contact-row {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-decoration: none;
-            color: #0f172a;
-        }
-
-        .support-contact-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .support-headset-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f172a;
-        }
-
-        .support-contact-text h4 {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: #0f172a;
-        }
-
-        .support-contact-text p {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* Full Width Action Buttons */
-        .btn-tracking-link {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px;
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 800;
-            color: #0f172a;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .btn-action-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .btn-act {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 800;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            text-decoration: none;
-        }
-
-        .btn-act-blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
-        .btn-act-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
-        .btn-act-purple { background: #673ab7; color: #ffffff; }
-
-        .btn-show-more-toggle {
-            width: 100%;
-            background: none;
-            border: 1px dashed #e2e8f0;
-            color: #64748b;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            margin-top: 8px;
         }
 
-        .expanded-details-block {
-            display: none;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid #e2e8f0;
+        .step.active .step-text {
+            color: var(--text-primary);
         }
 
-        /* Preserved Fixed Bottom Navbar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
+        .details-block {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
             display: flex;
-            justify-content: space-around;
-            padding: 10px 0 12px 0;
-            z-index: 90;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
 
-        .nav-item {
+        .detail-row:last-child { margin-bottom: 0; }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .tracking-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            gap: 2px;
-            text-decoration: none;
-            color: #94a3b8;
-            font-size: 11px;
-            font-weight: 600;
         }
 
-        .nav-item.active {
-            color: #0f172a;
-            font-weight: 800;
-        }
-
-        .nav-item .material-symbols-outlined {
-            font-size: 22px;
-        }
-
-        /* Adjustment Pills */
-        .adjustment-pill {
-            padding: 8px 4px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
+        .track-btn-link {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
-            color: #334155;
-            cursor: pointer;
-            text-align: center;
+            text-decoration: none;
         }
-        .adjustment-pill.active {
-            background: #154cbd;
-            color: #ffffff;
-            border-color: #154cbd;
+
+        .show-more-btn {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .show-more-btn:hover { background: #f5f5f5; }
+
+        .expanded-section {
+            display: none;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border);
+            margin-top: 20px;
+        }
+
+        .expanded-section.open { display: block; }
+
+        .timeline {
+            margin-top: 16px;
+            border-left: 2px solid #eee;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .timeline-item {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #eee;
+        }
+
+        .timeline-item:first-child::before {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .timeline-item-cancel::before,
+        .timeline-item-cancel:first-child::before {
+            background: var(--error) !important;
+            border-color: var(--error) !important;
+        }
+
+        .timeline-date {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .timeline-status {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ffcdd2;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover { background: #ffebee; }
+
+        #loader { text-align: center; padding: 40px 0; display: none; }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #eee;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 480px) {
+            .input-row { flex-direction: column; }
+            #trackBtn { width: 100%; }
         }
     </style>
 </head>
 
-<body>
+<body class="page-orders">
 
-    <!-- Preserved Header Navbar -->
-    <header class="brand-header" style="background:#fff; border-bottom:1px solid #e2e8f0; padding:16px; position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between;">
-        <a href="index.html" class="brand-logo" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#0f172a;">
-            <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" style="height:24px;">
-        </a>
-        <a href="https://wa.me/916363887497" target="_blank" class="header-help-btn" style="font-size:13px; font-weight:600; color:#64748b; text-decoration:none; display:flex; align-items:center; gap:4px; padding:6px 12px; border-radius:20px; background:#f8fafc; border:1px solid #f1f5f9;">
-            <span class="material-symbols-outlined" style="font-size:16px">help_outline</span> Need Help?
-        </a>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a href="wishlist.html" class="icon-btn">
+                <span class="material-symbols-outlined">favorite</span>
+            </a>
+            <a href="cart.html" class="icon-btn cart-icon-btn">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count">0</span>
+            </a>
+            <button class="menu-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
     </header>
 
-    <div class="page-container">
-        <!-- Phone Lookup Card -->
-        <div class="lookup-card">
-            <div class="field-label">Lookup Orders</div>
-            <p style="font-size:13px; color:#555; margin-bottom:14px;">Enter your 10-digit mobile number to track orders and manage returns/exchanges/alterations.</p>
-            <div class="input-row">
-                <div class="phone-wrapper">
-                    <span class="phone-prefix">+91</span>
-                    <input type="tel" id="mobileInput" placeholder="97420 06683" maxlength="10">
+    <!-- Main Container -->
+    <main class="page-container">
+        <section class="lookup-hero">
+            <span class="tag">Tracking</span>
+            <h1>Track Orders</h1>
+            <p>Get real-time updates on your slyte shipments.</p>
+        </section>
+
+        <div class="lookup-card" id="lookupCard">
+            <div id="mobileStep">
+                <label class="field-label">Mobile Number</label>
+                <div class="input-row">
+                    <div class="phone-wrapper">
+                        <span class="phone-prefix">+91</span>
+                        <input type="tel" id="mobileInput" maxlength="10" placeholder="98XXXXXXXX" />
+                    </div>
+                    <button type="button" id="trackBtn">Get OTP</button>
                 </div>
-                <button id="trackBtn" onclick="fetchOrders()">Look Up</button>
             </div>
+
+            <div id="otpStep" style="display:none;">
+                <p style="font-size: 14px; margin-bottom: 16px; font-weight: 500;">
+                    OTP sent to <span id="displaySentMobile" style="font-weight: 700;"></span>
+                    <a href="#" id="editMobileBtn" style="color: var(--accent); margin-left: 8px; font-size: 13px; text-decoration: none;">Edit</a>
+                </p>
+                <label class="field-label">Enter 6-digit OTP</label>
+                <div class="input-row">
+                    <div class="phone-wrapper">
+                        <input type="tel" id="otpInput" maxlength="6" placeholder="------" style="width: 100%; height: 52px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px;" />
+                    </div>
+                    <button type="button" id="verifyBtn">Verify OTP</button>
+                </div>
+                <div style="margin-top: 12px; font-size: 13px; text-align: right;">
+                    <span id="resendTimer" style="color: var(--text-muted);">Resend in 60s</span>
+                    <a href="#" id="resendBtn" style="color: var(--accent); display: none; text-decoration: none; font-weight: 600;">Resend OTP</a>
+                </div>
+            </div>
+
+            <div id="loggedInStep" style="display:none; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="field-label" style="margin-bottom: 4px;">Verified Mobile</div>
+                    <div id="loggedInMobile" style="font-weight: 700; font-size: 16px;"></div>
+                </div>
+                <button type="button" id="logoutBtn" style="background: none; border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;">Logout</button>
+            </div>
+
+            <div id="errorBanner" style="display:none; color: var(--error); font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
+            <div id="successBanner" style="display:none; color: var(--paid-color); background: var(--paid-bg); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
         </div>
 
-        <!-- Orders Results Container -->
-        <div id="resultsArea">
-            <div style="text-align:center; padding:30px; color:var(--text-muted); font-size:14px;">
-                Enter your phone number above to view orders.
-            </div>
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="font-size:14px; color:var(--text-secondary); font-weight: 500;">Fetching your order details...</p>
         </div>
-    </div>
 
-    <!-- Preserved Bottom Fixed Navigation Bar -->
+        <div id="resultsArea"></div>
+    </main>
+
+    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item">
             <span class="material-symbols-outlined">home</span>
-            <span>Home</span>
         </a>
-        <a href="custom-clothing.html" class="nav-item">
+        <a href="search.html" class="nav-item">
             <span class="material-symbols-outlined">search</span>
-            <span>Shop</span>
         </a>
-        <a href="orders.html" class="nav-item active">
-            <span class="material-symbols-outlined">local_shipping</span>
-            <span>Orders</span>
+        <a href="ai-fit.html" class="nav-item-center">
+            <span class="material-symbols-outlined">straighten</span>
         </a>
-        <a href="complete-profile.html" class="nav-item">
-            <span class="material-symbols-outlined">person</span>
-            <span>Account</span>
+        <a href="shop.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_bag</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="nav-cart-count">0</span>
         </a>
     </nav>
 
-    <!-- Modal Overlay -->
-    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
-        <div style="background:#fff; border-radius:20px; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
-            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
-            <div id="afterSalesModalContent">
-                <!-- Modal Content Injected Dynamically -->
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Hamburger Menu Drawer -->
+    <div class="menu-drawer" id="menuDrawer">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <div class="menu-logo">
+                    <a href="index.html">
+                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                    </a>
+                </div>
+                <button class="menu-close-btn" id="menuCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
+            <h2>Menu</h2>
         </div>
+        <nav class="menu-nav">
+            <a href="wishlist.html" class="menu-item">
+                <span class="material-symbols-outlined">favorite</span>
+                <span>Wishlist</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Track Orders</span>
+            </a>
+            <a href="cart.html" class="menu-item">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Addresses</span>
+            </a>
+            <a href="ai-fit.html" class="menu-item">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>Size</span>
+            </a>
+        </nav>
     </div>
+
+    <!-- Scripts -->
+    <script src="api-client.js?v=5"></script>
+    <script type="module" src="script.js?v=6"></script>
+    <script type="module" src="auth.js"></script>
+
+    <style>
+        /* ── Extra styles for lifecycle dashboard ── */
+        .lc-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 800; padding: 5px 12px;
+            border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .lc-badge.created    { background:#f3f4f6; color:#374151; }
+        .lc-badge.paid       { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.confirmed,.lc-badge.ready { background:#e3f2fd; color:#1565c0; }
+        .lc-badge.shipped,.lc-badge.transit,.lc-badge.out_for { background:#fff8e1; color:#e65100; }
+        .lc-badge.delivered  { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.cancelled  { background:#ffebee; color:#c62828; }
+        .lc-badge.return_init,.lc-badge.rto_transit { background:#fce4ec; color:#880e4f; }
+        .lc-badge.rto_delivered { background:#f3e5f5; color:#6a1b9a; }
+        .lc-badge.refund_pending { background:#fff8e1; color:#e65100; }
+        .lc-badge.refunded   { background:#e8f5e9; color:#2e7d32; }
+        .lc-badge.refund_failed { background:#ffebee; color:#c62828; }
+
+        .product-type-tag {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; padding: 3px 8px; border-radius: 6px;
+            margin-left: 8px; vertical-align: middle;
+        }
+        .tag-standard { background:#e3f2fd; color:#1565c0; }
+        .tag-custom   { background:#f3e5f5; color:#6a1b9a; }
+
+        .msg-banner {
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 13px; font-weight: 600; margin-top: 16px; line-height: 1.5;
+        }
+        .msg-info    { background:#e3f2fd; color:#1565c0; }
+        .msg-warn    { background:#fff8e1; color:#e65100; }
+        .msg-success { background:#e8f5e9; color:#2e7d32; }
+        .msg-error   { background:#ffebee; color:#c62828; }
+        .msg-purple  { background:#f3e5f5; color:#6a1b9a; }
+
+        .action-btn {
+            width:100%; padding:13px; border-radius:10px; font-weight:700;
+            font-size:14px; cursor:pointer; border:none; margin-top:12px;
+            transition:opacity 0.2s, transform 0.15s;
+        }
+        .action-btn:active { transform:scale(0.98); }
+        .btn-cancel  { background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
+        .btn-rto     { background:#fff8e1; color:#e65100; border:1px solid #ffe0b2; }
+        .btn-track   { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
+        .btn-support { background:#f5f5f5; color:#333; border:1px solid #e0e0e0; text-decoration:none;
+                       display:block; text-align:center; }
+
+        .refund-strip {
+            display:flex; align-items:center; justify-content:space-between;
+            background:#f9f9f9; border-radius:10px; padding:12px 16px; margin-top:12px;
+        }
+        .refund-strip .label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; }
+        .refund-strip .value { font-size:13px; font-weight:700; }
+    </style>
 
     <script>
         (function () {
-            const API_BASE = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-            let currentOrders = [];
+            const API_BASE = (typeof window !== 'undefined' && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
+                ? window.SLYTE_CONFIG.API_BASE_URL
+                : ((typeof window !== 'undefined' && window.SLYTE_API_BASE) || 'https://api.slyte.in');
+
+            // ── Lifecycle status config ────────────────────────────────────
+            const LC_LABEL = {
+                CREATED:          'Order Placed',
+                PAID:             'Payment Confirmed',
+                CONFIRMED:        'Confirmed',
+                READY_TO_SHIP:    'Ready to Ship',
+                SHIPPED:          'Shipped',
+                IN_TRANSIT:       'In Transit',
+                OUT_FOR_DELIVERY: 'Out for Delivery',
+                DELIVERED:        'Delivered',
+                CANCEL_REQUESTED: 'Cancel Requested',
+                CANCELLED:        'Cancelled',
+                RETURN_INITIATED: 'Return Initiated',
+                RTO_IN_TRANSIT:   'Return in Transit',
+                RTO_DELIVERED:    'Return Delivered',
+                REFUND_PENDING:   'Refund Initiated',
+                REFUNDED:         'Refund Completed',
+                REFUND_FAILED:    'Refund Failed'
+            };
+
+            const LC_CSS = {
+                CREATED:'created', PAID:'paid', CONFIRMED:'confirmed',
+                READY_TO_SHIP:'ready', SHIPPED:'shipped', IN_TRANSIT:'transit',
+                OUT_FOR_DELIVERY:'out_for', DELIVERED:'delivered',
+                CANCEL_REQUESTED:'refund_pending', CANCELLED:'cancelled',
+                RETURN_INITIATED:'return_init', RTO_IN_TRANSIT:'rto_transit',
+                RTO_DELIVERED:'rto_delivered', REFUND_PENDING:'refund_pending',
+                REFUNDED:'refunded', REFUND_FAILED:'refund_failed'
+            };
+
+            // Forward progress steps for normal stepper
+            const FORWARD_STEPS = [
+                { key:'CREATED',          label:'Placed' },
+                { key:'SHIPPED',          label:'Shipped' },
+                { key:'OUT_FOR_DELIVERY', label:'Out for Delivery' },
+                { key:'DELIVERED',        label:'Delivered' }
+            ];
+            const FORWARD_RANK = { CREATED:0, PAID:0, CONFIRMED:0, READY_TO_SHIP:0,
+                                   SHIPPED:1, IN_TRANSIT:1,
+                                   OUT_FOR_DELIVERY:2, DELIVERED:3 };
+
+            // ── getCancelAction ────────────────────────────────────────────
+            function getCancelAction(order) {
+                if (order.productType === 'CUSTOM') return 'NOT_ALLOWED';
+                
+                if (order.createdAt) {
+                    const diffDays = (Date.now() - new Date(order.createdAt).getTime()) / (1000 * 3600 * 24);
+                    if (diffDays > 8) return 'NOT_ALLOWED';
+                }
+
+                const PRE  = ['CREATED','PAID','CONFIRMED','READY_TO_SHIP','CANCEL_REQUESTED'];
+                const POST = ['SHIPPED','IN_TRANSIT','OUT_FOR_DELIVERY'];
+                if (PRE.includes(order.orderLifecycleStatus))  return 'DIRECT_CANCEL';
+                if (POST.includes(order.orderLifecycleStatus)) return 'RTO_CANCEL';
+                return 'NOT_ALLOWED';
+            }
+
+            // ── DOM refs ───────────────────────────────────────────────────
+            const mobileInput = document.getElementById('mobileInput');
+            const trackBtn    = document.getElementById('trackBtn');
+            const otpInput    = document.getElementById('otpInput');
+            const verifyBtn   = document.getElementById('verifyBtn');
+            const resendBtn   = document.getElementById('resendBtn');
+            const resendTimer = document.getElementById('resendTimer');
+            const editMobileBtn = document.getElementById('editMobileBtn');
+            const logoutBtn   = document.getElementById('logoutBtn');
+            const displaySentMobile = document.getElementById('displaySentMobile');
+            const loggedInMobile = document.getElementById('loggedInMobile');
+            
+            const mobileStep = document.getElementById('mobileStep');
+            const otpStep    = document.getElementById('otpStep');
+            const loggedInStep = document.getElementById('loggedInStep');
+
+            const errorBanner = document.getElementById('errorBanner');
+            const successBanner = document.getElementById('successBanner');
+            const loader      = document.getElementById('loader');
+            const resultsArea = document.getElementById('resultsArea');
+            let   currentMobile = '';
+            let   countdownInterval = null;
 
             function esc(s) {
-                return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                if (!s) return '';
+                const d = document.createElement('div');
+                d.textContent = s;
+                return d.innerHTML;
             }
-            function fmtDate(dStr) {
-                if (!dStr) return '14 Sep 2025';
-                const d = new Date(dStr);
-                return isNaN(d.getTime()) ? dStr : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            function fmtDate(ds) {
+                if (!ds) return '';
+                const d = new Date(ds);
+                return isNaN(d) ? ds : d.toLocaleString('en-IN',
+                    { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+            }
+            function setLoading(on, text = '...') {
+                loader.style.display = on ? 'block' : 'none';
+                if(text !== '...') trackBtn.textContent = text;
             }
 
-            window.fetchOrders = async function () {
-                const phoneInput = document.getElementById('mobileInput');
-                const resultsArea = document.getElementById('resultsArea');
-                const rawPhone = phoneInput.value.replace(/\D/g, '').slice(-10);
+            function showError(msg) {
+                successBanner.style.display = 'none';
+                errorBanner.textContent = msg;
+                errorBanner.style.display = 'block';
+            }
+            function showSuccess(msg) {
+                errorBanner.style.display = 'none';
+                successBanner.textContent = msg;
+                successBanner.style.display = 'block';
+            }
+            function clearMessages() {
+                errorBanner.style.display = 'none';
+                successBanner.style.display = 'none';
+            }
 
-                if (rawPhone.length < 10) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:20px; color:#c62828; font-weight:600;">Please enter a valid 10-digit mobile number.</div>`;
+            // ── Authentication Check ───────────────────────────────────────
+            document.addEventListener('DOMContentLoaded', async () => {
+                // Priority 1: Already OTP-verified (has JWT token)
+                const token = localStorage.getItem('slyte_otp_token');
+                if (token) {
+                    showLoggedInState();
+                    fetchOrders();
                     return;
                 }
 
-                localStorage.setItem('slyte_phone', rawPhone);
-                resultsArea.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b; font-size:14px;">Loading your orders...</div>`;
+                // Priority 2: Logged in via checkout (Cashfree set userPhone)
+                const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
+                if (checkoutPhone && checkoutPhone.length === 10) {
+                    // Silently exchange the checkout phone for a JWT
+                    try {
+                        const res = await fetch(`${API_BASE}/auto-login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: checkoutPhone })
+                        });
+                        const data = await res.json();
+                        if (data.success && data.token) {
+                            localStorage.setItem('slyte_otp_token', data.token);
+                            localStorage.setItem('slyte_phone', checkoutPhone);
+                            // 'username' is what script.js reads to show name in hamburger menu
+                            const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
+                                ? data.user.name
+                                : (localStorage.getItem('userName') || localStorage.getItem('username') || checkoutPhone);
+                            localStorage.setItem('username', displayName);
+                            localStorage.setItem('userName', displayName);
+                            showLoggedInState();
+                            fetchOrders();
+                            return;
+                        }
+                    } catch (e) {
+                        // Silently fall through to mobile entry screen
+                    }
+                }
+
+                // Priority 3: Not logged in — show mobile input
+                showMobileStep();
+            });
+
+            function showLoggedInState() {
+                mobileStep.style.display = 'none';
+                otpStep.style.display = 'none';
+                loggedInStep.style.display = 'flex';
+                // Decode token payload manually just to show number, or rely on fetch
+                const phone = localStorage.getItem('slyte_phone') || 'User';
+                loggedInMobile.textContent = '+91 ' + phone;
+            }
+
+            function showMobileStep() {
+                mobileStep.style.display = 'block';
+                otpStep.style.display = 'none';
+                loggedInStep.style.display = 'none';
+                resultsArea.innerHTML = '';
+                clearMessages();
+            }
+
+            function showOtpStep(phone) {
+                mobileStep.style.display = 'none';
+                loggedInStep.style.display = 'none';
+                otpStep.style.display = 'block';
+                displaySentMobile.textContent = '+91 ' + phone;
+                startResendTimer();
+            }
+
+            // ── Send OTP ───────────────────────────────────────────────
+            async function requestOtp() {
+                const val = mobileInput.value.trim().replace(/\D/g,'').slice(-10);
+                if (val.length < 10) {
+                    showError('Enter a valid 10-digit mobile number.');
+                    return;
+                }
+                currentMobile = val;
+                clearMessages();
+                trackBtn.disabled = true;
+                trackBtn.textContent = 'Sending...';
 
                 try {
-                    const token = localStorage.getItem('slyte_otp_token');
-                    const res = await fetch(`${API_BASE}/orders/lookup`, {
+                    const res = await fetch(`${API_BASE}/send-otp`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                        },
-                        body: JSON.stringify({ phone: rawPhone })
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ phone: currentMobile })
                     });
                     const data = await res.json();
-                    if (data.success && Array.isArray(data.orders)) {
-                        currentOrders = data.orders;
-                        renderOrders(currentOrders);
+                    
+                    if (data.success) {
+                        showOtpStep(currentMobile);
+                        showSuccess('OTP sent successfully.');
                     } else {
-                        resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#64748b; font-size:14px;">No orders found for +91 ${rawPhone}.</div>`;
+                        showError(data.message || 'Failed to send OTP.');
                     }
-                } catch (err) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#c62828; font-size:14px;">Could not connect to server. Please try again.</div>`;
+                } catch (e) {
+                    showError('Network error. Please try again.');
+                } finally {
+                    trackBtn.disabled = false;
+                    trackBtn.textContent = 'Get OTP';
                 }
-            };
+            }
 
-            function resolveOrderJourney(order) {
-                const lcs = (order.orderLifecycleStatus || 'DELIVERED').toUpperCase();
-                const isCustom = order.productType === 'CUSTOM' || (order.fitType || '').toLowerCase().includes('custom');
+            // ── Verify OTP ───────────────────────────────────────────────
+            async function verifyOtp() {
+                const otp = otpInput.value.trim();
+                if (otp.length !== 6) {
+                    showError('Enter a valid 6-digit OTP.');
+                    return;
+                }
+                clearMessages();
+                verifyBtn.disabled = true;
+                verifyBtn.textContent = 'Verifying...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ phone: currentMobile, otp })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        localStorage.setItem('slyte_otp_token', data.token);
+                        if (data.user && data.user.phone) {
+                            const phone = data.user.phone;
+                            const name = data.user.name || '';
+                            // Sync to slyte_phone AND the checkout keys so everything stays consistent
+                            localStorage.setItem('slyte_phone', phone);
+                            localStorage.setItem('userPhone', phone);
+                            // 'username' is what script.js reads to show name in hamburger menu
+                            localStorage.setItem('username', name || phone);
+                            localStorage.setItem('userName', name || phone);
+                        }
+                        showLoggedInState();
+                        fetchOrders();
+                    } else {
+                        showError(data.message || 'Invalid OTP.');
+                    }
+                } catch (e) {
+                    showError('Network error. Please try again.');
+                } finally {
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify OTP';
+                }
+            }
+
+            // ── Timer Logic ──────────────────────────────────────────────
+            function startResendTimer() {
+                resendBtn.style.display = 'none';
+                resendTimer.style.display = 'inline';
+                let timeLeft = 60;
+                resendTimer.textContent = `Resend in ${timeLeft}s`;
                 
-                let mode = 'NORMAL';
-                if (['RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED', 'REFUNDED'].includes(lcs)) mode = 'RETURN';
-                else if (lcs.startsWith('EXCHANGE_')) mode = 'EXCHANGE';
-                else if (lcs.startsWith('ALTERATION_')) mode = 'ALTERATION';
-
-                let stepperSteps = [];
-                let stepIndex = 0;
-                let themeClass = 'theme-delivered';
-                let statusIcon = 'check_circle';
-                let bannerTitle = 'Delivered';
-                let bannerMessage = 'Enjoy your order.';
-                let infoText = 'Includes 7-day return/exchange window and custom alterations.';
-                let trackingId = order.trackingNumber || 'SR123456789';
-
-                if (mode === 'RETURN') {
-                    themeClass = 'theme-red-card';
-                    stepperSteps = [
-                        { label: 'Return Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Refund Processing', date: '', icon: 'currency_rupee' },
-                        { label: 'Refunded', date: '', icon: 'check' }
-                    ];
-                    infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-
-                    if (lcs === 'RETURN_INITIATED') {
-                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Return Requested'; bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
-                    } else if (lcs === 'RTO_IN_TRANSIT') {
-                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your return has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'RTO_DELIVERED') {
-                        stepIndex = 2; statusIcon = 'inventory_2'; bannerTitle = 'Return Received'; bannerMessage = 'Your return has reached us. Your refund is now being processed.';
-                    } else if (lcs === 'REFUNDED') {
-                        stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Refund Processed'; bannerMessage = `₹${order.amount || 1699} has been refunded successfully to your bank account.`;
+                if (countdownInterval) clearInterval(countdownInterval);
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        resendTimer.style.display = 'none';
+                        resendBtn.style.display = 'inline';
+                    } else {
+                        resendTimer.textContent = `Resend in ${timeLeft}s`;
                     }
-                } else if (mode === 'EXCHANGE') {
-                    themeClass = 'theme-blue-card';
-                    stepperSteps = [
-                        { label: 'Exchange Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Exchange Shipped', date: '', icon: 'warehouse' },
-                        { label: 'Delivered', date: '', icon: 'check' }
-                    ];
-                    infoText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
+                }, 1000);
+            }
 
-                    if (lcs === 'EXCHANGE_REQUESTED') {
-                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Exchange Requested'; bannerMessage = 'Exchange confirmed. Replacement size will be prepared upon pickup.';
-                    } else if (lcs === 'EXCHANGE_PICKED_UP') {
-                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your exchange item has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'EXCHANGE_RECEIVED' || lcs === 'EXCHANGE_SHIPPED') {
-                        stepIndex = 2; statusIcon = 'warehouse'; bannerTitle = 'Exchange Shipped'; bannerMessage = 'Your replacement trousers are on the way.';
-                    } else if (lcs === 'EXCHANGE_DELIVERED') {
-                        stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Your replacement trousers have been delivered.';
-                    }
-                } else if (mode === 'ALTERATION') {
-                    themeClass = 'theme-green-card';
-                    stepperSteps = [
-                        { label: 'Alteration Requested', date: '14 Sep', icon: 'package_2' },
-                        { label: 'Picked Up', date: '15 Sep', icon: 'local_shipping' },
-                        { label: 'Under Alteration', date: '', icon: 'content_cut' },
-                        { label: 'Out for Delivery', date: '', icon: 'local_shipping' },
-                        { label: 'Delivered', date: '', icon: 'check' }
-                    ];
-                    infoText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
+            function normalizeOrder(o) {
+                const isCod = o.isCodOrder === true ||
+                    (o.paymentGroup || o.payment_method || '').toUpperCase() === 'COD' ||
+                    (o.paymentGroup || o.payment_method || '').toLowerCase().includes('cash');
 
-                    if (lcs === 'ALTERATION_REQUESTED') {
-                        stepIndex = 0; statusIcon = 'package_2'; bannerTitle = 'Alteration Requested'; bannerMessage = "We'll arrange a pickup for your trousers.";
-                    } else if (lcs === 'ALTERATION_PICKED_UP') {
-                        stepIndex = 1; statusIcon = 'local_shipping'; bannerTitle = 'Picked Up'; bannerMessage = 'Your item for alteration has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'ALTERATION_RECEIVED' || lcs === 'ALTERATION_IN_PROGRESS') {
-                        stepIndex = 2; statusIcon = 'content_cut'; bannerTitle = 'Under Alteration'; bannerMessage = 'Our master tailors are working on your custom trousers.';
-                    } else if (lcs === 'ALTERATION_SHIPPED') {
-                        stepIndex = 3; statusIcon = 'local_shipping'; bannerTitle = 'Out for Delivery'; bannerMessage = 'Your altered trousers are out for delivery.';
-                    } else if (lcs === 'ALTERATION_DELIVERED') {
-                        stepIndex = 4; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.';
-                    }
-                } else {
-                    // Normal Delivered Forward Order
-                    stepperSteps = [
-                        { label: 'Order Placed', date: '12 Sep', icon: 'package_2' },
-                        { label: 'Dispatched', date: '13 Sep', icon: 'warehouse' },
-                        { label: 'Out for Delivery', date: '14 Sep', icon: 'local_shipping' },
-                        { label: 'Delivered', date: '14 Sep', icon: 'check' }
-                    ];
-                    stepIndex = 3; statusIcon = 'check_circle'; bannerTitle = 'Delivered'; bannerMessage = 'Enjoy your order.';
-                }
+                const pType = (o.productType || o.product_type || (o.items?.[0]?.fit_type) || (o.productName?.includes('Custom') ? 'CUSTOM' : 'STANDARD')).toUpperCase();
+                const fType = o.fitType || o.fit_type || (pType === 'CUSTOM' ? 'Custom Fit' : 'Standard Fit');
+                const rawId = o.orderId || o.id || o.order_id || 'SLYTE-ORD-001';
 
                 return {
-                    mode, isCustom, stepperSteps, stepIndex, themeClass, statusIcon, bannerTitle, bannerMessage, infoText, trackingId
+                    orderId: rawId,
+                    displayId: o.displayId || (rawId.startsWith('#') ? rawId : '#' + rawId),
+                    productName: o.productName || o.items?.[0]?.name || o.product_name || 'Slyte Trouser',
+                    productType: pType,
+                    fitType: fType,
+                    orderLifecycleStatus: o.orderLifecycleStatus || o.order_status || 'DELIVERED',
+                    fulfillmentStatus: o.fulfillmentStatus || o.tracking_status || o.order_status || 'DELIVERED',
+                    amount: o.amount || o.total_amount || 1699,
+                    paymentGroup: o.paymentGroup || o.payment_method || (isCod ? 'COD' : 'CASHFREE'),
+                    isCodOrder: isCod,
+                    createdAt: o.createdAt || o.created_at || new Date().toISOString(),
+                    trackingNumber: o.trackingNumber || o.awb || null,
+                    deliveryAddress: typeof o.deliveryAddress === 'object' ? o.deliveryAddress : (
+                        typeof o.delivery_address === 'object' ? o.delivery_address : {
+                            addressLine1: o.delivery_address || 'Delivery Address',
+                            city: 'Bengaluru',
+                            pincode: '560034'
+                        }
+                    ),
+                    items: o.items || [],
+                    is_test: o.is_test || false
                 };
             }
 
-            function renderOrders(ordersList) {
-                const resultsArea = document.getElementById('resultsArea');
-                if (!ordersList || !ordersList.length) {
-                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:#64748b;">No orders found.</div>`;
+            const TEST_ORDERS_FALLBACK = [
+                {
+                    orderId: "SLYTE-TEST-RETURN-001",
+                    displayId: "#SLYTE-TEST-RETURN-001",
+                    productName: "Slyte 24H Beige Trouser",
+                    productType: "STANDARD",
+                    fitType: "Standard Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1699,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-01",
+                    deliveryAddress: { addressLine1: "123 Test Street, Koramangala", city: "Bengaluru", pincode: "560034" },
+                    is_test: true
+                },
+                {
+                    orderId: "SLYTE-TEST-EXCHANGE-001",
+                    displayId: "#SLYTE-TEST-EXCHANGE-001",
+                    productName: "Slyte 24H Navy Trouser",
+                    productType: "STANDARD",
+                    fitType: "Standard Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1699,
+                    paymentGroup: "CASHFREE_CARD",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-02",
+                    deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
+                    is_test: true
+                },
+                {
+                    orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
+                    displayId: "#SLYTE-TEST-CUSTOM-ALTER-001",
+                    productName: "Slyte 24H Black Trouser (Custom Fit)",
+                    productType: "CUSTOM",
+                    fitType: "Custom Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1799,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-03",
+                    deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
+                    is_test: true
+                },
+                {
+                    orderId: "SLYTE-TEST-ALTERATION-002",
+                    displayId: "#SLYTE-TEST-ALTERATION-002",
+                    productName: "Slyte 24H Beige Trouser (Custom Fit)",
+                    productType: "CUSTOM",
+                    fitType: "Custom Fit",
+                    orderLifecycleStatus: "DELIVERED",
+                    fulfillmentStatus: "Delivered",
+                    amount: 1799,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-04",
+                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
+                    is_test: true
+                }
+            ];
+
+            // ── Fetch orders (Protected) ─────────────────────────────────
+            function fetchOrders() {
+                const token = localStorage.getItem('slyte_otp_token') || '';
+                const userPhone = (localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone') || '').replace(/\D/g, '');
+                
+                setLoading(true);
+                clearMessages();
+                resultsArea.innerHTML = '';
+
+                fetch(`${API_BASE}/orders-lookup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ phone: userPhone })
+                })
+                .then(r => {
+                    if (r.status === 401) throw new Error('Unauthorized');
+                    return r.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    let list = (data.orders || []).map(normalizeOrder);
+                    
+                    // Guarantee pre-seeded test orders for 9742006683 / 97420066683
+                    if (userPhone.includes('9742006683') || userPhone.includes('97420066683') || token.includes('9742006683')) {
+                        const existingIds = new Set(list.map(o => o.orderId));
+                        TEST_ORDERS_FALLBACK.forEach(t => {
+                            if (!existingIds.has(t.orderId)) {
+                                list.unshift(normalizeOrder(t));
+                            }
+                        });
+                    }
+
+                    if (!list.length) {
+                        showError('No orders found.');
+                        return;
+                    }
+                    renderOrders(list);
+                })
+                .catch((e) => {
+                    setLoading(false);
+                    if (userPhone.includes('9742006683') || userPhone.includes('97420066683') || token.includes('9742006683')) {
+                        renderOrders(TEST_ORDERS_FALLBACK.map(normalizeOrder));
+                    } else if (e.message === 'Unauthorized') {
+                        localStorage.removeItem('slyte_otp_token');
+                        showMobileStep();
+                        showError('Session expired. Please verify mobile again.');
+                    } else {
+                        showError('Failed to fetch orders. Please try again.');
+                    }
+                });
+            }
+
+            // Bindings
+            trackBtn.onclick = requestOtp;
+            verifyBtn.onclick = verifyOtp;
+            resendBtn.onclick = (e) => { e.preventDefault(); requestOtp(); };
+            editMobileBtn.onclick = (e) => { e.preventDefault(); showMobileStep(); };
+            logoutBtn.onclick = () => {
+                localStorage.removeItem('slyte_otp_token');
+                localStorage.removeItem('slyte_phone');
+                localStorage.removeItem('userPhone');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('username');
+                localStorage.removeItem('slyteUser');
+                showMobileStep();
+                // Reload so script.js updates the hamburger menu to logged-out state
+                location.reload();
+            };
+            
+            mobileInput.onkeyup = e => { if (e.key === 'Enter') requestOtp(); };
+            otpInput.onkeyup = e => { if (e.key === 'Enter') verifyOtp(); };
+
+            // ── Toggle expand ──────────────────────────────────────────────
+            window.toggleExpand = function(id) {
+                const el  = document.getElementById('expand-' + id);
+                const btn = document.getElementById('btn-more-' + id);
+                const open = el.classList.toggle('open');
+                btn.textContent = open ? 'Hide Details' : 'Show Details';
+            };
+
+            // ── Cancel / RTO ───────────────────────────────────────────────
+            window.doCancel = function(orderId, action, btn, paymentGroup, isCod) {
+                const isCodOrder = isCod === true || isCod === 'true';
+                let msg = '';
+                if (action === 'RTO_CANCEL') {
+                    msg = !isCodOrder
+                        ? `Order is already shipped. We'll initiate a return — you'll be refunded once it reaches our warehouse. Continue?`
+                        : `Order is already shipped. We'll initiate a return. No cash refund for COD. Continue?`;
+                } else {
+                    msg = !isCodOrder
+                        ? `Cancel this order? Refund will be initiated immediately to your payment method.`
+                        : `Cancel this COD order? No refund as no payment was made. Continue?`;
+                }
+                
+                if (!confirm(msg)) return;
+
+                const orig = btn.textContent;
+                setLoading(true, 'Cancelling...');
+                btn.textContent = '...'; btn.disabled = true;
+
+                const token = localStorage.getItem('slyte_otp_token');
+                fetch(`${API_BASE}/orders-cancel`, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    setLoading(false);
+                    if (res.success) {
+                        // Show different alert based on payment type
+                        const msg = res.message || (res.isCodOrder
+                            ? 'Order cancelled successfully.'
+                            : 'Order cancelled. Refund will be credited within 5–7 business days.');
+                        alert(msg);
+                        fetchOrders();
+                    } else {
+                        alert(res.message || 'Could not cancel. Contact support.');
+                        btn.textContent = orig; btn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    setLoading(false);
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+            // ── Retry refund (prepaid orders only) ─────────────────────────
+            window.doRetryRefund = function(orderId, btn) {
+                const orig = btn.textContent;
+                btn.textContent = 'Retrying...'; btn.disabled = true;
+                const token = localStorage.getItem('slyte_otp_token');
+                setLoading(true, 'Retrying Refund...');
+                fetch(`${API_BASE}/refund-retry`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    alert(res.message || (res.success ? 'Refund retry initiated.' : 'Retry failed. Contact support.'));
+                    if (res.success) fetchOrders();
+                    else { btn.textContent = orig; btn.disabled = false; }
+                })
+                .catch(() => {
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+            // ── Delete Order ───────────────────────────────────────────────
+            window.doDelete = function(orderId, btn) {
+                if (!confirm('Are you sure you want to permanently delete this cancelled order?')) return;
+
+                const orig = btn.textContent;
+                btn.textContent = '...'; btn.disabled = true;
+
+                const token = localStorage.getItem('slyte_otp_token');
+                fetch(`${API_BASE}/orders/delete`, {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        fetchOrders();
+                    } else {
+                        alert(res.message || 'Could not delete order.');
+                        btn.textContent = orig; btn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    alert('Network error. Please try again.');
+                    btn.textContent = orig; btn.disabled = false;
+                });
+            };
+
+
+            // ── Build stepper HTML ─────────────────────────────────────────
+            function buildStepper(lcs) {
+                const cancelStatuses = [
+                    'CANCELLED', 'REFUNDED', 'REFUND_FAILED', 'REFUND_PENDING', 
+                    'CANCEL_REQUESTED', 'RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED'
+                ];
+                
+                if (cancelStatuses.includes(lcs)) {
+                    return `<div class="stepper">
+                        <div class="step done">
+                            <div class="step-dot">✓</div>
+                            <div class="step-text">Placed</div>
+                        </div>
+                        <div class="step active" style="--accent: var(--error);">
+                            <div class="step-dot" style="background: var(--error); border-color: var(--error); color: #fff;">✕</div>
+                            <div class="step-text" style="color: var(--error); font-weight: 700;">Canceled (completed)</div>
+                        </div>
+                    </div>`;
+                }
+
+                const rank = FORWARD_RANK[lcs] ?? 0;
+                return `<div class="stepper">
+                    ${FORWARD_STEPS.map((s,i) => `
+                        <div class="step ${i < rank ? 'done' : i === rank ? 'active' : ''}">
+                            <div class="step-dot">${i <= rank ? '✓' : ''}</div>
+                            <div class="step-text">${s.label}</div>
+                        </div>`).join('')}
+                </div>`;
+            }
+
+            // ── Build cancel/action buttons ───────────────────────────────
+            function buildActionUI(order) {
+                const lcs    = order.orderLifecycleStatus || 'CREATED';
+                const action = getCancelAction(order);
+                const parts  = [];
+
+                // Tracking button (show if AWB available and order is NOT delivered)
+                if (order.trackingNumber && lcs !== 'DELIVERED') {
+                    parts.push(`<a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
+                        target="_blank" class="action-btn btn-track">📦 Track Live</a>`);
+                }
+
+                // ── CASE 1: CUSTOM → no cancel (alteration available once delivered) ─────
+                if (order.productType === 'CUSTOM' && lcs !== 'DELIVERED') {
+                    parts.push(`<div class="msg-banner msg-purple">✂️ Custom fit orders cannot be cancelled. (Free alteration available upon delivery)</div>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 2: Direct cancel (pre-shipping) ───────────────────
+                if (action === 'DIRECT_CANCEL') {
+                    const btnLabel = order.isCodOrder ? '✕ Cancel Order (COD)' : '✕ Cancel Order';
+                    parts.push(`<button class="action-btn btn-cancel"
+                        onclick="doCancel('${esc(order.orderId)}','DIRECT_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">${btnLabel}</button>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 3: RTO (post-shipping) ────────────────────────────
+                if (action === 'RTO_CANCEL') {
+                    const notice = !order.isCodOrder
+                        ? 'Order already shipped. A return will be initiated and you will be refunded once received at our warehouse.'
+                        : 'Order already shipped (COD). A return will be initiated. No cash refund applies.';
+                    parts.push(`<div class="msg-banner msg-warn">⚠️ ${notice}</div>`);
+                    if (!order.rtoShiprocketOrderId) {
+                        parts.push(`<button class="action-btn btn-rto"
+                            onclick="doCancel('${esc(order.orderId)}','RTO_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">↩ Cancel (Return to Origin)</button>`);
+                    }
+                    return parts.join('');
+                }
+
+                // ── CASE 4: Return in progress ─────────────────────────────
+                if (['RETURN_INITIATED','RTO_IN_TRANSIT'].includes(lcs)) {
+                    parts.push(`<div class="msg-banner msg-purple">🔄 Return in progress. Refund will be processed once the package reaches our warehouse.</div>`);
+                    return parts.join('');
+                }
+
+                // ── CASE 5: Terminal states ────────────────────────────────
+                if (lcs === 'CANCELLED' || lcs === 'REFUNDED') {
+                    parts.push(`<div class="msg-banner msg-error">✕ Order cancelled.</div>`);
+                    parts.push(`<button class="action-btn" style="background-color: var(--error); color: white; margin-top: 10px;"
+                        onclick="doDelete('${esc(order.orderId)}', this)">🗑️ Delete Order</button>`);
+                    return parts.join('');
+                }
+                if (lcs === 'DELIVERED') {
+                    parts.push(`<div class="msg-banner msg-success">✓ Delivered! Enjoy your order.</div>`);
+
+                    const isCustom = order.productType === 'CUSTOM' ||
+                        (order.fitType || '').toLowerCase().includes('custom') ||
+                        (order.items || []).some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit');
+
+                    if (isCustom) {
+                        parts.push(`<div class="msg-banner msg-purple" style="margin-top:8px;">✂️ Custom Fit: Returns/Exchanges not applicable. Includes free alteration (up to ±1.5").</div>`);
+                        parts.push(`<button class="action-btn" style="background:#673ab7; color:#fff; margin-top:8px; width:100%; font-weight:700; border:none; padding:12px; border-radius:10px; cursor:pointer;"
+                            onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName || 'Trouser')}')">✂️ Request Alteration</button>`);
+                    } else {
+                        parts.push(`<div style="display:flex; gap:10px; margin-top:8px;">
+                            <button class="action-btn" style="flex:1; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                                onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
+                            <button class="action-btn" style="flex:1; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                                onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
+                        </div>`);
+                    }
+                    return parts.join('');
+                }
+                if (lcs === 'RTO_DELIVERED') {
+                    const rtoMsg = order.isCodOrder
+                        ? '📦 Return received. No refund applicable (COD order).'
+                        : '📦 Return received. Refund is being processed — 5-7 business days.';
+                    parts.push(`<div class="msg-banner msg-purple">${rtoMsg}</div>`);
+                    return parts.join('');
+                }
+
+                // ── Support fallback ───────────────────────────────────────
+                parts.push(`<a href="https://wa.me/916363887497" target="_blank"
+                    class="action-btn btn-support">💬 Contact Support</a>`);
+                return parts.join('');
+            }
+
+            // ── Build refund strip ─────────────────────────────────────────
+            // RULE: COD orders NEVER show a refund strip.
+            // Prepaid orders show refund status with retry for REFUND_FAILED.
+            function buildRefundStrip(order) {
+                // ❌ HARD BLOCK: No refund UI for COD orders
+                // Check both isCodOrder flag AND paymentGroup for robustness
+                const isCod = order.isCodOrder === true ||
+                              (order.paymentGroup || '').toUpperCase() === 'COD' ||
+                              (order.paymentGroup || '').toLowerCase().includes('cash');
+                if (isCod) {
+                    const lcsCheck = order.orderLifecycleStatus || '';
+                    if (['CANCELLED','CANCEL_REQUESTED'].includes(lcsCheck)) {
+                        return `<div class="refund-strip">
+                            <div><div class="label">Payment Mode</div>
+                            <div class="value">💵 Cash on Delivery — no refund applicable</div></div>
+                        </div>`;
+                    }
+                    return '';
+                }
+
+                const lcs = order.orderLifecycleStatus || '';
+                const ref = order.refund;
+
+                // Only show if there is a refund scenario for prepaid
+                const refundStatuses = ['REFUND_PENDING','REFUNDED','REFUND_FAILED',
+                                        'CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'];
+                if (!refundStatuses.includes(lcs) && !ref) return '';
+
+                let icon = '💳', label = '', retryHtml = '';
+                if (ref?.status === 'SUCCESS' || lcs === 'REFUNDED') {
+                    icon = '✅'; label = 'Refund completed';
+                } else if (ref?.status === 'FAILED' || lcs === 'REFUND_FAILED') {
+                    icon = '❌'; label = 'Refund failed — contact support';
+                    retryHtml = `<button onclick="doRetryRefund('${esc(order.orderId)}',this)"
+                        style="margin-top:8px;background:#fff3e0;color:#e65100;border:1px solid #ffe0b2;
+                        padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">↺ Retry Refund</button>`;
+                } else if (lcs === 'REFUND_PENDING' || ref?.status === 'PENDING') {
+                    icon = '⏳'; label = 'Refund initiated — 5-7 business days';
+                } else if (['CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'].includes(lcs) && !ref) {
+                    icon = '⏳'; label = 'Refund will be initiated shortly';
+                } else { return ''; }
+
+                const amt = ref?.amount ? `₹${ref.amount}` : `₹${order.amount}`;
+                return `<div class="refund-strip">
+                    <div style="flex:1">
+                        <div class="label">Refund Status</div>
+                        <div class="value">${icon} ${label}</div>
+                        ${retryHtml}
+                    </div>
+                    <div class="value" style="font-size:16px">${amt}</div>
+                </div>`;
+            }
+
+            window.copyTrackingId = function(id, btn) {
+                if (!id) return;
+                navigator.clipboard.writeText(id).then(() => {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = 'Copied!';
+                    setTimeout(() => { btn.innerHTML = orig; }, 1500);
+                }).catch(() => {
+                    alert('Tracking ID: ' + id);
+                });
+            };
+
+            function renderAfterSalesCard(order, type) {
+                const isCustom = order.productType === 'CUSTOM' ||
+                                 (order.fitType || '').toLowerCase().includes('custom') ||
+                                 (order.items || []).some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit');
+
+                const displayId = order.displayId || `#${order.orderId}`;
+                const productName = order.productName || (order.items && order.items[0] && order.items[0].name) || 'Slyte 24H Trouser';
+                const fitSubtitle = isCustom ? 'Custom Fit' : (order.fitType || 'Standard Fit');
+                const tagBadge = isCustom ? `<span class="as-tag-badge custom">CUSTOM FIT</span>` : `<span class="as-tag-badge standard">STANDARD</span>`;
+
+                let imgPath = 'images/products/BEIGE_1.jpeg';
+                const pNameLower = productName.toLowerCase();
+                if (pNameLower.includes('black')) imgPath = 'images/products/BLACK_1.jpeg';
+                else if (pNameLower.includes('navy')) imgPath = 'images/products/NAVY_1.jpeg';
+                else if (pNameLower.includes('brown')) imgPath = 'images/products/BROWN_1.jpeg';
+
+                const awb = order.rtoAwbNumber || order.trackingNumber || order.awb || 'SR123456789';
+                const reqDate = fmtDate(order.createdAt || new Date());
+                const pickupDate = fmtDate(new Date());
+
+                let themeClass = 'as-theme-return';
+                let bannerClass = 'as-banner-return';
+                let detailsTitle = 'Return Details';
+                let infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
+                let steps = [];
+                let activeStepIdx = 1;
+                let bannerIcon = '🚚';
+                let bannerTitle = 'Picked Up';
+                let bannerDesc = 'Your return has been picked up and is on its way to our warehouse.';
+                let detailRowsHtml = '';
+
+                if (type === 'RETURN') {
+                    themeClass = 'as-theme-return';
+                    bannerClass = 'as-banner-return';
+                    detailsTitle = 'Return Details';
+                    infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
+                    
+                    steps = [
+                        { label: 'Return Requested', icon: '📦', date: reqDate },
+                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
+                        { label: 'Refund Processing', icon: '₹', date: '' },
+                        { label: 'Refunded', icon: '✓', date: '' }
+                    ];
+
+                    const lcs = order.orderLifecycleStatus || '';
+                    if (lcs === 'RETURN_INITIATED') {
+                        activeStepIdx = 0;
+                        bannerTitle = 'Return Requested';
+                        bannerDesc = 'Your return request has been registered. Reverse pickup is being scheduled.';
+                    } else if (lcs === 'RTO_IN_TRANSIT') {
+                        activeStepIdx = 1;
+                        bannerTitle = 'Picked Up';
+                        bannerDesc = 'Your return has been picked up and is on its way to our warehouse.';
+                    } else if (lcs === 'RTO_DELIVERED' || lcs === 'REFUND_PENDING') {
+                        activeStepIdx = 2;
+                        bannerTitle = 'Refund Processing';
+                        bannerDesc = 'Your return item has arrived at our warehouse. Refund will be credited shortly.';
+                    } else if (lcs === 'REFUNDED') {
+                        activeStepIdx = 3;
+                        bannerTitle = 'Refunded';
+                        bannerDesc = 'Your refund has been successfully processed to your bank account.';
+                    }
+
+                    const returnReasonVal = order.returnReason || order.reason || (order.returnRequest && order.returnRequest.reason) || "Size didn't fit";
+                    detailRowsHtml = `
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📦</span> Return Reason</div>
+                            <div class="as-row-val">${esc(returnReasonVal)}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Return Requested On</div>
+                            <div class="as-row-val">${reqDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
+                            <div class="as-row-val">${pickupDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
+                            <div class="as-row-val">
+                                ${esc(awb)}
+                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'EXCHANGE') {
+                    themeClass = 'as-theme-exchange';
+                    bannerClass = 'as-banner-exchange';
+                    detailsTitle = 'Exchange Details';
+                    infoText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
+
+                    steps = [
+                        { label: 'Exchange Requested', icon: '📦', date: reqDate },
+                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
+                        { label: 'Exchange Shipped', icon: '🏬', date: '' },
+                        { label: 'Delivered', icon: '✓', date: '' }
+                    ];
+
+                    const lcs = order.orderLifecycleStatus || '';
+                    if (lcs === 'EXCHANGE_INITIATED' || lcs === 'REQUESTED') {
+                        activeStepIdx = 0;
+                        bannerTitle = 'Exchange Requested';
+                        bannerDesc = 'Your exchange request has been registered. Reverse pickup is being scheduled.';
+                    } else if (lcs === 'EXCHANGE_PICKED_UP' || lcs === 'RTO_IN_TRANSIT') {
+                        activeStepIdx = 1;
+                        bannerTitle = 'Picked Up';
+                        bannerDesc = 'Your exchange item has been picked up and is on its way to our warehouse.';
+                    } else if (lcs === 'EXCHANGE_SHIPPED') {
+                        activeStepIdx = 2;
+                        bannerTitle = 'Exchange Shipped';
+                        bannerDesc = 'Your replacement item has been dispatched and is on its way to you.';
+                    } else if (lcs === 'DELIVERED') {
+                        activeStepIdx = 3;
+                        bannerTitle = 'Delivered';
+                        bannerDesc = 'Your replacement item has been delivered successfully.';
+                    }
+
+                    const excSize = order.exchangeSize || (order.exchangeRequest && order.exchangeRequest.replacement_size) || '34';
+                    const excReasonVal = order.exchangeReason || order.reason || (order.exchangeRequest && order.exchangeRequest.reason) || "Size change (32 → " + excSize + ")";
+                    detailRowsHtml = `
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📦</span> Exchange Reason</div>
+                            <div class="as-row-val">${esc(excReasonVal)}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Exchange Requested On</div>
+                            <div class="as-row-val">${reqDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
+                            <div class="as-row-val">${pickupDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
+                            <div class="as-row-val">
+                                ${esc(awb)}
+                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
+                            </div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">⇄</span> Exchange Item</div>
+                            <div class="as-row-val">Same Product (Size ${esc(excSize)})</div>
+                        </div>
+                    `;
+                } else if (type === 'ALTERATION') {
+                    themeClass = 'as-theme-alteration';
+                    bannerClass = 'as-banner-alteration';
+                    detailsTitle = 'Alteration Details';
+                    infoText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
+
+                    steps = [
+                        { label: 'Alteration Requested', icon: '📦', date: reqDate },
+                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
+                        { label: 'Under Alteration', icon: '✂️', date: '' },
+                        { label: 'Out for Delivery', icon: '🚚', date: '' },
+                        { label: 'Delivered', icon: '✓', date: '' }
+                    ];
+
+                    const altStatus = order.alterationStatus || order.orderLifecycleStatus || '';
+                    if (altStatus === 'ALTERATION_INITIATED' || altStatus === 'REQUESTED') {
+                        activeStepIdx = 0;
+                        bannerTitle = 'Alteration Requested';
+                        bannerDesc = 'Your alteration request has been submitted. Pickup to tailoring hub is being scheduled.';
+                    } else if (altStatus === 'ALTERATION_PICKED_UP' || altStatus === 'RTO_IN_TRANSIT') {
+                        activeStepIdx = 1;
+                        bannerTitle = 'Picked Up';
+                        bannerDesc = 'Your item for alteration has been picked up and is on its way to our warehouse.';
+                    } else if (altStatus === 'UNDER_ALTERATION' || altStatus === 'ALTERATION_IN_PROGRESS') {
+                        activeStepIdx = 2;
+                        bannerTitle = 'Under Alteration';
+                        bannerDesc = 'Your trouser is currently being tailored by our master tailors to your exact measurements.';
+                    } else if (altStatus === 'OUT_FOR_DELIVERY' || altStatus === 'ALTERATION_SHIPPED') {
+                        activeStepIdx = 3;
+                        bannerTitle = 'Out for Delivery';
+                        bannerDesc = 'Your tailored trouser is out for delivery to your doorstep.';
+                    } else if (altStatus === 'DELIVERED') {
+                        activeStepIdx = 4;
+                        bannerTitle = 'Delivered';
+                        bannerDesc = 'Your tailored trouser has been delivered successfully.';
+                    }
+
+                    const altType = order.alterationType || (order.alterationRequest && order.alterationRequest.alteration_type) || 'Waist adjustment (-1 inch)';
+                    const altNotes = order.alterationNotes || (order.alterationRequest && order.alterationRequest.customer_notes) || 'Minor waist adjustment';
+                    detailRowsHtml = `
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">✂️</span> Alteration Reason</div>
+                            <div class="as-row-val">${esc(altNotes)}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Alteration Requested On</div>
+                            <div class="as-row-val">${reqDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
+                            <div class="as-row-val">${pickupDate}</div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
+                            <div class="as-row-val">
+                                ${esc(awb)}
+                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
+                            </div>
+                        </div>
+                        <div class="as-row">
+                            <div class="as-row-label-wrap"><span class="as-row-icon">👖</span> Alteration Type</div>
+                            <div class="as-row-val">${esc(altType)}</div>
+                        </div>
+                    `;
+                }
+
+                const fillPercent = Math.round((activeStepIdx / (steps.length - 1)) * 100);
+
+                const stepsHtml = steps.map((s, idx) => {
+                    const isDone = idx < activeStepIdx;
+                    const isActive = idx === activeStepIdx;
+                    const cls = isDone ? 'completed' : (isActive ? 'active' : '');
+                    return `
+                        <div class="as-step-item ${cls}">
+                            <div class="as-step-circle">${s.icon}</div>
+                            <div class="as-step-title">${s.label}</div>
+                            ${s.date ? `<div class="as-step-subdate">${s.date}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                <div class="after-sales-card ${themeClass}" id="card-${esc(order.orderId)}">
+                    <div class="as-top-header">
+                        <div class="as-title-box">
+                            <div class="as-title-main">Order Details</div>
+                            <div class="as-order-id-sub">${displayId}</div>
+                        </div>
+                        <button class="as-more-btn" title="Options">⋮</button>
+                    </div>
+
+                    <div class="as-product-card">
+                        <img src="${imgPath}" alt="${esc(productName)}" class="as-product-thumb">
+                        <div class="as-product-info">
+                            <div class="as-product-name">${esc(productName)}</div>
+                            <div class="as-product-fit">${esc(fitSubtitle)}</div>
+                            ${tagBadge}
+                        </div>
+                    </div>
+
+                    <div class="as-stepper-container">
+                        <div class="as-stepper-track"></div>
+                        <div class="as-stepper-fill" style="width: ${fillPercent}%;"></div>
+                        <div class="as-stepper-steps">
+                            ${stepsHtml}
+                        </div>
+                    </div>
+
+                    <div class="as-status-card ${bannerClass}">
+                        <div class="as-banner-icon-bg">${bannerIcon}</div>
+                        <div class="as-banner-content">
+                            <div class="as-banner-head">${bannerTitle}</div>
+                            <div class="as-banner-sub">${bannerDesc}</div>
+                            <div class="as-banner-time">15 Sep, 4:20 PM</div>
+                        </div>
+                    </div>
+
+                    <div class="as-details-container">
+                        <div class="as-details-head-title">${detailsTitle}</div>
+                        ${detailRowsHtml}
+                    </div>
+
+                    <div class="as-notice-box">
+                        <span class="as-notice-icon">ⓘ</span>
+                        <div>${infoText}</div>
+                    </div>
+
+                    <a href="https://wa.me/916363887497" target="_blank" class="as-support-card">
+                        <div class="as-support-left">
+                            <div class="as-support-icon-wrap">🎧</div>
+                            <div>
+                                <div class="as-support-title">Need Help?</div>
+                                <div class="as-support-desc">Contact our support team</div>
+                            </div>
+                        </div>
+                        <div class="as-support-arrow">›</div>
+                    </a>
+
+                    <a href="https://shiprocket.co/tracking/${esc(awb)}" target="_blank" class="as-primary-track-btn">
+                        View Tracking ↗
+                    </a>
+                </div>
+                `;
+            }
+
+            // ── Main render ────────────────────────────────────────────────
+            function renderOrders(orders) {
+                if (!orders.length) {
+                    resultsArea.innerHTML = `<div style="text-align:center;padding:40px;
+                        color:var(--text-secondary);font-weight:500;">No orders found.</div>`;
                     return;
                 }
 
-                resultsArea.innerHTML = ordersList.map((order) => {
-                    const j = resolveOrderJourney(order);
+                resultsArea.innerHTML = orders.map((order, i) => {
+                    let afterSalesType = localStorage.getItem('after_sales_' + order.orderId) || order.afterSalesType;
+                    const lcs    = order.orderLifecycleStatus || order.order_status || 'CREATED';
 
-                    let imgSrc = "images/homepage/ai-output-placeholder.webp";
-                    if (order.productName && order.productName.toLowerCase().includes('beige')) imgSrc = "beigegurkha.webp";
-                    else if (order.productName && order.productName.toLowerCase().includes('black')) imgSrc = "DeepBlackPleatedGurkhaPant.jpg";
+                    if (!afterSalesType) {
+                        if (order.id === 'SLYTE-TEST-RETURN-001' || ['RETURN_INITIATED','RTO_IN_TRANSIT','RTO_DELIVERED','REFUNDED','REFUND_PENDING'].includes(lcs)) {
+                            afterSalesType = 'RETURN';
+                        } else if (order.id === 'SLYTE-TEST-EXCHANGE-001' || ['EXCHANGE_INITIATED','EXCHANGE_PICKED_UP','EXCHANGE_SHIPPED','EXCHANGE_DELIVERED'].includes(lcs)) {
+                            afterSalesType = 'EXCHANGE';
+                        } else if (order.id === 'SLYTE-TEST-ALTERATION-002' || ['ALTERATION_INITIATED','ALTERATION_PICKED_UP','UNDER_ALTERATION','ALTERATION_SHIPPED','ALTERATION_DELIVERED'].includes(lcs) || order.alterationStatus) {
+                            afterSalesType = 'ALTERATION';
+                        }
+                    }
+
+                    if (afterSalesType) {
+                        return renderAfterSalesCard(order, afterSalesType);
+                    }
+                    const cssCls = LC_CSS[lcs] || 'created';
+                    const lcLabel = LC_LABEL[lcs] || lcs;
+                    const isRtoPath = ['RETURN_INITIATED','RTO_IN_TRANSIT',
+                                       'RTO_DELIVERED'].includes(lcs);
+                    const isCancelled = ['CANCELLED','CANCEL_REQUESTED'].includes(lcs);
+                    // Robust COD check — use both flag and paymentGroup
+                    const isCod = order.isCodOrder === true ||
+                                  (order.paymentGroup || '').toUpperCase() === 'COD' ||
+                                  (order.paymentGroup || '').toLowerCase().includes('cash');
+                    const typeTag = order.productType === 'CUSTOM'
+                        ? `<span class="product-type-tag tag-custom">Custom</span>`
+                        : `<span class="product-type-tag tag-standard">Standard</span>`;
+
+                    // Stepper: show RTO path or normal path
+                    let stepperHtml = '';
+                    if (!isCancelled && !isRtoPath) {
+                        stepperHtml = buildStepper(lcs);
+                    } else if (isRtoPath) {
+                        stepperHtml = `<div class="msg-banner msg-purple">
+                            🔄 ${lcLabel}</div>`;
+                    } else {
+                        stepperHtml = `<div class="msg-banner msg-error">
+                            ✕ ${lcLabel}</div>`;
+                    }
+
+                    // Tracking timeline
+                    let timelineHtml = `<div class="timeline-status"
+                        style="color:var(--text-muted);font-size:11px;">No updates yet</div>`;
+                    if (order.trackingHistory?.length) {
+                        timelineHtml = order.trackingHistory.map(t => `
+                            <div class="timeline-item">
+                                <div class="timeline-date">${fmtDate(t.date)}</div>
+                                <div class="timeline-status">${esc(t.activity||t.status||'')}
+                                    ${t.location ? '— '+esc(t.location) : ''}</div>
+                            </div>`).join('');
+                    } else {
+                        timelineHtml = `<div class="timeline-item">
+                            <div class="timeline-date">${fmtDate(order.createdAt)}</div>
+                            <div class="timeline-status">Order placed successfully</div>
+                        </div>`;
+                    }
+
+                    // Prepend a cancellation/return event at the top of the timeline
+                    const cancelStatuses = ['CANCELLED','CANCEL_REQUESTED','RETURN_INITIATED','RTO_IN_TRANSIT','RTO_DELIVERED'];
+                    if (cancelStatuses.includes(lcs)) {
+                        // Pick the best timestamp: last lifecycle history entry → cancelRequestedAt → now
+                        const lh = order.lifecycleHistory;
+                        const cancelTs = (lh && lh.length)
+                            ? lh[lh.length - 1].timestamp
+                            : null;
+                        const cancelDate = fmtDate(cancelTs || new Date().toISOString());
+
+                        const cancelLabel = {
+                            CANCELLED:         '✕ Order cancelled',
+                            CANCEL_REQUESTED:  '⏳ Cancellation requested',
+                            RETURN_INITIATED:  '↩ Return initiated',
+                            RTO_IN_TRANSIT:    '🚚 Return in transit',
+                            RTO_DELIVERED:     '📦 Return delivered to warehouse'
+                        }[lcs] || '✕ Order cancelled';
+
+                        const cancelEntry = `<div class="timeline-item timeline-item-cancel">
+                            <div class="timeline-date">${cancelDate}</div>
+                            <div class="timeline-status" style="color:#c62828;font-weight:600;">${cancelLabel}</div>
+                        </div>`;
+                        timelineHtml = cancelEntry + timelineHtml;
+                    }
+
+                    const addr = order.deliveryAddress;
+                    const addrStr = addr
+                        ? `${esc(addr.addressLine1)}, ${esc(addr.city)}, ${esc(addr.pincode)}`
+                        : 'N/A';
 
                     return `
-                    <div class="order-card" id="card-${esc(order.orderId)}">
-                        <!-- Top Order Details Header -->
-                        <div class="card-top-header">
-                            <span class="title">Order Details</span>
-                            <span class="code">${esc(order.displayId || '#' + order.orderId)}</span>
-                        </div>
-
-                        <!-- Product Hero Block -->
-                        <div class="product-hero-row">
-                            <img src="${imgSrc}" class="product-img-thumb" alt="Trouser Thumbnail">
-                            <div class="product-details-col">
-                                <div class="product-name-txt">${esc(order.productName || 'Slyte 24H Navy Trouser')}</div>
-                                <div class="fit-spec-txt">${esc(order.fitType || 'Standard Fit')}</div>
-                                <span class="type-badge-pill ${j.isCustom ? 'badge-cst' : 'badge-std'}">
-                                    ${j.isCustom ? 'Custom' : 'Standard'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Stepper Timeline (Exact Color & Line match) -->
-                        ${renderStepperTimeline(j.mode, j.stepIndex, j.stepperSteps)}
-
-                        <!-- Status Banner Card -->
-                        <div class="status-banner-card ${j.themeClass}">
-                            <div class="status-avatar-wrap">
-                                <span class="material-symbols-outlined">${j.statusIcon}</span>
-                            </div>
-                            <div class="status-txt-col">
-                                <div class="status-card-title">${j.bannerTitle}</div>
-                                <div class="status-card-desc">${j.bannerMessage}</div>
-                                <div class="status-card-time">15 Sep, 4:20 PM</div>
-                            </div>
-                        </div>
-
-                        <!-- Specific Journey Details Block (Matching Mockups 1:1) -->
-                        ${renderJourneyDetailsBlock(j.mode, order, j.trackingId)}
-
-                        <!-- Info Blue Banner -->
-                        <div class="info-notice-box">
-                            <span class="material-symbols-outlined">info</span>
-                            <span>${j.infoText}</span>
-                        </div>
-
-                        <!-- Support Card (Need Help?) -->
-                        <a href="https://wa.me/916363887497" target="_blank" class="support-contact-row">
-                            <div class="support-contact-left">
-                                <div class="support-headset-circle">
-                                    <span class="material-symbols-outlined">headset_mic</span>
-                                </div>
-                                <div class="support-contact-text">
-                                    <h4>Need Help?</h4>
-                                    <p>Contact our support team</p>
+                    <div class="order-card" style="animation-delay:${i*0.08}s" id="card-${esc(order.orderId)}">
+                        <div class="card-header">
+                            <div>
+                                <div class="order-id-label">${esc(order.displayId)}</div>
+                                <div class="product-name">
+                                    ${esc(order.productName)}
+                                    ${order.fitType ? `<span style="font-weight:400;font-size:13px;color:var(--text-secondary)"> — ${esc(order.fitType)}</span>` : ''}
+                                    ${typeTag}
                                 </div>
                             </div>
-                            <span class="material-symbols-outlined" style="color:#94a3b8;">chevron_right</span>
-                        </a>
+                            <span class="lc-badge ${cssCls}">${lcLabel}</span>
+                        </div>
 
-                        <!-- Action Buttons -->
-                        ${renderActionButtons(j.mode, order, j.isCustom, j.trackingId)}
+                        <div class="card-body">
+                            ${stepperHtml}
+                            ${buildRefundStrip(order)}
 
-                        <!-- Show Order Info Toggle -->
-                        <button class="btn-show-more-toggle" id="btn-toggle-${esc(order.orderId)}" onclick="toggleExpand('${esc(order.orderId)}')">
-                            Show Order Details ▼
-                        </button>
-
-                        <div class="expanded-details-block" id="expand-${esc(order.orderId)}">
-                            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#94a3b8; margin-bottom:8px;">Order Details</div>
-                            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
-                                <span style="color:#64748b;">Order Amount</span>
-                                <span style="font-weight:700;">₹${order.amount || 1699}</span>
+                            <div class="details-block" style="margin-top:16px;">
+                                <div class="detail-row">
+                                    <span class="detail-label">Current Status</span>
+                                    <span class="detail-value" style="color:var(--accent)">
+                                        ${esc(order.fulfillmentStatus || lcLabel)}
+                                    </span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Amount</span>
+                                    <span class="detail-value">₹${order.amount}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Payment</span>
+                                    <span class="detail-value">
+                                        ${isCod
+                                            ? '<span style="background:#fff8e1;color:#e65100;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">COD</span>'
+                                            : `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">PREPAID</span>`
+                                        }
+                                        ${isCod ? 'Cash on Delivery' : esc(order.paymentGroup)}
+                                    </span>
+                                </div>
+                                ${order.estimatedDelivery ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Est. Delivery</span>
+                                    <span class="detail-value" style="color:#2e7d32;">${fmtDate(order.estimatedDelivery)}</span>
+                                </div>` : ''}
+                                ${(order.trackingNumber && lcs !== 'DELIVERED') ? `
+                                <div class="tracking-card">
+                                    <div>
+                                        <div class="detail-label" style="font-size:10px;text-transform:uppercase;">AWB</div>
+                                        <div class="detail-value" style="font-size:13px;text-align:left;">${esc(order.trackingNumber)}</div>
+                                    </div>
+                                    <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
+                                       target="_blank" class="track-btn-link">Track Live</a>
+                                </div>` : ''}
                             </div>
-                            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
-                                <span style="color:#64748b;">Payment Mode</span>
-                                <span style="font-weight:700;">${esc(order.paymentGroup || 'Cashfree UPI')}</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
-                                <span style="color:#64748b;">Delivery Address</span>
-                                <span style="font-weight:600; text-align:right;">${esc(order.deliveryAddress?.addressLine1 || '123 Test Street')}, ${esc(order.deliveryAddress?.city || 'Bengaluru')}</span>
+
+                            ${buildActionUI(order)}
+
+                            <button class="show-more-btn" style="margin-top:16px;"
+                                id="btn-more-${esc(order.orderId)}"
+                                onclick="toggleExpand('${esc(order.orderId)}')">Show Details</button>
+
+                            <div class="expanded-section" id="expand-${esc(order.orderId)}">
+                                <div class="detail-row">
+                                    <span class="detail-label">Order ID</span>
+                                    <span class="detail-value" style="font-size:11px;">${esc(order.orderId)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Payment Mode</span>
+                                    <span class="detail-value">${esc(order.paymentGroup)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Ordered</span>
+                                    <span class="detail-value">${fmtDate(order.createdAt)}</span>
+                                </div>
+                                <div class="detail-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+                                    <span class="detail-label">Delivery Address</span>
+                                    <span class="detail-value" style="text-align:left;font-size:12px;font-weight:500;">${addrStr}</span>
+                                </div>
+                                <div style="margin-top:20px;font-weight:700;font-size:11px;
+                                    text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;">
+                                    Shipment Timeline
+                                </div>
+                                <div class="timeline">${timelineHtml}</div>
                             </div>
                         </div>
                     </div>`;
                 }).join('');
             }
 
-            function renderStepperTimeline(mode, activeIndex, steps) {
-                if (!steps || !steps.length) return '';
-                const total = steps.length;
-                const percent = Math.min(100, Math.max(0, (activeIndex / (total - 1)) * 100));
-
-                let themeColor = '#dc2626';
-                if (mode === 'EXCHANGE') themeColor = '#2563eb';
-                else if (mode === 'ALTERATION') themeColor = '#16a34a';
-                else if (mode === 'NORMAL') themeColor = '#16a34a';
-
-                return `
-                <div class="stepper-timeline">
-                    <div class="stepper-track-bg"></div>
-                    <div class="stepper-track-fill" style="width: calc(${percent}% - 20px); background: ${themeColor};"></div>
-                    ${steps.map((s, idx) => {
-                        const isDoneOrActive = idx <= activeIndex;
-                        const circleBg = isDoneOrActive ? themeColor : '#ffffff';
-                        const iconColor = isDoneOrActive ? '#ffffff' : '#94a3b8';
-
-                        return `
-                        <div class="step-item-node ${idx < activeIndex ? 'done' : idx === activeIndex ? 'active' : ''}">
-                            <div class="node-circle-icon" style="background:${circleBg}; border-color:${isDoneOrActive ? 'transparent' : '#e2e8f0'}; color:${iconColor};">
-                                <span class="material-symbols-outlined">${s.icon || 'check'}</span>
-                            </div>
-                            <div class="step-label-txt">${s.label}</div>
-                            ${s.date ? `<div class="step-date-txt">${s.date}</div>` : ''}
-                        </div>`;
-                    }).join('')}
-                </div>`;
-            }
-
-            function renderJourneyDetailsBlock(mode, order, trackingId) {
-                if (mode === 'RETURN') {
-                    return `
-                    <div class="details-summary-card">
-                        <div class="details-summary-title">Return Details</div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">package_2</span>Return Reason</div>
-                            <div class="detail-right-val">Size didn't fit</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Return Requested On</div>
-                            <div class="detail-right-val">14 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-right-val">15 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-right-val">
-                                ${esc(trackingId)}
-                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
-                            </div>
-                        </div>
-                    </div>`;
-                }
-
-                if (mode === 'EXCHANGE') {
-                    return `
-                    <div class="details-summary-card">
-                        <div class="details-summary-title">Exchange Details</div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">package_2</span>Exchange Reason</div>
-                            <div class="detail-right-val">Size change (32 → 34)</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Exchange Requested On</div>
-                            <div class="detail-right-val">14 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-right-val">15 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-right-val">
-                                ${esc(trackingId)}
-                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
-                            </div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">swap_horiz</span>Exchange Item</div>
-                            <div class="detail-right-val">Same Product (Size 34)</div>
-                        </div>
-                    </div>`;
-                }
-
-                if (mode === 'ALTERATION') {
-                    return `
-                    <div class="details-summary-card">
-                        <div class="details-summary-title">Alteration Details</div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">content_cut</span>Alteration Reason</div>
-                            <div class="detail-right-val">Minor waist adjustment</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Alteration Requested On</div>
-                            <div class="detail-right-val">14 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">local_shipping</span>Picked Up On</div>
-                            <div class="detail-right-val">15 Sep 2025</div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                            <div class="detail-right-val">
-                                ${esc(trackingId)}
-                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
-                            </div>
-                        </div>
-                        <div class="detail-row-line">
-                            <div class="detail-left-label"><span class="material-symbols-outlined">checkroom</span>Alteration Type</div>
-                            <div class="detail-right-val">Waist adjustment (-1 inch)</div>
-                        </div>
-                    </div>`;
-                }
-
-                // Normal Forward Delivered Summary
-                return `
-                <div class="details-summary-card">
-                    <div class="details-summary-title">Delivery Summary</div>
-                    <div class="detail-row-line">
-                        <div class="detail-left-label"><span class="material-symbols-outlined">calendar_today</span>Order Date</div>
-                        <div class="detail-right-val">${fmtDate(order.createdAt)}</div>
-                    </div>
-                    <div class="detail-row-line">
-                        <div class="detail-left-label"><span class="material-symbols-outlined">payments</span>Total Amount</div>
-                        <div class="detail-right-val">₹${order.amount || 1699}</div>
-                    </div>
-                    <div class="detail-row-line">
-                        <div class="detail-left-label"><span class="material-symbols-outlined">location_on</span>Tracking ID</div>
-                        <div class="detail-right-val">
-                            ${esc(trackingId)}
-                            <button class="btn-copy" onclick="navigator.clipboard.writeText('${esc(trackingId)}')">📋</button>
-                        </div>
-                    </div>
-                </div>`;
-            }
-
-            function renderActionButtons(mode, order, isCustom, trackingId) {
-                if (mode === 'NORMAL') {
-                    if (isCustom) {
-                        return `
-                        <button class="btn-act btn-act-purple" style="width:100%;" onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName)}')">
-                            ✂️ Request Custom Alteration
-                        </button>`;
-                    }
-                    return `
-                    <div class="btn-action-row">
-                        <button class="btn-act btn-act-blue" onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
-                        <button class="btn-act btn-act-green" onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
-                    </div>`;
-                }
-
-                // Active Return/Exchange/Alteration -> View Tracking Button (Matching Mockup 1:1)
-                return `
-                <a href="https://shiprocket.co/tracking/${esc(trackingId)}" target="_blank" class="btn-tracking-link">
-                    View Tracking <span class="material-symbols-outlined" style="font-size:16px;">open_in_new</span>
-                </a>`;
-            }
-
-            window.toggleExpand = function(orderId) {
-                const p = document.getElementById(`expand-${orderId}`);
-                const b = document.getElementById(`btn-toggle-${orderId}`);
-                if (p.style.display === 'block') {
-                    p.style.display = 'none';
-                    b.textContent = 'Show Order Details ▼';
-                } else {
-                    p.style.display = 'block';
-                    b.textContent = 'Hide Order Details ▲';
-                }
-            };
-
-            window.closeAfterSalesModal = function() {
-                document.getElementById('afterSalesModalOverlay').style.display = 'none';
-            };
-
-            // Modal Handlers
-            window.openReturnModal = function(orderId) {
-                const overlay = document.getElementById('afterSalesModalOverlay');
-                const content = document.getElementById('afterSalesModalContent');
-                content.innerHTML = `
-                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">↩ Request Return</h2>
-                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Return</p>
-                    
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Return</label>
-                        <select id="returnReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                            <option value="Size issue">Size issue / fit not comfortable</option>
-                            <option value="Fabric / Quality">Fabric or quality issue</option>
-                            <option value="Color difference">Color different than expected</option>
-                            <option value="Changed mind">Changed mind</option>
-                        </select>
-                    </div>
-
-                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
-                        <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px;">🏦 Refund Bank Account Details</h4>
-                        <div style="margin-bottom:10px;">
-                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Account Holder Name *</label>
-                            <input type="text" id="returnAccountName" placeholder="Full name as in bank account" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                        </div>
-                        <div style="margin-bottom:10px;">
-                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Bank Account Number *</label>
-                            <input type="password" id="returnAccountNumber" placeholder="Enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                        </div>
-                        <div style="margin-bottom:10px;">
-                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Confirm Account Number *</label>
-                            <input type="text" id="returnConfirmAccountNumber" placeholder="Re-enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                        </div>
-                        <div>
-                            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">IFSC Code *</label>
-                            <input type="text" id="returnIfscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-transform:uppercase; outline:none;">
-                        </div>
-                    </div>
-
-                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                    <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
-                `;
-                overlay.style.display = 'flex';
-            };
-
-            window.submitReturnRequest = async function(orderId) {
-                const btn = document.getElementById('btnSubmitRet');
-                const msg = document.getElementById('modalMsg');
-                const reason = document.getElementById('returnReason').value;
-                const accountName = (document.getElementById('returnAccountName').value || '').trim();
-                const accountNumber = (document.getElementById('returnAccountNumber').value || '').trim();
-                const confirmAccountNumber = (document.getElementById('returnConfirmAccountNumber').value || '').trim();
-                const ifscCode = (document.getElementById('returnIfscCode').value || '').trim().toUpperCase();
-
-                if (!accountName) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter Account Holder Name.'; return; }
-                if (!accountNumber || accountNumber.length < 8) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter a valid Account Number.'; return; }
-                if (accountNumber !== confirmAccountNumber) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Account Numbers do not match.'; return; }
-                if (!ifscCode || ifscCode.length !== 11) { msg.style.display='block'; msg.style.background='#fee2e2'; msg.style.color='#991b1b'; msg.innerHTML='⚠️ Please enter a valid 11-digit IFSC Code.'; return; }
-
-                btn.disabled = true; btn.innerHTML = 'Submitting...';
-                try {
-                    const res = await fetch(API_BASE + '/api/after-sales/return', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderId, reason, bank_details: { account_name: accountName, account_number: accountNumber, ifsc_code: ifscCode }
-                        })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
-                        msg.innerHTML = '✓ Return request submitted! Pickup will be scheduled.';
-                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
-                    } else {
-                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit return request.');
-                        btn.disabled = false; btn.innerHTML = 'Submit Return Request';
-                    }
-                } catch (err) {
-                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ Network error submitting return request.';
-                    btn.disabled = false; btn.innerHTML = 'Submit Return Request';
-                }
-            };
-
-            window.openExchangeModal = function(orderId) {
-                const overlay = document.getElementById('afterSalesModalOverlay');
-                const content = document.getElementById('afterSalesModalContent');
-                content.innerHTML = `
-                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">🔄 Request Exchange</h2>
-                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Exchange</p>
-                    
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Select Replacement Size</label>
-                        <select id="exchangeSize" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                            <option value="28">Size 28</option>
-                            <option value="30">Size 30</option>
-                            <option value="32">Size 32</option>
-                            <option value="34" selected>Size 34</option>
-                            <option value="36">Size 36</option>
-                            <option value="38">Size 38</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Exchange</label>
-                        <select id="exchangeReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                            <option value="Too small">Too small / Tight fit</option>
-                            <option value="Too large">Too large / Loose fit</option>
-                            <option value="Length incorrect">Length incorrect</option>
-                        </select>
-                    </div>
-                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                    <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
-                `;
-                overlay.style.display = 'flex';
-            };
-
-            window.submitExchangeRequest = async function(orderId) {
-                const btn = document.getElementById('btnSubmitExc');
-                const msg = document.getElementById('modalMsg');
-                const replacement_size = document.getElementById('exchangeSize').value;
-                const reason = document.getElementById('exchangeReason').value;
-                btn.disabled = true; btn.innerHTML = 'Submitting...';
-                try {
-                    const res = await fetch(API_BASE + '/api/after-sales/exchange', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order_id: orderId, replacement_size, reason })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
-                        msg.innerHTML = '✓ Exchange request submitted! Replacement will be dispatched.';
-                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
-                    } else {
-                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit exchange request.');
-                        btn.disabled = false; btn.innerHTML = 'Submit Exchange Request';
-                    }
-                } catch (err) {
-                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ Network error submitting exchange request.';
-                    btn.disabled = false; btn.innerHTML = 'Submit Exchange Request';
-                }
-            };
-
-            let selectedWaistVal = "0.0";
-            let selectedLengthVal = "0.0";
-
-            window.openAlterationModal = function(orderId, productName) {
-                selectedWaistVal = "0.0"; selectedLengthVal = "0.0";
-                const overlay = document.getElementById('afterSalesModalOverlay');
-                const content = document.getElementById('afterSalesModalContent');
-                content.innerHTML = `
-                    <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">✂️ Request Custom Alteration</h2>
-                    <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Free alteration up to ±1.5"</p>
-                    
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Waist Adjustment</label>
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-1.5')">-1.5"</button>
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-1.0')">-1.0"</button>
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'-0.5')">-0.5"</button>
-                            <button type="button" class="adjustment-pill waist-pill active" onclick="selectWaist(this,'0.0')">0"</button>
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+0.5')">+0.5"</button>
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+1.0')">+1.0"</button>
-                            <button type="button" class="adjustment-pill waist-pill" onclick="selectWaist(this,'+1.5')">+1.5"</button>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Length Adjustment</label>
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-1.5')">-1.5"</button>
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-1.0')">-1.0"</button>
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'-0.5')">-0.5"</button>
-                            <button type="button" class="adjustment-pill length-pill active" onclick="selectLength(this,'0.0')">0"</button>
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+0.5')">+0.5"</button>
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+1.0')">+1.0"</button>
-                            <button type="button" class="adjustment-pill length-pill" onclick="selectLength(this,'+1.5')">+1.5"</button>
-                        </div>
-                    </div>
-
-                    <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                    <button id="btnSubmitAlt" onclick="submitAlterationRequest('${orderId}')" style="width:100%; background:#673ab7; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Alteration Request</button>
-                `;
-                overlay.style.display = 'flex';
-            };
-
-            window.selectWaist = function(btn, val) {
-                document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active'); selectedWaistVal = val;
-            };
-
-            window.selectLength = function(btn, val) {
-                document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active'); selectedLengthVal = val;
-            };
-
-            window.submitAlterationRequest = async function(orderId) {
-                const btn = document.getElementById('btnSubmitAlt');
-                const msg = document.getElementById('modalMsg');
-                btn.disabled = true; btn.innerHTML = 'Submitting...';
-                try {
-                    const res = await fetch(API_BASE + '/api/after-sales/alteration', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderId,
-                            alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
-                            measurements: { waist_diff: selectedWaistVal, length_diff: selectedLengthVal }
-                        })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        msg.style.display = 'block'; msg.style.background = '#dcfce7'; msg.style.color = '#166534';
-                        msg.innerHTML = '✓ Alteration request submitted! Pickup will be arranged.';
-                        setTimeout(() => { closeAfterSalesModal(); fetchOrders(); }, 1800);
-                    } else {
-                        msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                        msg.innerHTML = '❌ ' + (data.error || 'Failed to submit alteration request.');
-                        btn.disabled = false; btn.innerHTML = 'Submit Alteration Request';
-                    }
-                } catch (err) {
-                    msg.style.display = 'block'; msg.style.background = '#fee2e2'; msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ Network error submitting alteration request.';
-                    btn.disabled = false; btn.innerHTML = 'Submit Alteration Request';
-                }
-            };
-
-            const savedPhone = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
-            if (savedPhone) {
-                document.getElementById('mobileInput').value = savedPhone.replace(/\D/g, '').slice(-10);
+            // Auto-fill from localStorage
+            const saved = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
+            if (saved) {
+                mobileInput.value = saved.replace(/\D/g,'').slice(-10);
                 fetchOrders();
             }
 
         })();
+
+        // ── AFTER-SALES MODAL HANDLERS ───────────────────────────────────────
+        let selectedWaistVal = "0.0";
+        let selectedLengthVal = "0.0";
+
+        window.selectWaist = function(btn, val) {
+            document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedWaistVal = val;
+        };
+
+        window.selectLength = function(btn, val) {
+            document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedLengthVal = val;
+        };
+
+        window.closeAfterSalesModal = function() {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            if (overlay) overlay.style.display = 'none';
+        };
+
+        window.openAlterationModal = function(orderId, productName) {
+            selectedWaistVal = "0.0";
+            selectedLengthVal = "0.0";
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">✂️ Request Custom Alteration</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • ${productName}<br><span style="color:#673ab7; font-weight:600;">Free alteration up to ±1.5 inches</span></p>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Waist Adjustment</label>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.5" onclick="selectWaist(this, '-1.5')">-1.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.0" onclick="selectWaist(this, '-1.0')">-1.0"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="-0.5" onclick="selectWaist(this, '-0.5')">-0.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill active" data-val="0.0" onclick="selectWaist(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+0.5" onclick="selectWaist(this, '+0.5')">+0.5"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.0" onclick="selectWaist(this, '+1.0')">+1.0"</button>
+                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.5" onclick="selectWaist(this, '+1.5')">+1.5"</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Length Adjustment</label>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                        <button type="button" class="adjustment-pill length-pill" data-val="-1.5" onclick="selectLength(this, '-1.5')">-1.5"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="-1.0" onclick="selectLength(this, '-1.0')">-1.0"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="-0.5" onclick="selectLength(this, '-0.5')">-0.5"</button>
+                        <button type="button" class="adjustment-pill length-pill active" data-val="0.0" onclick="selectLength(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+0.5" onclick="selectLength(this, '+0.5')">+0.5"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+1.0" onclick="selectLength(this, '+1.0')">+1.0"</button>
+                        <button type="button" class="adjustment-pill length-pill" data-val="+1.5" onclick="selectLength(this, '+1.5')">+1.5"</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Fitting / Tailoring Notes (Optional)</label>
+                    <textarea id="alterationNotes" placeholder="e.g. Taper slightly around calves..." style="width:100%; height:75px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+                <button id="btnSubmitAlt" onclick="submitAlterationRequest('${orderId}')" style="width:100%; background:#673ab7; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Alteration Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitAlterationRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitAlt');
+            const msg = document.getElementById('modalMsg');
+            const notes = document.getElementById('alterationNotes').value.trim();
+            
+            if (selectedWaistVal === "0.0" && selectedLengthVal === "0.0" && !notes) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please select a Waist/Length adjustment or enter fitting notes.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            msg.style.display = 'none';
+
+            try {
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/alteration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
+                        measurements: { waist_diff: selectedWaistVal, length_diff: selectedLengthVal },
+                        customer_notes: notes
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('after_sales_' + orderId, 'ALTERATION');
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        fetchOrders();
+                    }, 1200);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit alteration request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Alteration Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting alteration request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Alteration Request';
+            }
+        };
+
+        window.openReturnModal = function(orderId) {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">↩ Request Return</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Return</p>
+                
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Return</label>
+                    <select id="returnReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="Size issue">Size issue / fit not comfortable</option>
+                        <option value="Fabric / Quality">Fabric or quality issue</option>
+                        <option value="Color difference">Color different than expected</option>
+                        <option value="Changed mind">Changed mind</option>
+                    </select>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+                    <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                        🏦 Refund Bank Account Details
+                    </h4>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Account Holder Name *</label>
+                        <input type="text" id="returnAccountName" placeholder="Full name as in bank account" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Bank Account Number *</label>
+                        <input type="password" id="returnAccountNumber" placeholder="Enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Confirm Account Number *</label>
+                        <input type="text" id="returnConfirmAccountNumber" placeholder="Re-enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">IFSC Code *</label>
+                        <input type="text" id="returnIfscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-transform:uppercase; outline:none;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Comments / Notes</label>
+                    <textarea id="returnNotes" placeholder="Optional details..." style="width:100%; height:60px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0369a1; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitReturnRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitRet');
+            const msg = document.getElementById('modalMsg');
+            const reason = document.getElementById('returnReason').value;
+            const accountName = (document.getElementById('returnAccountName').value || '').trim();
+            const accountNumber = (document.getElementById('returnAccountNumber').value || '').trim();
+            const confirmAccountNumber = (document.getElementById('returnConfirmAccountNumber').value || '').trim();
+            const ifscCode = (document.getElementById('returnIfscCode').value || '').trim().toUpperCase();
+            const notes = (document.getElementById('returnNotes').value || '').trim();
+
+            if (!accountName) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter Account Holder Name.';
+                return;
+            }
+            if (!accountNumber || accountNumber.length < 8) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter a valid Bank Account Number.';
+                return;
+            }
+            if (accountNumber !== confirmAccountNumber) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Account Numbers do not match.';
+                return;
+            }
+            if (!ifscCode || ifscCode.length !== 11) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '⚠️ Please enter a valid 11-digit IFSC Code (e.g. SBIN0001234).';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            msg.style.display = 'none';
+
+            try {
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/return', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        reason,
+                        customer_notes: notes,
+                        bank_details: {
+                            account_name: accountName,
+                            account_number: accountNumber,
+                            ifsc_code: ifscCode
+                        }
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('after_sales_' + orderId, 'RETURN');
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Return request & bank details submitted! Pickup will be scheduled.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        fetchOrders();
+                    }, 1200);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit return request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Return Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting return request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Return Request';
+            }
+        };
+
+        window.openExchangeModal = function(orderId) {
+            const overlay = document.getElementById('afterSalesModalOverlay');
+            const content = document.getElementById('afterSalesModalContent');
+            content.innerHTML = `
+                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">🔄 Request Exchange</h2>
+                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Exchange</p>
+                
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Select Replacement Size</label>
+                    <select id="exchangeSize" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="28">Size 28</option>
+                        <option value="30">Size 30</option>
+                        <option value="32">Size 32</option>
+                        <option value="34" selected>Size 34</option>
+                        <option value="36">Size 36</option>
+                        <option value="38">Size 38</option>
+                        <option value="40">Size 40</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Exchange</label>
+                    <select id="exchangeReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
+                        <option value="Too small">Too small / Tight fit</option>
+                        <option value="Too large">Too large / Loose fit</option>
+                        <option value="Length incorrect">Length incorrect</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
+                    <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitExchangeRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitExc');
+            const msg = document.getElementById('modalMsg');
+            const replacement_size = document.getElementById('exchangeSize').value;
+            const reason = document.getElementById('exchangeReason').value;
+            const notes = document.getElementById('exchangeNotes').value.trim();
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            try {
+                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
+                const res = await fetch(apiBase + '/api/after-sales/exchange', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('after_sales_' + orderId, 'EXCHANGE');
+                    msg.style.display = 'block';
+                    msg.style.background = '#dcfce7';
+                    msg.style.color = '#166534';
+                    msg.innerHTML = '✓ Exchange request submitted successfully! Replacement item will be dispatched.';
+                    setTimeout(() => {
+                        closeAfterSalesModal();
+                        fetchOrders();
+                    }, 1200);
+                } else {
+                    msg.style.display = 'block';
+                    msg.style.background = '#fee2e2';
+                    msg.style.color = '#991b1b';
+                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit exchange request.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Submit Exchange Request';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.background = '#fee2e2';
+                msg.style.color = '#991b1b';
+                msg.innerHTML = '❌ Network error submitting exchange request.';
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Exchange Request';
+            }
+        };
     </script>
+
+    <!-- After-Sales Modal Overlay -->
+    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#fff; border-radius:20px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
+            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
+            <div id="afterSalesModalContent">
+                <!-- Dynamic Modal Content Injection -->
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
+
+
