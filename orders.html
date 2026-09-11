@@ -573,10 +573,118 @@
             100% { background-position: 200% 0; }
         }
 
+        /* ── Comprehensive Responsive Alignment Across All Screens ── */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 20px 14px;
+            }
+            .lookup-card {
+                padding: 22px 18px;
+            }
+        }
+
         @media (max-width: 480px) {
-            .input-row { flex-direction: column; }
-            #trackBtn { width: 100%; }
-            .card-header { flex-direction: column; gap: 10px; }
+            .page-container {
+                padding: 16px 12px;
+            }
+            .lookup-hero {
+                margin-bottom: 24px;
+            }
+            .lookup-hero h1 {
+                font-size: 24px;
+                letter-spacing: -0.5px;
+            }
+            .lookup-hero p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+            .lookup-card {
+                padding: 18px 14px;
+                border-radius: 16px;
+                margin-bottom: 24px;
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #trackBtn, #verifyBtn {
+                width: 100%;
+                height: 48px;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 16px;
+            }
+            .card-body {
+                padding: 16px 14px;
+            }
+            .stepper {
+                margin-bottom: 22px;
+                padding-top: 6px;
+            }
+            .step-dot {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+                margin-bottom: 5px;
+            }
+            .step:not(:last-child)::after {
+                top: 10px;
+                height: 2px;
+            }
+            .step-text {
+                font-size: 9.5px;
+                letter-spacing: -0.2px;
+                line-height: 1.15;
+            }
+            .details-block {
+                padding: 14px;
+                border-radius: 12px;
+            }
+            .detail-row {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            .tracking-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .track-btn-link {
+                width: 100%;
+                justify-content: center;
+            }
+            .action-btn {
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+            .modal-inner {
+                padding: 20px 16px !important;
+                border-radius: 18px !important;
+            }
+            .adjustment-pill {
+                font-size: 12px;
+                padding: 8px 4px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .page-container {
+                padding: 12px 8px;
+            }
+            .step-dot {
+                width: 19px;
+                height: 19px;
+                font-size: 9.5px;
+            }
+            .step:not(:last-child)::after {
+                top: 9px;
+            }
+            .step-text {
+                font-size: 8px;
+            }
         }
     </style>
 </head>
@@ -663,7 +771,13 @@
                         <div id="loggedInMobile" style="font-weight: 800; font-size: 16px; color: var(--text-primary);"></div>
                     </div>
                 </div>
-                <button type="button" id="logoutBtn" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; font-size: 13px; color: var(--text-secondary); transition: var(--transition);">Switch Account</button>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" id="resetTestOrdersBtn" onclick="resetAllTestOrders()" style="display:none; background:#eff6ff; border:1.5px solid #bfdbfe; color:#1d4ed8; padding:8px 14px; border-radius:var(--radius-sm); cursor:pointer; font-weight:700; font-size:12px; transition:var(--transition); align-items:center; gap:5px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">refresh</span>
+                        Refresh Test Orders
+                    </button>
+                    <button type="button" id="logoutBtn" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; font-size: 13px; color: var(--text-secondary); transition: var(--transition);">Switch Account</button>
+                </div>
             </div>
 
             <div id="errorBanner" style="display:none; color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;"></div>
@@ -1037,7 +1151,42 @@
                 // Decode token payload manually just to show number, or rely on fetch
                 const phone = localStorage.getItem('slyte_phone') || 'User';
                 loggedInMobile.textContent = '+91 ' + phone;
+                const resetBtn = document.getElementById('resetTestOrdersBtn');
+                if (resetBtn) {
+                    resetBtn.style.display = (phone.includes('9742006683') || phone.includes('97420066683') || phone.includes('test')) ? 'inline-flex' : 'none';
+                }
             }
+
+            window.resetAllTestOrders = async function() {
+                const btn = document.getElementById('resetTestOrdersBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px; animation:spin 1s linear infinite;">refresh</span> Resetting...';
+                }
+                
+                // Clear all local status overrides
+                try {
+                    Object.keys(localStorage).forEach(k => {
+                        if (k.startsWith('slyte_order_status_')) {
+                            localStorage.removeItem(k);
+                        }
+                    });
+                } catch(e) {}
+
+                try {
+                    const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
+                    await fetch(apiBase + '/api/test/reset-orders', { method: 'POST' }).catch(() => {});
+                } catch(e) {}
+
+                showSuccess('✓ All test orders refreshed to initial state!');
+                setTimeout(() => {
+                    fetchOrders();
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">refresh</span> Refresh Test Orders';
+                    }
+                }, 500);
+            };
 
             function showMobileStep() {
                 mobileStep.style.display = 'block';
@@ -1274,6 +1423,22 @@
                     createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
                     trackingNumber: "AWB9742006683-03",
                     deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
+                    is_test: true
+                },
+                {
+                    orderId: "SLYTE-TEST-ALTERATION-002",
+                    displayId: "#SLYTE-TEST-ALTERATION-002",
+                    productName: "Slyte 24H Beige Trouser (Custom Fit)",
+                    productType: "CUSTOM",
+                    fitType: "Custom Fit",
+                    orderLifecycleStatus: "ALTERATION_REQUESTED",
+                    fulfillmentStatus: "Alteration Requested",
+                    amount: 1799,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-05",
+                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
                     is_test: true
                 }
             ];
@@ -1617,13 +1782,13 @@
 
                     if (isCustom) {
                         parts.push(`<div class="msg-banner msg-purple" style="margin-top:8px;">✂️ Custom Fit: Returns/Exchanges not applicable. Includes free alteration (up to ±1.5").</div>`);
-                        parts.push(`<button class="action-btn" style="background:#673ab7; color:#fff; margin-top:8px; width:100%; font-weight:700; border:none; padding:12px; border-radius:10px; cursor:pointer;"
-                            onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName || 'Trouser')}')">✂️ Request Alteration</button>`);
+                        parts.push(`<button class="action-btn" style="background:#000000; color:#ffffff; border:1.5px solid #000000; margin-top:10px; width:100%; font-weight:800; padding:13px; border-radius:12px; cursor:pointer;"
+                            onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName || 'Trouser')}')">✂️ Request Alteration (±1.5")</button>`);
                     } else {
-                        parts.push(`<div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="action-btn" style="flex:1; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                        parts.push(`<div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
+                            <button class="action-btn" style="flex:1; min-width:140px; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1; font-weight:800; padding:12px; border-radius:12px; cursor:pointer;"
                                 onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
-                            <button class="action-btn" style="flex:1; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
+                            <button class="action-btn" style="flex:1; min-width:140px; background:var(--primary-blue); color:#ffffff; border:1.5px solid var(--primary-blue); font-weight:800; padding:12px; border-radius:12px; cursor:pointer;"
                                 onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
                         </div>`);
                     }
@@ -1904,11 +2069,11 @@
                 
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Waist Adjustment</label>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap:8px;">
                         <button type="button" class="adjustment-pill waist-pill" data-val="-1.5" onclick="selectWaist(this, '-1.5')">-1.5"</button>
                         <button type="button" class="adjustment-pill waist-pill" data-val="-1.0" onclick="selectWaist(this, '-1.0')">-1.0"</button>
                         <button type="button" class="adjustment-pill waist-pill" data-val="-0.5" onclick="selectWaist(this, '-0.5')">-0.5"</button>
-                        <button type="button" class="adjustment-pill waist-pill active" data-val="0.0" onclick="selectWaist(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill waist-pill active" data-val="0.0" onclick="selectWaist(this, '0.0')">0" (Orig)</button>
                         <button type="button" class="adjustment-pill waist-pill" data-val="+0.5" onclick="selectWaist(this, '+0.5')">+0.5"</button>
                         <button type="button" class="adjustment-pill waist-pill" data-val="+1.0" onclick="selectWaist(this, '+1.0')">+1.0"</button>
                         <button type="button" class="adjustment-pill waist-pill" data-val="+1.5" onclick="selectWaist(this, '+1.5')">+1.5"</button>
@@ -1917,11 +2082,11 @@
 
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Length Adjustment</label>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap:8px;">
                         <button type="button" class="adjustment-pill length-pill" data-val="-1.5" onclick="selectLength(this, '-1.5')">-1.5"</button>
                         <button type="button" class="adjustment-pill length-pill" data-val="-1.0" onclick="selectLength(this, '-1.0')">-1.0"</button>
                         <button type="button" class="adjustment-pill length-pill" data-val="-0.5" onclick="selectLength(this, '-0.5')">-0.5"</button>
-                        <button type="button" class="adjustment-pill length-pill active" data-val="0.0" onclick="selectLength(this, '0.0')">0" (Original)</button>
+                        <button type="button" class="adjustment-pill length-pill active" data-val="0.0" onclick="selectLength(this, '0.0')">0" (Orig)</button>
                         <button type="button" class="adjustment-pill length-pill" data-val="+0.5" onclick="selectLength(this, '+0.5')">+0.5"</button>
                         <button type="button" class="adjustment-pill length-pill" data-val="+1.0" onclick="selectLength(this, '+1.0')">+1.0"</button>
                         <button type="button" class="adjustment-pill length-pill" data-val="+1.5" onclick="selectLength(this, '+1.5')">+1.5"</button>
@@ -2228,7 +2393,7 @@
 
     <!-- After-Sales Modal Overlay -->
     <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:16px;">
-        <div style="background:#ffffff; border-radius:24px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; padding:28px; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.25); border:1px solid #e2e8f0; position:relative; font-family:inherit; animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div class="modal-inner" style="background:#ffffff; border-radius:24px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; padding:28px; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.25); border:1px solid #e2e8f0; position:relative; font-family:inherit; animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
             <button onclick="closeAfterSalesModal()" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:800; cursor:pointer; color:#334155; transition:var(--transition); display:flex; align-items:center; justify-content:center;">✕</button>
             <div id="afterSalesModalContent">
                 <!-- Dynamic Modal Content Injection -->

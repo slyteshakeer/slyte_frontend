@@ -333,6 +333,15 @@ export default {
                 }
             }
 
+            if ((pathStr === "/api/test/reset-orders" || pathStr === "/test/reset-orders") && (method === "POST" || method === "GET")) {
+                const res = backendStore.resetTestOrders();
+                return jsonResponse({
+                    success: true,
+                    message: "All test orders successfully refreshed to their initial states",
+                    data: res
+                }, 200, corsHeaders);
+            }
+
             // ----------------------------------------------------
             // ADMIN AUTHENTICATION
             // ----------------------------------------------------

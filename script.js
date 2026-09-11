@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
-            const priceFormatted = isCustom ? '₹1,799' : (baseProd.price || (pid === 1 ? '₹10' : '₹1,699'));
+            const priceFormatted = isCustom ? '₹1,799' : (baseProd.price || (pid === 1 ? '₹199' : '₹1,699'));
             
             product.price = priceFormatted;
             product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
@@ -412,8 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (product) {
                 const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
-                const priceNum = isCustom ? 1799 : (pid === 1 ? 10 : 1699);
-                const priceFormatted = isCustom ? '₹1,799' : (pid === 1 ? '₹10' : '₹1,699');
+                const priceNum = isCustom ? 1799 : (pid === 1 ? 199 : 1699);
+                const priceFormatted = isCustom ? '₹1,799' : (pid === 1 ? '₹199' : '₹1,699');
                 product.price = priceFormatted;
                 product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const pid = parseInt(urlParams.get('id')) || 1;
             const baseProd = allProducts.find(p => p.id === pid) || {};
-            if (priceEl) priceEl.textContent = baseProd.price || (pid === 1 ? '₹10' : '₹1,699');
+            if (priceEl) priceEl.textContent = baseProd.price || (pid === 1 ? '₹199' : '₹1,699');
         });
     });
 

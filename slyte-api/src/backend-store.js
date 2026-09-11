@@ -19,8 +19,8 @@ const INITIAL_PRODUCTS = [
         id: 1,
         name: "Slyte 24H Black Trouser",
         sku: "SLYTE-TR-BLK-001",
-        price: "₹10",
-        numeric_price: 10,
+        price: "₹199",
+        numeric_price: 199,
         image: "images/products/blackpant_1.jpeg",
         images: [
             "images/products/blackpant_1.jpeg",
@@ -317,6 +317,14 @@ class SlyteBackendStore {
         this.auditLogs = [];
         this.notifiedEvents = new Set(); // Order event keys for Telegram idempotency
         this.adminSessions = new Map(); // token -> admin object
+    }
+
+    resetTestOrders() {
+        this.orders = JSON.parse(JSON.stringify(INITIAL_TEST_ORDERS));
+        this.returns = [];
+        this.exchanges = [];
+        this.alterations = JSON.parse(JSON.stringify(INITIAL_ALTERATIONS));
+        return { success: true, count: this.orders.length };
     }
 
     // --- Admin Authentication ---

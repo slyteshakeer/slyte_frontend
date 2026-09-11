@@ -3,7 +3,7 @@ window.productsData = [
     {
         id: 1,
         name: "Slyte 24H Black Trouser",
-        price: "₹10",
+        price: "₹199",
         image: "images/products/blackpant_1.jpeg",
         images: [
             "images/products/blackpant_1.jpeg",
