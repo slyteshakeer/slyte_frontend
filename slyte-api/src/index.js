@@ -679,16 +679,18 @@ async function createShiprocketExchangeOrder(order, exchangeRec, env) {
     if (!token) return null;
 
     try {
-        const pickupLocId = env?.SHIPROCKET_PICKUP_LOCATION_ID || "5723898";
+        const pickupLocId = env?.SHIPROCKET_PICKUP_LOCATION_ID || "59097601";
+        const channelId = env?.SHIPROCKET_CHANNEL_ID || "10394369";
         const addr = order.delivery_address || order.deliveryAddress || {};
         const isAddrObj = typeof addr === 'object';
-        const addrStr = isAddrObj ? (addr.addressLine1 || "Customer Address") : String(addr || "Customer Address");
+        const addrStr = isAddrObj ? (addr.addressLine1 || "456 Sample Avenue, Indiranagar") : String(addr || "456 Sample Avenue, Indiranagar");
         const city = isAddrObj ? (addr.city || "Bengaluru") : "Bengaluru";
         const state = isAddrObj ? (addr.state || "Karnataka") : "Karnataka";
-        const pincode = isAddrObj ? (addr.pincode || "560034") : "560034";
+        const pincode = isAddrObj ? (addr.pincode || "560038") : "560038";
         const oId = String(order.id || order.orderId || order.order_id || Date.now()).replace(/^#/, '');
 
         const payload = {
+            channel_id: String(channelId),
             exchange_order_id: "EXC-" + oId,
             return_order_id: "RET-" + oId,
             seller_pickup_location_id: String(pickupLocId),
@@ -742,7 +744,7 @@ async function createShiprocketExchangeOrder(order, exchangeRec, env) {
             exchange_breadth: "25.00",
             exchange_height: "5.00",
             exchange_weight: "0.500",
-            return_reason: exchangeRec.reason || "Size issue",
+            return_reason: "29",
             qc_check: "false"
         };
 

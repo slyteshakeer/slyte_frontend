@@ -6,12 +6,19 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "routes": [
+    {
+      "pattern": "api.slyte.in",
+      "custom_domain": true
+    }
+  ],
   "observability": {
     "enabled": true
   },
   "vars": {
     "ALLOWED_ORIGIN": "https://slyte.in",
     "CASHFREE_ENV": "PRODUCTION",
+    "SHIPROCKET_EMAIL": "dashclothingin@gmail.com",
     "SUPABASE_URL": "https://iqdtfllkdtjypiseklzt.supabase.co",
     "PORT": "3000",
     "GOOGLE_CLIENT_ID": "529998054171-r8b812rrog6vec73leabukse393rndmt.apps.googleusercontent.com"

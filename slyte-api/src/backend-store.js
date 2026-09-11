@@ -4,8 +4,14 @@
  * Test Orders (9742006683), Audit Logs, and Idempotent Notifications.
  */
 
-const fs = require('fs');
-const path = require('path');
+let fs = null;
+let path = null;
+try {
+    fs = require('node:fs');
+    path = require('node:path');
+} catch (e) {
+    // Cloudflare worker environment without filesystem
+}
 
 // Initial seed catalog for products-data.js
 const INITIAL_PRODUCTS = [
