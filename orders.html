@@ -3,1936 +3,1693 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Your Orders — Slyte</title>
-    <meta name="description" content="Look up all your Slyte custom trouser orders by entering your mobile number." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Orders & After-Sales — Slyte</title>
+    <meta name="description" content="Manage your Slyte trouser orders, track delivery, request returns, exchanges, or custom fit alterations." />
     <meta name="robots" content="noindex, follow">
 
     <!-- Central Application Config -->
     <script src="js/config.js"></script>
-
-    <!-- Cloudflare Web Analytics -->
-    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
-
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="icon" type="image/png" href="images/logos/slyte-only-logo-black.png">
 
     <style>
         :root {
-            --bg: #ffffff;
+            --bg-body: #fafafa;
             --surface: #ffffff;
-            --surface-2: #f8f8f8;
-            --border: #eeeeee;
-            --text-primary: #000000;
-            --text-secondary: #555555;
-            --text-muted: #999999;
-            --accent: #154cbd;
-            --accent-light: #0d3a95;
-            --paid-bg: #e8f5e9;
-            --paid-color: #2e7d32;
-            --pending-pay-bg: #fff8e1;
-            --pending-pay-color: #e65100;
-            --error: #c62828;
-            --radius: 16px;
-            --radius-sm: 12px;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            --transition: 0.3s ease;
+            --surface-subtle: #f8fafc;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            --navy-primary: #0f172a;
+            --navy-secondary: #1e293b;
+            --navy-accent: #2563eb;
+            --navy-muted: #64748b;
+            
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --text-muted: #94a3b8;
+            
+            /* Status Colors */
+            --green-bg: #f0fdf4;
+            --green-border: #bbf7d0;
+            --green-text: #166534;
+            
+            --red-bg: #fef2f2;
+            --red-border: #fecaca;
+            --red-text: #991b1b;
+            
+            --blue-bg: #eff6ff;
+            --blue-border: #bfdbfe;
+            --blue-text: #1e40af;
+            
+            --amber-bg: #fffbebf0;
+            --amber-border: #fde68a;
+            --amber-text: #92400e;
+            
+            --radius-card: 16px;
+            --radius-inner: 12px;
+            --radius-btn: 10px;
+            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+            --shadow-modal: 0 24px 48px -12px rgba(15, 23, 42, 0.2);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .adjustment-pill {
-            padding: 8px 4px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #334155;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .adjustment-pill.active {
-            background: #154cbd;
-            color: #ffffff;
-            border-color: #154cbd;
-            box-shadow: 0 2px 8px rgba(21, 76, 189, 0.3);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-primary);
-            padding-bottom: 100px; /* Extra space above fixed bottom-nav */
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding-bottom: 90px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .page-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 24px 16px;
+        /* Top Brand Navigation */
+        .brand-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .lookup-hero {
-            text-align: center;
-            margin-bottom: 32px;
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--navy-primary);
         }
 
-        .lookup-hero .tag {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
-            margin-bottom: 12px;
+        .brand-logo img {
+            height: 24px;
+            width: auto;
         }
 
-        .lookup-hero h1 {
-            font-size: 28px;
+        .brand-logo span {
             font-weight: 800;
-            margin-bottom: 8px;
+            font-size: 18px;
             letter-spacing: -0.5px;
         }
 
-        .lookup-hero p {
-            font-size: 14px;
-            color: var(--text-secondary);
+        .header-help-btn {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-light);
         }
 
+        .container {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Phone Lookup Hero */
         .lookup-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 32px;
+            border-radius: var(--radius-card);
+            padding: 20px;
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 24px;
         }
 
-        .field-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            color: var(--text-secondary);
+        .lookup-card h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--navy-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
         }
 
-        .input-row {
+        .lookup-card p {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 16px;
+        }
+
+        .input-group {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
-        .phone-wrapper {
+        .phone-input-wrap {
             flex: 1;
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .phone-prefix {
             position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 14px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--navy-primary);
+            pointer-events: none;
         }
 
         #mobileInput {
             width: 100%;
-            height: 52px;
+            height: 48px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0 16px 0 50px;
-            font-size: 16px;
+            border-radius: var(--radius-inner);
+            padding: 0 12px 0 46px;
+            font-size: 15px;
             font-weight: 600;
             font-family: inherit;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: #fafafa;
+            background: var(--surface-subtle);
+            transition: var(--transition);
         }
 
         #mobileInput:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.1);
-            background: #fff;
+            border-color: var(--navy-primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
         }
 
         #trackBtn {
-            height: 52px;
-            padding: 0 24px;
-            background: var(--primary-black);
-            color: #fff;
+            height: 48px;
+            padding: 0 20px;
+            background: var(--navy-primary);
+            color: #ffffff;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-inner);
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: var(--transition);
         }
 
         #trackBtn:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
 
-        /* Results Area */
+        /* Demo / Scenario Simulator Bar */
+        .scenario-bar {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-inner);
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .scenario-bar label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .scenario-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Order Card Component */
         .order-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-card);
             margin-bottom: 20px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            animation: slideUp 0.4s ease forwards;
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
+        .card-header-row {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            background: #ffffff;
         }
 
-        .order-id-label {
+        .order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .order-id-code {
             font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
         }
 
-        .product-name {
+        .product-title {
             font-size: 16px;
             font-weight: 700;
+            color: var(--navy-primary);
             line-height: 1.3;
         }
 
-        .payment-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .fit-spec {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--navy-muted);
         }
 
-        .payment-badge.paid { background: #e8f5e9; color: #2e7d32; }
-        .payment-badge.pending { background: #fff8e1; color: #e65100; }
-        .payment-badge.cancelled { background: #ffebee; color: #c62828; }
+        .tag-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 4px;
+        }
 
-        .card-body {
+        .tag-standard { background: #e2e8f0; color: #334155; }
+        .tag-custom { background: #f3e8ff; color: #6b21a8; }
+
+        .card-content {
             padding: 20px;
         }
 
-        /* Stepper */
-        .stepper {
+        /* Timeline Stepper Component */
+        .timeline-stepper {
             display: flex;
-            margin-bottom: 24px;
-            padding-top: 10px;
-        }
-
-        .step {
-            flex: 1;
-            text-align: center;
+            align-items: flex-start;
+            justify-content: space-between;
             position: relative;
+            margin: 16px 0 24px 0;
+            padding: 0 4px;
         }
 
-        .step:not(:last-child)::after {
+        .timeline-stepper::before {
             content: '';
             position: absolute;
-            top: 11px;
-            left: 50%;
-            width: 100%;
+            top: 12px;
+            left: 20px;
+            right: 20px;
             height: 2px;
-            background: #eee;
+            background: #e2e8f0;
             z-index: 1;
         }
 
-        .step.done:not(:last-child)::after {
-            background: var(--accent);
+        .step-node {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            text-align: center;
         }
 
-        .step-dot {
-            width: 24px;
-            height: 24px;
+        .node-circle {
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            background: #fff;
-            border: 2px solid #eee;
-            margin: 0 auto 8px;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .step-node.done .node-circle {
+            background: var(--navy-primary);
+            border-color: var(--navy-primary);
+            color: #ffffff;
+        }
+
+        .step-node.active .node-circle {
+            background: #ffffff;
+            border-color: var(--navy-primary);
+            color: var(--navy-primary);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
+        }
+
+        .step-node.active-amber .node-circle {
+            background: #ffffff;
+            border-color: #d97706;
+            color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+
+        .step-node.active-green .node-circle {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .node-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            line-height: 1.25;
+            max-width: 72px;
+        }
+
+        .step-node.done .node-label,
+        .step-node.active .node-label {
+            color: var(--navy-primary);
+            font-weight: 700;
+        }
+
+        /* Status Banners */
+        .status-banner {
+            border-radius: var(--radius-inner);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-banner-title {
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-banner-desc {
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .banner-green { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green-text); }
+        .banner-red { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); }
+        .banner-blue { background: var(--blue-bg); border: 1px solid var(--blue-border); color: var(--blue-text); }
+        .banner-amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber-text); }
+
+        /* Warning Card for Missing Bank Details */
+        .bank-warning-card {
+            background: #fffbe6;
+            border: 1px dashed #d97706;
+            border-radius: var(--radius-inner);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .bank-warning-info h4 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 2px;
+        }
+
+        .bank-warning-info p {
+            font-size: 12px;
+            color: #b45309;
+        }
+
+        .btn-add-bank {
+            background: #d97706;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
-            color: #ccc;
-            position: relative;
-            z-index: 2;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
-        .step.active .step-dot {
-            border-color: var(--accent);
-            color: var(--accent);
+        /* Order Summary / Quick Info Rows */
+        .info-grid {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-inner);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .step.done .step-dot {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
-        }
-
-        .step-text {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .step.active .step-text {
-            color: var(--text-primary);
-        }
-
-        .details-block {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .detail-row {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
             font-size: 13px;
         }
 
-        .detail-row:last-child { margin-bottom: 0; }
-
-        .detail-label {
-            color: var(--text-secondary);
+        .info-label {
+            color: var(--navy-muted);
             font-weight: 500;
         }
 
-        .detail-value {
+        .info-val {
+            color: var(--navy-primary);
             font-weight: 700;
             text-align: right;
         }
 
-        .tracking-card {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 12px;
+        /* Action Buttons Grid */
+        .actions-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .track-btn-link {
-            background: var(--accent);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--radius-btn);
+            font-size: 13px;
             font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            text-align: center;
         }
 
-        .show-more-btn {
+        .btn-primary { background: var(--navy-primary); color: #ffffff; }
+        .btn-primary:active { background: var(--navy-secondary); }
+
+        .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--navy-primary); }
+        .btn-secondary:active { background: var(--surface-subtle); }
+
+        .btn-outline-blue { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+        .btn-outline-green { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+        .btn-outline-purple { background: #f3e8ff; border-color: #e9d5ff; color: #6b21a8; }
+
+        .btn-details-toggle {
             width: 100%;
             background: none;
             border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 10px;
+            color: var(--navy-muted);
+            padding: 10px;
+            border-radius: var(--radius-btn);
+            font-size: 12px;
             font-weight: 700;
-            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 12px;
+            transition: var(--transition);
         }
 
-        .show-more-btn:hover { background: #f5f5f5; }
+        .btn-details-toggle:hover {
+            color: var(--navy-primary);
+            background: var(--surface-subtle);
+        }
 
-        .expanded-section {
+        /* Expanded Details Section */
+        .details-expand-panel {
             display: none;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border);
-            margin-top: 20px;
-        }
-
-        .expanded-section.open { display: block; }
-
-        .timeline {
             margin-top: 16px;
-            border-left: 2px solid #eee;
-            padding-left: 20px;
-            position: relative;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
         }
 
-        .timeline-item {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .detail-box {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-inner);
+            padding: 14px;
             margin-bottom: 16px;
+        }
+
+        .detail-box-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--navy-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-box-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .detail-box-row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Modal Overlay & Card */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: var(--shadow-modal);
             position: relative;
         }
 
-        .timeline-item::before {
-            content: '';
+        .modal-close-btn {
             position: absolute;
-            left: -27px;
-            top: 4px;
-            width: 12px;
-            height: 12px;
+            top: 18px;
+            right: 18px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: #fff;
-            border: 2px solid #eee;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .timeline-item:first-child::before {
-            background: var(--accent);
-            border-color: var(--accent);
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--navy-primary);
+            margin-bottom: 4px;
         }
 
-        .timeline-item-cancel::before,
-        .timeline-item-cancel:first-child::before {
-            background: var(--error) !important;
-            border-color: var(--error) !important;
+        .modal-subtitle {
+            font-size: 13px;
+            color: var(--navy-muted);
+            margin-bottom: 20px;
         }
 
-        .timeline-date {
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
         }
 
-        .timeline-status {
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        .cancel-btn {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
-            background: #fff;
-            border: 1px solid #ffcdd2;
-            color: #d32f2f;
             padding: 12px;
-            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-inner);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            background: #ffffff;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--navy-primary);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-disclaimer {
+            font-size: 12px;
+            color: var(--navy-muted);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Adjustment Pills */
+        .adj-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .adj-pill {
+            padding: 10px 4px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 700;
-            margin-top: 20px;
+            color: var(--navy-primary);
             cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
         }
 
-        .cancel-btn:hover { background: #ffebee; }
-
-        #loader { text-align: center; padding: 40px 0; display: none; }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #eee;
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
+        .adj-pill.active {
+            background: var(--navy-primary);
+            color: #ffffff;
+            border-color: var(--navy-primary);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 480px) {
-            .input-row { flex-direction: column; }
-            #trackBtn { width: 100%; }
+        /* Bottom Fixed Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 12px 0;
+            z-index: 90;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .nav-item.active {
+            color: var(--navy-primary);
+            font-weight: 800;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        .masked-acc-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-inner);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .masked-acc-info {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy-primary);
+        }
+
+        .masked-acc-sub {
+            font-size: 11px;
+            color: var(--navy-muted);
         }
     </style>
 </head>
 
-<body class="page-orders">
+<body>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">
-            <a href="index.html">
-                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
-            </a>
-        </div>
-        <div class="header-icons">
-            <a href="wishlist.html" class="icon-btn">
-                <span class="material-symbols-outlined">favorite</span>
-            </a>
-            <a href="cart.html" class="icon-btn cart-icon-btn">
-                <span class="material-symbols-outlined">shopping_cart</span>
-                <span class="cart-count">0</span>
-            </a>
-            <button class="menu-btn">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-        </div>
+    <!-- Header Navbar -->
+    <header class="brand-header">
+        <a href="index.html" class="brand-logo">
+            <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo">
+        </a>
+        <a href="https://wa.me/916363887497" target="_blank" class="header-help-btn">
+            <span class="material-symbols-outlined" style="font-size:16px">help_outline</span> Need Help?
+        </a>
     </header>
 
-    <!-- Main Container -->
-    <main class="page-container">
-        <section class="lookup-hero">
-            <span class="tag">Tracking</span>
-            <h1>Track Orders</h1>
-            <p>Get real-time updates on your slyte shipments.</p>
-        </section>
-
-        <div class="lookup-card" id="lookupCard">
-            <div id="mobileStep">
-                <label class="field-label">Mobile Number</label>
-                <div class="input-row">
-                    <div class="phone-wrapper">
-                        <span class="phone-prefix">+91</span>
-                        <input type="tel" id="mobileInput" maxlength="10" placeholder="98XXXXXXXX" />
-                    </div>
-                    <button type="button" id="trackBtn">Get OTP</button>
+    <div class="container">
+        <!-- Phone Lookup Card -->
+        <div class="lookup-card">
+            <h1>Look Up Your Orders</h1>
+            <p>Enter the mobile number used during checkout to view delivery status and after-sales options.</p>
+            <div class="input-group">
+                <div class="phone-input-wrap">
+                    <span class="phone-prefix">+91</span>
+                    <input type="tel" id="mobileInput" placeholder="97420 06683" maxlength="10">
                 </div>
+                <button id="trackBtn" onclick="fetchOrders()">Look Up</button>
             </div>
-
-            <div id="otpStep" style="display:none;">
-                <p style="font-size: 14px; margin-bottom: 16px; font-weight: 500;">
-                    OTP sent to <span id="displaySentMobile" style="font-weight: 700;"></span>
-                    <a href="#" id="editMobileBtn" style="color: var(--accent); margin-left: 8px; font-size: 13px; text-decoration: none;">Edit</a>
-                </p>
-                <label class="field-label">Enter 6-digit OTP</label>
-                <div class="input-row">
-                    <div class="phone-wrapper">
-                        <input type="tel" id="otpInput" maxlength="6" placeholder="------" style="width: 100%; height: 52px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px;" />
-                    </div>
-                    <button type="button" id="verifyBtn">Verify OTP</button>
-                </div>
-                <div style="margin-top: 12px; font-size: 13px; text-align: right;">
-                    <span id="resendTimer" style="color: var(--text-muted);">Resend in 60s</span>
-                    <a href="#" id="resendBtn" style="color: var(--accent); display: none; text-decoration: none; font-weight: 600;">Resend OTP</a>
-                </div>
-            </div>
-
-            <div id="loggedInStep" style="display:none; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="field-label" style="margin-bottom: 4px;">Verified Mobile</div>
-                    <div id="loggedInMobile" style="font-weight: 700; font-size: 16px;"></div>
-                </div>
-                <button type="button" id="logoutBtn" style="background: none; border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;">Logout</button>
-            </div>
-
-            <div id="errorBanner" style="display:none; color: var(--error); font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
-            <div id="successBanner" style="display:none; color: var(--paid-color); background: var(--paid-bg); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
         </div>
 
-        <div id="loader">
-            <div class="spinner"></div>
-            <p style="font-size:14px; color:var(--text-secondary); font-weight: 500;">Fetching your order details...</p>
+        <!-- Scenario Tester / Simulator Bar -->
+        <div class="scenario-bar">
+            <label>
+                <span>🧪 Test Journey Simulator (Test Mobile 9742006683)</span>
+                <span style="font-size:10px; color:#64748b;">Live Preview</span>
+            </label>
+            <select id="scenarioSelect" class="scenario-select" onchange="applyScenarioSimulation()">
+                <option value="REAL">Standard Live Order Flow (Default)</option>
+                <optgroup label="1. Normal Delivered">
+                    <option value="SIM_DELIVERED">1. Delivered Order (Standard / Custom)</option>
+                </optgroup>
+                <optgroup label="2. Return Journey Scenarios">
+                    <option value="SIM_RET_REQ">2. Return Requested (With Bank Warning)</option>
+                    <option value="SIM_RET_PICKED">3. Return Picked Up (In Transit)</option>
+                    <option value="SIM_RET_REC">4. Return Received at Slyte</option>
+                    <option value="SIM_RET_REFUNDED">5. Refund Processed (Completed)</option>
+                </optgroup>
+                <optgroup label="3. Exchange Journey Scenarios">
+                    <option value="SIM_EXC_REQ">6. Exchange Requested</option>
+                    <option value="SIM_EXC_PICKED">7. Exchange Item Picked Up</option>
+                    <option value="SIM_EXC_REC">8. Exchange Item Received</option>
+                    <option value="SIM_EXC_SHIPPED">9. Exchange Shipped (Replacement En Route)</option>
+                    <option value="SIM_EXC_DELIVERED">10. Exchange Delivered (Completed)</option>
+                </optgroup>
+                <optgroup label="4. Alteration Journey Scenarios">
+                    <option value="SIM_ALT_REQ">11. Alteration Requested</option>
+                    <option value="SIM_ALT_PICKED">12. Alteration Picked Up</option>
+                    <option value="SIM_ALT_REC">13. Alteration Received at Slyte</option>
+                    <option value="SIM_ALT_INPROG">14. Alteration in Progress</option>
+                    <option value="SIM_ALT_DONE">15. Alteration Completed</option>
+                    <option value="SIM_ALT_SHIPPED">16. Alteration Shipped</option>
+                    <option value="SIM_ALT_DELIVERED">17. Alteration Delivered (Completed)</option>
+                </optgroup>
+            </select>
         </div>
 
-        <div id="resultsArea"></div>
-    </main>
+        <!-- Orders Results Container -->
+        <div id="resultsArea">
+            <div style="text-align:center; padding:30px; color:var(--text-muted); font-size:14px;">
+                Enter your phone number above to view orders.
+            </div>
+        </div>
+    </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Fixed Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item">
             <span class="material-symbols-outlined">home</span>
+            <span>Home</span>
         </a>
-        <a href="search.html" class="nav-item">
+        <a href="custom-clothing.html" class="nav-item">
             <span class="material-symbols-outlined">search</span>
+            <span>Catalog</span>
         </a>
-        <a href="ai-fit.html" class="nav-item-center">
-            <span class="material-symbols-outlined">straighten</span>
+        <a href="orders.html" class="nav-item active">
+            <span class="material-symbols-outlined">local_shipping</span>
+            <span>Orders</span>
         </a>
-        <a href="shop.html" class="nav-item">
-            <span class="material-symbols-outlined">shopping_bag</span>
-        </a>
-        <a href="cart.html" class="nav-item">
-            <span class="material-symbols-outlined">shopping_cart</span>
-            <span class="nav-cart-count">0</span>
+        <a href="complete-profile.html" class="nav-item">
+            <span class="material-symbols-outlined">person</span>
+            <span>Account</span>
         </a>
     </nav>
 
-    <!-- Hamburger Menu Overlay -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- Hamburger Menu Drawer -->
-    <div class="menu-drawer" id="menuDrawer">
-        <div class="menu-header">
-            <div class="menu-header-top">
-                <div class="menu-logo">
-                    <a href="index.html">
-                        <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
-                    </a>
-                </div>
-                <button class="menu-close-btn" id="menuCloseBtn">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <h2>Menu</h2>
+    <!-- Generic Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeModal()">✕</button>
+            <div id="modalBody"></div>
         </div>
-        <nav class="menu-nav">
-            <a href="wishlist.html" class="menu-item">
-                <span class="material-symbols-outlined">favorite</span>
-                <span>Wishlist</span>
-            </a>
-            <a href="orders.html" class="menu-item">
-                <span class="material-symbols-outlined">receipt_long</span>
-                <span>Track Orders</span>
-            </a>
-            <a href="cart.html" class="menu-item">
-                <span class="material-symbols-outlined">shopping_cart</span>
-                <span>Cart</span>
-            </a>
-            <a href="#" class="menu-item">
-                <span class="material-symbols-outlined">location_on</span>
-                <span>Addresses</span>
-            </a>
-            <a href="ai-fit.html" class="menu-item">
-                <span class="material-symbols-outlined">straighten</span>
-                <span>Size</span>
-            </a>
-        </nav>
     </div>
-
-    <!-- Scripts -->
-    <script src="api-client.js?v=5"></script>
-    <script type="module" src="script.js?v=6"></script>
-    <script type="module" src="auth.js"></script>
-
-    <style>
-        /* ── Extra styles for lifecycle dashboard ── */
-        .lc-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 800; padding: 5px 12px;
-            border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .lc-badge.created    { background:#f3f4f6; color:#374151; }
-        .lc-badge.paid       { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.confirmed,.lc-badge.ready { background:#e3f2fd; color:#1565c0; }
-        .lc-badge.shipped,.lc-badge.transit,.lc-badge.out_for { background:#fff8e1; color:#e65100; }
-        .lc-badge.delivered  { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.cancelled  { background:#ffebee; color:#c62828; }
-        .lc-badge.return_init,.lc-badge.rto_transit { background:#fce4ec; color:#880e4f; }
-        .lc-badge.rto_delivered { background:#f3e5f5; color:#6a1b9a; }
-        .lc-badge.refund_pending { background:#fff8e1; color:#e65100; }
-        .lc-badge.refunded   { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.refund_failed { background:#ffebee; color:#c62828; }
-
-        .product-type-tag {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; padding: 3px 8px; border-radius: 6px;
-            margin-left: 8px; vertical-align: middle;
-        }
-        .tag-standard { background:#e3f2fd; color:#1565c0; }
-        .tag-custom   { background:#f3e5f5; color:#6a1b9a; }
-
-        .msg-banner {
-            border-radius: 10px; padding: 12px 16px;
-            font-size: 13px; font-weight: 600; margin-top: 16px; line-height: 1.5;
-        }
-        .msg-info    { background:#e3f2fd; color:#1565c0; }
-        .msg-warn    { background:#fff8e1; color:#e65100; }
-        .msg-success { background:#e8f5e9; color:#2e7d32; }
-        .msg-error   { background:#ffebee; color:#c62828; }
-        .msg-purple  { background:#f3e5f5; color:#6a1b9a; }
-
-        .action-btn {
-            width:100%; padding:13px; border-radius:10px; font-weight:700;
-            font-size:14px; cursor:pointer; border:none; margin-top:12px;
-            transition:opacity 0.2s, transform 0.15s;
-        }
-        .action-btn:active { transform:scale(0.98); }
-        .btn-cancel  { background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
-        .btn-rto     { background:#fff8e1; color:#e65100; border:1px solid #ffe0b2; }
-        .btn-track   { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
-        .btn-support { background:#f5f5f5; color:#333; border:1px solid #e0e0e0; text-decoration:none;
-                       display:block; text-align:center; }
-
-        .refund-strip {
-            display:flex; align-items:center; justify-content:space-between;
-            background:#f9f9f9; border-radius:10px; padding:12px 16px; margin-top:12px;
-        }
-        .refund-strip .label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; }
-        .refund-strip .value { font-size:13px; font-weight:700; }
-    </style>
 
     <script>
         (function () {
-            const API_BASE = (typeof window !== 'undefined' && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
-                ? window.SLYTE_CONFIG.API_BASE_URL
-                : ((typeof window !== 'undefined' && window.SLYTE_API_BASE) || 'https://api.slyte.in');
+            const API_BASE = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
+            let currentOrders = [];
+            let activeSimulationKey = "REAL";
 
-            // ── Lifecycle status config ────────────────────────────────────
-            const LC_LABEL = {
-                CREATED:          'Order Placed',
-                PAID:             'Payment Confirmed',
-                CONFIRMED:        'Confirmed',
-                READY_TO_SHIP:    'Ready to Ship',
-                SHIPPED:          'Shipped',
-                IN_TRANSIT:       'In Transit',
-                OUT_FOR_DELIVERY: 'Out for Delivery',
-                DELIVERED:        'Delivered',
-                CANCEL_REQUESTED: 'Cancel Requested',
-                CANCELLED:        'Cancelled',
-                RETURN_INITIATED: 'Return Initiated',
-                RTO_IN_TRANSIT:   'Return in Transit',
-                RTO_DELIVERED:    'Return Delivered',
-                REFUND_PENDING:   'Refund Initiated',
-                REFUNDED:         'Refund Completed',
-                REFUND_FAILED:    'Refund Failed'
-            };
-
-            const LC_CSS = {
-                CREATED:'created', PAID:'paid', CONFIRMED:'confirmed',
-                READY_TO_SHIP:'ready', SHIPPED:'shipped', IN_TRANSIT:'transit',
-                OUT_FOR_DELIVERY:'out_for', DELIVERED:'delivered',
-                CANCEL_REQUESTED:'refund_pending', CANCELLED:'cancelled',
-                RETURN_INITIATED:'return_init', RTO_IN_TRANSIT:'rto_transit',
-                RTO_DELIVERED:'rto_delivered', REFUND_PENDING:'refund_pending',
-                REFUNDED:'refunded', REFUND_FAILED:'refund_failed'
-            };
-
-            // Forward progress steps for normal stepper
-            const FORWARD_STEPS = [
-                { key:'CREATED',          label:'Placed' },
-                { key:'SHIPPED',          label:'Shipped' },
-                { key:'OUT_FOR_DELIVERY', label:'Out for Delivery' },
-                { key:'DELIVERED',        label:'Delivered' }
-            ];
-            const FORWARD_RANK = { CREATED:0, PAID:0, CONFIRMED:0, READY_TO_SHIP:0,
-                                   SHIPPED:1, IN_TRANSIT:1,
-                                   OUT_FOR_DELIVERY:2, DELIVERED:3 };
-
-            // ── getCancelAction ────────────────────────────────────────────
-            function getCancelAction(order) {
-                if (order.productType === 'CUSTOM') return 'NOT_ALLOWED';
-                
-                if (order.createdAt) {
-                    const diffDays = (Date.now() - new Date(order.createdAt).getTime()) / (1000 * 3600 * 24);
-                    if (diffDays > 8) return 'NOT_ALLOWED';
-                }
-
-                const PRE  = ['CREATED','PAID','CONFIRMED','READY_TO_SHIP','CANCEL_REQUESTED'];
-                const POST = ['SHIPPED','IN_TRANSIT','OUT_FOR_DELIVERY'];
-                if (PRE.includes(order.orderLifecycleStatus))  return 'DIRECT_CANCEL';
-                if (POST.includes(order.orderLifecycleStatus)) return 'RTO_CANCEL';
-                return 'NOT_ALLOWED';
-            }
-
-            // ── DOM refs ───────────────────────────────────────────────────
-            const mobileInput = document.getElementById('mobileInput');
-            const trackBtn    = document.getElementById('trackBtn');
-            const otpInput    = document.getElementById('otpInput');
-            const verifyBtn   = document.getElementById('verifyBtn');
-            const resendBtn   = document.getElementById('resendBtn');
-            const resendTimer = document.getElementById('resendTimer');
-            const editMobileBtn = document.getElementById('editMobileBtn');
-            const logoutBtn   = document.getElementById('logoutBtn');
-            const displaySentMobile = document.getElementById('displaySentMobile');
-            const loggedInMobile = document.getElementById('loggedInMobile');
-            
-            const mobileStep = document.getElementById('mobileStep');
-            const otpStep    = document.getElementById('otpStep');
-            const loggedInStep = document.getElementById('loggedInStep');
-
-            const errorBanner = document.getElementById('errorBanner');
-            const successBanner = document.getElementById('successBanner');
-            const loader      = document.getElementById('loader');
-            const resultsArea = document.getElementById('resultsArea');
-            let   currentMobile = '';
-            let   countdownInterval = null;
-
+            // Helper Utilities
             function esc(s) {
-                if (!s) return '';
-                const d = document.createElement('div');
-                d.textContent = s;
-                return d.innerHTML;
+                return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
             }
-            function fmtDate(ds) {
-                if (!ds) return '';
-                const d = new Date(ds);
-                return isNaN(d) ? ds : d.toLocaleString('en-IN',
-                    { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-            }
-            function setLoading(on, text = '...') {
-                loader.style.display = on ? 'block' : 'none';
-                if(text !== '...') trackBtn.textContent = text;
+            function fmtDate(dStr) {
+                if (!dStr) return 'N/A';
+                const d = new Date(dStr);
+                return isNaN(d.getTime()) ? dStr : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
             }
 
-            function showError(msg) {
-                successBanner.style.display = 'none';
-                errorBanner.textContent = msg;
-                errorBanner.style.display = 'block';
-            }
-            function showSuccess(msg) {
-                errorBanner.style.display = 'none';
-                successBanner.textContent = msg;
-                successBanner.style.display = 'block';
-            }
-            function clearMessages() {
-                errorBanner.style.display = 'none';
-                successBanner.style.display = 'none';
-            }
+            // Global fetchOrders
+            window.fetchOrders = async function () {
+                const phoneInput = document.getElementById('mobileInput');
+                const resultsArea = document.getElementById('resultsArea');
+                const rawPhone = phoneInput.value.replace(/\D/g, '').slice(-10);
 
-            // ── Authentication Check ───────────────────────────────────────
-            document.addEventListener('DOMContentLoaded', async () => {
-                // Priority 1: Already OTP-verified (has JWT token)
-                const token = localStorage.getItem('slyte_otp_token');
-                if (token) {
-                    showLoggedInState();
-                    fetchOrders();
+                if (rawPhone.length < 10) {
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:20px; color:var(--red-text); font-weight:600;">Please enter a valid 10-digit mobile number.</div>`;
                     return;
                 }
 
-                // Priority 2: Logged in via checkout (Cashfree set userPhone)
-                const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
-                if (checkoutPhone && checkoutPhone.length === 10) {
-                    // Silently exchange the checkout phone for a JWT
-                    try {
-                        const res = await fetch(`${API_BASE}/auto-login`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ phone: checkoutPhone })
-                        });
-                        const data = await res.json();
-                        if (data.success && data.token) {
-                            localStorage.setItem('slyte_otp_token', data.token);
-                            localStorage.setItem('slyte_phone', checkoutPhone);
-                            // 'username' is what script.js reads to show name in hamburger menu
-                            const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
-                                ? data.user.name
-                                : (localStorage.getItem('userName') || localStorage.getItem('username') || checkoutPhone);
-                            localStorage.setItem('username', displayName);
-                            localStorage.setItem('userName', displayName);
-                            showLoggedInState();
-                            fetchOrders();
-                            return;
-                        }
-                    } catch (e) {
-                        // Silently fall through to mobile entry screen
-                    }
-                }
-
-                // Priority 3: Not logged in — show mobile input
-                showMobileStep();
-            });
-
-            function showLoggedInState() {
-                mobileStep.style.display = 'none';
-                otpStep.style.display = 'none';
-                loggedInStep.style.display = 'flex';
-                // Decode token payload manually just to show number, or rely on fetch
-                const phone = localStorage.getItem('slyte_phone') || 'User';
-                loggedInMobile.textContent = '+91 ' + phone;
-            }
-
-            function showMobileStep() {
-                mobileStep.style.display = 'block';
-                otpStep.style.display = 'none';
-                loggedInStep.style.display = 'none';
-                resultsArea.innerHTML = '';
-                clearMessages();
-            }
-
-            function showOtpStep(phone) {
-                mobileStep.style.display = 'none';
-                loggedInStep.style.display = 'none';
-                otpStep.style.display = 'block';
-                displaySentMobile.textContent = '+91 ' + phone;
-                startResendTimer();
-            }
-
-            // ── Send OTP ───────────────────────────────────────────────
-            async function requestOtp() {
-                const val = mobileInput.value.trim().replace(/\D/g,'').slice(-10);
-                if (val.length < 10) {
-                    showError('Enter a valid 10-digit mobile number.');
-                    return;
-                }
-                currentMobile = val;
-                clearMessages();
-                trackBtn.disabled = true;
-                trackBtn.textContent = 'Sending...';
+                localStorage.setItem('slyte_phone', rawPhone);
+                resultsArea.innerHTML = `<div style="text-align:center; padding:40px; color:var(--navy-muted); font-size:14px;">Loading your orders...</div>`;
 
                 try {
-                    const res = await fetch(`${API_BASE}/send-otp`, {
+                    const token = localStorage.getItem('slyte_otp_token');
+                    const res = await fetch(`${API_BASE}/orders/lookup`, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ phone: currentMobile })
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                        },
+                        body: JSON.stringify({ phone: rawPhone })
                     });
                     const data = await res.json();
-                    
-                    if (data.success) {
-                        showOtpStep(currentMobile);
-                        showSuccess('OTP sent successfully.');
+                    if (data.success && Array.isArray(data.orders)) {
+                        currentOrders = data.orders;
+                        renderOrders(currentOrders);
                     } else {
-                        showError(data.message || 'Failed to send OTP.');
+                        resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--navy-muted); font-size:14px;">No orders found for +91 ${rawPhone}.</div>`;
                     }
-                } catch (e) {
-                    showError('Network error. Please try again.');
-                } finally {
-                    trackBtn.disabled = false;
-                    trackBtn.textContent = 'Get OTP';
+                } catch (err) {
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--red-text); font-size:14px;">Could not connect to server. Please try again.</div>`;
                 }
-            }
-
-            // ── Verify OTP ───────────────────────────────────────────────
-            async function verifyOtp() {
-                const otp = otpInput.value.trim();
-                if (otp.length !== 6) {
-                    showError('Enter a valid 6-digit OTP.');
-                    return;
-                }
-                clearMessages();
-                verifyBtn.disabled = true;
-                verifyBtn.textContent = 'Verifying...';
-
-                try {
-                    const res = await fetch(`${API_BASE}/verify-otp`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ phone: currentMobile, otp })
-                    });
-                    const data = await res.json();
-                    
-                    if (data.success) {
-                        localStorage.setItem('slyte_otp_token', data.token);
-                        if (data.user && data.user.phone) {
-                            const phone = data.user.phone;
-                            const name = data.user.name || '';
-                            // Sync to slyte_phone AND the checkout keys so everything stays consistent
-                            localStorage.setItem('slyte_phone', phone);
-                            localStorage.setItem('userPhone', phone);
-                            // 'username' is what script.js reads to show name in hamburger menu
-                            localStorage.setItem('username', name || phone);
-                            localStorage.setItem('userName', name || phone);
-                        }
-                        showLoggedInState();
-                        fetchOrders();
-                    } else {
-                        showError(data.message || 'Invalid OTP.');
-                    }
-                } catch (e) {
-                    showError('Network error. Please try again.');
-                } finally {
-                    verifyBtn.disabled = false;
-                    verifyBtn.textContent = 'Verify OTP';
-                }
-            }
-
-            // ── Timer Logic ──────────────────────────────────────────────
-            function startResendTimer() {
-                resendBtn.style.display = 'none';
-                resendTimer.style.display = 'inline';
-                let timeLeft = 60;
-                resendTimer.textContent = `Resend in ${timeLeft}s`;
-                
-                if (countdownInterval) clearInterval(countdownInterval);
-                countdownInterval = setInterval(() => {
-                    timeLeft--;
-                    if (timeLeft <= 0) {
-                        clearInterval(countdownInterval);
-                        resendTimer.style.display = 'none';
-                        resendBtn.style.display = 'inline';
-                    } else {
-                        resendTimer.textContent = `Resend in ${timeLeft}s`;
-                    }
-                }, 1000);
-            }
-
-            function normalizeOrder(o) {
-                const isCod = o.isCodOrder === true ||
-                    (o.paymentGroup || o.payment_method || '').toUpperCase() === 'COD' ||
-                    (o.paymentGroup || o.payment_method || '').toLowerCase().includes('cash');
-
-                const pType = (o.productType || o.product_type || (o.items?.[0]?.fit_type) || (o.productName?.includes('Custom') ? 'CUSTOM' : 'STANDARD')).toUpperCase();
-                const fType = o.fitType || o.fit_type || (pType === 'CUSTOM' ? 'Custom Fit' : 'Standard Fit');
-                const rawId = o.orderId || o.id || o.order_id || 'SLYTE-ORD-001';
-
-                return {
-                    orderId: rawId,
-                    displayId: o.displayId || (rawId.startsWith('#') ? rawId : '#' + rawId),
-                    productName: o.productName || o.items?.[0]?.name || o.product_name || 'Slyte Trouser',
-                    productType: pType,
-                    fitType: fType,
-                    orderLifecycleStatus: o.orderLifecycleStatus || o.order_status || 'DELIVERED',
-                    fulfillmentStatus: o.fulfillmentStatus || o.tracking_status || o.order_status || 'DELIVERED',
-                    amount: o.amount || o.total_amount || 1699,
-                    paymentGroup: o.paymentGroup || o.payment_method || (isCod ? 'COD' : 'CASHFREE'),
-                    isCodOrder: isCod,
-                    createdAt: o.createdAt || o.created_at || new Date().toISOString(),
-                    trackingNumber: o.trackingNumber || o.awb || null,
-                    deliveryAddress: typeof o.deliveryAddress === 'object' ? o.deliveryAddress : (
-                        typeof o.delivery_address === 'object' ? o.delivery_address : {
-                            addressLine1: o.delivery_address || 'Delivery Address',
-                            city: 'Bengaluru',
-                            pincode: '560034'
-                        }
-                    ),
-                    items: o.items || [],
-                    is_test: o.is_test || false
-                };
-            }
-
-            const TEST_ORDERS_FALLBACK = [
-                {
-                    orderId: "SLYTE-TEST-RETURN-001",
-                    displayId: "#SLYTE-TEST-RETURN-001",
-                    productName: "Slyte 24H Beige Trouser",
-                    productType: "STANDARD",
-                    fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1699,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-01",
-                    deliveryAddress: { addressLine1: "123 Test Street, Koramangala", city: "Bengaluru", pincode: "560034" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-EXCHANGE-001",
-                    displayId: "#SLYTE-TEST-EXCHANGE-001",
-                    productName: "Slyte 24H Navy Trouser",
-                    productType: "STANDARD",
-                    fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1699,
-                    paymentGroup: "CASHFREE_CARD",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-02",
-                    deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
-                    displayId: "#SLYTE-TEST-CUSTOM-ALTER-001",
-                    productName: "Slyte 24H Black Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1799,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-03",
-                    deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
-                    is_test: true
-                },
-                {
-                    orderId: "SLYTE-TEST-ALTERATION-002",
-                    displayId: "#SLYTE-TEST-ALTERATION-002",
-                    productName: "Slyte 24H Beige Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
-                    amount: 1799,
-                    paymentGroup: "CASHFREE_UPI",
-                    isCodOrder: false,
-                    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-04",
-                    deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
-                    is_test: true
-                }
-            ];
-
-            // ── Fetch orders (Protected) ─────────────────────────────────
-            function fetchOrders() {
-                const token = localStorage.getItem('slyte_otp_token') || '';
-                const userPhone = (localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone') || '').replace(/\D/g, '');
-                
-                setLoading(true);
-                clearMessages();
-                resultsArea.innerHTML = '';
-
-                fetch(`${API_BASE}/orders-lookup`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ phone: userPhone })
-                })
-                .then(r => {
-                    if (r.status === 401) throw new Error('Unauthorized');
-                    return r.json();
-                })
-                .then(data => {
-                    setLoading(false);
-                    let list = (data.orders || []).map(normalizeOrder);
-                    
-                    // Guarantee pre-seeded test orders for 9742006683 / 97420066683
-                    if (userPhone.includes('9742006683') || userPhone.includes('97420066683') || token.includes('9742006683')) {
-                        const existingIds = new Set(list.map(o => o.orderId));
-                        TEST_ORDERS_FALLBACK.forEach(t => {
-                            if (!existingIds.has(t.orderId)) {
-                                list.unshift(normalizeOrder(t));
-                            }
-                        });
-                    }
-
-                    if (!list.length) {
-                        showError('No orders found.');
-                        return;
-                    }
-                    renderOrders(list);
-                })
-                .catch((e) => {
-                    setLoading(false);
-                    if (userPhone.includes('9742006683') || userPhone.includes('97420066683') || token.includes('9742006683')) {
-                        renderOrders(TEST_ORDERS_FALLBACK.map(normalizeOrder));
-                    } else if (e.message === 'Unauthorized') {
-                        localStorage.removeItem('slyte_otp_token');
-                        showMobileStep();
-                        showError('Session expired. Please verify mobile again.');
-                    } else {
-                        showError('Failed to fetch orders. Please try again.');
-                    }
-                });
-            }
-
-            // Bindings
-            trackBtn.onclick = requestOtp;
-            verifyBtn.onclick = verifyOtp;
-            resendBtn.onclick = (e) => { e.preventDefault(); requestOtp(); };
-            editMobileBtn.onclick = (e) => { e.preventDefault(); showMobileStep(); };
-            logoutBtn.onclick = () => {
-                localStorage.removeItem('slyte_otp_token');
-                localStorage.removeItem('slyte_phone');
-                localStorage.removeItem('userPhone');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('username');
-                localStorage.removeItem('slyteUser');
-                showMobileStep();
-                // Reload so script.js updates the hamburger menu to logged-out state
-                location.reload();
-            };
-            
-            mobileInput.onkeyup = e => { if (e.key === 'Enter') requestOtp(); };
-            otpInput.onkeyup = e => { if (e.key === 'Enter') verifyOtp(); };
-
-            // ── Toggle expand ──────────────────────────────────────────────
-            window.toggleExpand = function(id) {
-                const el  = document.getElementById('expand-' + id);
-                const btn = document.getElementById('btn-more-' + id);
-                const open = el.classList.toggle('open');
-                btn.textContent = open ? 'Hide Details' : 'Show Details';
             };
 
-            // ── Cancel / RTO ───────────────────────────────────────────────
-            window.doCancel = function(orderId, action, btn, paymentGroup, isCod) {
-                const isCodOrder = isCod === true || isCod === 'true';
-                let msg = '';
-                if (action === 'RTO_CANCEL') {
-                    msg = !isCodOrder
-                        ? `Order is already shipped. We'll initiate a return — you'll be refunded once it reaches our warehouse. Continue?`
-                        : `Order is already shipped. We'll initiate a return. No cash refund for COD. Continue?`;
+            window.applyScenarioSimulation = function() {
+                activeSimulationKey = document.getElementById('scenarioSelect').value;
+                if (currentOrders && currentOrders.length > 0) {
+                    renderOrders(currentOrders);
                 } else {
-                    msg = !isCodOrder
-                        ? `Cancel this order? Refund will be initiated immediately to your payment method.`
-                        : `Cancel this COD order? No refund as no payment was made. Continue?`;
+                    // Inject a mock test order to demonstrate scenario
+                    currentOrders = [{
+                        orderId: "SLYTE-TEST-ORDER-001",
+                        displayId: "SLYTE-ORD-001",
+                        productName: "Slyte 24H Trouser",
+                        fitType: "Standard Fit",
+                        productType: "STANDARD",
+                        amount: 1699,
+                        paymentGroup: "Cashfree UPI",
+                        createdAt: new Date().toISOString(),
+                        deliveryAddress: {
+                            fullName: "Valued Customer",
+                            addressLine1: "123 Test Street, Koramangala",
+                            city: "Bengaluru",
+                            state: "Karnataka",
+                            pincode: "560034"
+                        },
+                        orderLifecycleStatus: "DELIVERED"
+                    }];
+                    renderOrders(currentOrders);
                 }
-                
-                if (!confirm(msg)) return;
-
-                const orig = btn.textContent;
-                setLoading(true, 'Cancelling...');
-                btn.textContent = '...'; btn.disabled = true;
-
-                const token = localStorage.getItem('slyte_otp_token');
-                fetch(`${API_BASE}/orders-cancel`, {
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ orderId })
-                })
-                .then(r => r.json())
-                .then(res => {
-                    setLoading(false);
-                    if (res.success) {
-                        // Show different alert based on payment type
-                        const msg = res.message || (res.isCodOrder
-                            ? 'Order cancelled successfully.'
-                            : 'Order cancelled. Refund will be credited within 5–7 business days.');
-                        alert(msg);
-                        fetchOrders();
-                    } else {
-                        alert(res.message || 'Could not cancel. Contact support.');
-                        btn.textContent = orig; btn.disabled = false;
-                    }
-                })
-                .catch(() => {
-                    setLoading(false);
-                    alert('Network error. Please try again.');
-                    btn.textContent = orig; btn.disabled = false;
-                });
             };
 
-            // ── Retry refund (prepaid orders only) ─────────────────────────
-            window.doRetryRefund = function(orderId, btn) {
-                const orig = btn.textContent;
-                btn.textContent = 'Retrying...'; btn.disabled = true;
-                const token = localStorage.getItem('slyte_otp_token');
-                setLoading(true, 'Retrying Refund...');
-                fetch(`${API_BASE}/refund-retry`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ orderId })
-                })
-                .then(r => r.json())
-                .then(res => {
-                    alert(res.message || (res.success ? 'Refund retry initiated.' : 'Retry failed. Contact support.'));
-                    if (res.success) fetchOrders();
-                    else { btn.textContent = orig; btn.disabled = false; }
-                })
-                .catch(() => {
-                    alert('Network error. Please try again.');
-                    btn.textContent = orig; btn.disabled = false;
-                });
-            };
-
-            // ── Delete Order ───────────────────────────────────────────────
-            window.doDelete = function(orderId, btn) {
-                if (!confirm('Are you sure you want to permanently delete this cancelled order?')) return;
-
-                const orig = btn.textContent;
-                btn.textContent = '...'; btn.disabled = true;
-
-                const token = localStorage.getItem('slyte_otp_token');
-                fetch(`${API_BASE}/orders/delete`, {
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ orderId })
-                })
-                .then(r => r.json())
-                .then(res => {
-                    if (res.success) {
-                        fetchOrders();
-                    } else {
-                        alert(res.message || 'Could not delete order.');
-                        btn.textContent = orig; btn.disabled = false;
-                    }
-                })
-                .catch(() => {
-                    alert('Network error. Please try again.');
-                    btn.textContent = orig; btn.disabled = false;
-                });
-            };
-
-
-            // ── Build stepper HTML ─────────────────────────────────────────
-            function buildStepper(lcs) {
-                const cancelStatuses = [
-                    'CANCELLED', 'REFUNDED', 'REFUND_FAILED', 'REFUND_PENDING', 
-                    'CANCEL_REQUESTED', 'RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED'
-                ];
-                
-                if (cancelStatuses.includes(lcs)) {
-                    return `<div class="stepper">
-                        <div class="step done">
-                            <div class="step-dot">✓</div>
-                            <div class="step-text">Placed</div>
-                        </div>
-                        <div class="step active" style="--accent: var(--error);">
-                            <div class="step-dot" style="background: var(--error); border-color: var(--error); color: #fff;">✕</div>
-                            <div class="step-text" style="color: var(--error); font-weight: 700;">Canceled (completed)</div>
-                        </div>
-                    </div>`;
-                }
-
-                const rank = FORWARD_RANK[lcs] ?? 0;
-                return `<div class="stepper">
-                    ${FORWARD_STEPS.map((s,i) => `
-                        <div class="step ${i < rank ? 'done' : i === rank ? 'active' : ''}">
-                            <div class="step-dot">${i <= rank ? '✓' : ''}</div>
-                            <div class="step-text">${s.label}</div>
-                        </div>`).join('')}
-                </div>`;
-            }
-
-            // ── Build cancel/action buttons ───────────────────────────────
-            function buildActionUI(order) {
-                const lcs    = order.orderLifecycleStatus || 'CREATED';
-                const action = getCancelAction(order);
-                const parts  = [];
-
-                // Tracking button (show if AWB available and order is NOT delivered)
-                if (order.trackingNumber && lcs !== 'DELIVERED') {
-                    parts.push(`<a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
-                        target="_blank" class="action-btn btn-track">📦 Track Live</a>`);
-                }
-
-                // ── CASE 1: CUSTOM → no cancel (alteration available once delivered) ─────
-                if (order.productType === 'CUSTOM' && lcs !== 'DELIVERED') {
-                    parts.push(`<div class="msg-banner msg-purple">✂️ Custom fit orders cannot be cancelled. (Free alteration available upon delivery)</div>`);
-                    return parts.join('');
-                }
-
-                // ── CASE 2: Direct cancel (pre-shipping) ───────────────────
-                if (action === 'DIRECT_CANCEL') {
-                    const btnLabel = order.isCodOrder ? '✕ Cancel Order (COD)' : '✕ Cancel Order';
-                    parts.push(`<button class="action-btn btn-cancel"
-                        onclick="doCancel('${esc(order.orderId)}','DIRECT_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">${btnLabel}</button>`);
-                    return parts.join('');
-                }
-
-                // ── CASE 3: RTO (post-shipping) ────────────────────────────
-                if (action === 'RTO_CANCEL') {
-                    const notice = !order.isCodOrder
-                        ? 'Order already shipped. A return will be initiated and you will be refunded once received at our warehouse.'
-                        : 'Order already shipped (COD). A return will be initiated. No cash refund applies.';
-                    parts.push(`<div class="msg-banner msg-warn">⚠️ ${notice}</div>`);
-                    if (!order.rtoShiprocketOrderId) {
-                        parts.push(`<button class="action-btn btn-rto"
-                            onclick="doCancel('${esc(order.orderId)}','RTO_CANCEL',this,'${esc(order.paymentGroup)}',${!!order.isCodOrder})">↩ Cancel (Return to Origin)</button>`);
-                    }
-                    return parts.join('');
-                }
-
-                // ── CASE 4: Return in progress ─────────────────────────────
-                if (['RETURN_INITIATED','RTO_IN_TRANSIT'].includes(lcs)) {
-                    parts.push(`<div class="msg-banner msg-purple">🔄 Return in progress. Refund will be processed once the package reaches our warehouse.</div>`);
-                    return parts.join('');
-                }
-
-                // ── CASE 5: Terminal states ────────────────────────────────
-                if (lcs === 'CANCELLED' || lcs === 'REFUNDED') {
-                    parts.push(`<div class="msg-banner msg-error">✕ Order cancelled.</div>`);
-                    parts.push(`<button class="action-btn" style="background-color: var(--error); color: white; margin-top: 10px;"
-                        onclick="doDelete('${esc(order.orderId)}', this)">🗑️ Delete Order</button>`);
-                    return parts.join('');
-                }
-                if (lcs === 'DELIVERED') {
-                    parts.push(`<div class="msg-banner msg-success">✓ Delivered! Enjoy your order.</div>`);
-
-                    const isCustom = order.productType === 'CUSTOM' ||
-                        (order.fitType || '').toLowerCase().includes('custom') ||
-                        (order.items || []).some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit');
-
-                    if (isCustom) {
-                        parts.push(`<div class="msg-banner msg-purple" style="margin-top:8px;">✂️ Custom Fit: Returns/Exchanges not applicable. Includes free alteration (up to ±1.5").</div>`);
-                        parts.push(`<button class="action-btn" style="background:#673ab7; color:#fff; margin-top:8px; width:100%; font-weight:700; border:none; padding:12px; border-radius:10px; cursor:pointer;"
-                            onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName || 'Trouser')}')">✂️ Request Alteration</button>`);
-                    } else {
-                        parts.push(`<div style="display:flex; gap:10px; margin-top:8px;">
-                            <button class="action-btn" style="flex:1; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
-                                onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
-                            <button class="action-btn" style="flex:1; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; font-weight:700; padding:10px; border-radius:10px; cursor:pointer;"
-                                onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
-                        </div>`);
-                    }
-                    return parts.join('');
-                }
-                if (lcs === 'RTO_DELIVERED') {
-                    const rtoMsg = order.isCodOrder
-                        ? '📦 Return received. No refund applicable (COD order).'
-                        : '📦 Return received. Refund is being processed — 5-7 business days.';
-                    parts.push(`<div class="msg-banner msg-purple">${rtoMsg}</div>`);
-                    return parts.join('');
-                }
-
-                // ── Support fallback ───────────────────────────────────────
-                parts.push(`<a href="https://wa.me/916363887497" target="_blank"
-                    class="action-btn btn-support">💬 Contact Support</a>`);
-                return parts.join('');
-            }
-
-            // ── Build refund strip ─────────────────────────────────────────
-            // RULE: COD orders NEVER show a refund strip.
-            // Prepaid orders show refund status with retry for REFUND_FAILED.
-            function buildRefundStrip(order) {
-                // ❌ HARD BLOCK: No refund UI for COD orders
-                // Check both isCodOrder flag AND paymentGroup for robustness
-                const isCod = order.isCodOrder === true ||
-                              (order.paymentGroup || '').toUpperCase() === 'COD' ||
-                              (order.paymentGroup || '').toLowerCase().includes('cash');
-                if (isCod) {
-                    const lcsCheck = order.orderLifecycleStatus || '';
-                    if (['CANCELLED','CANCEL_REQUESTED'].includes(lcsCheck)) {
-                        return `<div class="refund-strip">
-                            <div><div class="label">Payment Mode</div>
-                            <div class="value">💵 Cash on Delivery — no refund applicable</div></div>
-                        </div>`;
-                    }
-                    return '';
-                }
-
-                const lcs = order.orderLifecycleStatus || '';
-                const ref = order.refund;
-
-                // Only show if there is a refund scenario for prepaid
-                const refundStatuses = ['REFUND_PENDING','REFUNDED','REFUND_FAILED',
-                                        'CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'];
-                if (!refundStatuses.includes(lcs) && !ref) return '';
-
-                let icon = '💳', label = '', retryHtml = '';
-                if (ref?.status === 'SUCCESS' || lcs === 'REFUNDED') {
-                    icon = '✅'; label = 'Refund completed';
-                } else if (ref?.status === 'FAILED' || lcs === 'REFUND_FAILED') {
-                    icon = '❌'; label = 'Refund failed — contact support';
-                    retryHtml = `<button onclick="doRetryRefund('${esc(order.orderId)}',this)"
-                        style="margin-top:8px;background:#fff3e0;color:#e65100;border:1px solid #ffe0b2;
-                        padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">↺ Retry Refund</button>`;
-                } else if (lcs === 'REFUND_PENDING' || ref?.status === 'PENDING') {
-                    icon = '⏳'; label = 'Refund initiated — 5-7 business days';
-                } else if (['CANCELLED','CANCEL_REQUESTED','RTO_DELIVERED'].includes(lcs) && !ref) {
-                    icon = '⏳'; label = 'Refund will be initiated shortly';
-                } else { return ''; }
-
-                const amt = ref?.amount ? `₹${ref.amount}` : `₹${order.amount}`;
-                return `<div class="refund-strip">
-                    <div style="flex:1">
-                        <div class="label">Refund Status</div>
-                        <div class="value">${icon} ${label}</div>
-                        ${retryHtml}
-                    </div>
-                    <div class="value" style="font-size:16px">${amt}</div>
-                </div>`;
-            }
-
-            // ── Main render ────────────────────────────────────────────────
-            function renderOrders(orders) {
-                if (!orders.length) {
-                    resultsArea.innerHTML = `<div style="text-align:center;padding:40px;
-                        color:var(--text-secondary);font-weight:500;">No orders found.</div>`;
+            // Main Renderer
+            function renderOrders(ordersList) {
+                const resultsArea = document.getElementById('resultsArea');
+                if (!ordersList || !ordersList.length) {
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:30px; color:var(--navy-muted);">No orders found.</div>`;
                     return;
                 }
 
-                resultsArea.innerHTML = orders.map((order, i) => {
-                    const lcs    = order.orderLifecycleStatus || 'CREATED';
-                    const cssCls = LC_CSS[lcs] || 'created';
-                    const lcLabel = LC_LABEL[lcs] || lcs;
-                    const isRtoPath = ['RETURN_INITIATED','RTO_IN_TRANSIT',
-                                       'RTO_DELIVERED'].includes(lcs);
-                    const isCancelled = ['CANCELLED','CANCEL_REQUESTED'].includes(lcs);
-                    // Robust COD check — use both flag and paymentGroup
-                    const isCod = order.isCodOrder === true ||
-                                  (order.paymentGroup || '').toUpperCase() === 'COD' ||
-                                  (order.paymentGroup || '').toLowerCase().includes('cash');
-                    const typeTag = order.productType === 'CUSTOM'
-                        ? `<span class="product-type-tag tag-custom">Custom</span>`
-                        : `<span class="product-type-tag tag-standard">Standard</span>`;
-
-                    // Stepper: show RTO path or normal path
-                    let stepperHtml = '';
-                    if (!isCancelled && !isRtoPath) {
-                        stepperHtml = buildStepper(lcs);
-                    } else if (isRtoPath) {
-                        stepperHtml = `<div class="msg-banner msg-purple">
-                            🔄 ${lcLabel}</div>`;
-                    } else {
-                        stepperHtml = `<div class="msg-banner msg-error">
-                            ✕ ${lcLabel}</div>`;
-                    }
-
-                    // Tracking timeline
-                    let timelineHtml = `<div class="timeline-status"
-                        style="color:var(--text-muted);font-size:11px;">No updates yet</div>`;
-                    if (order.trackingHistory?.length) {
-                        timelineHtml = order.trackingHistory.map(t => `
-                            <div class="timeline-item">
-                                <div class="timeline-date">${fmtDate(t.date)}</div>
-                                <div class="timeline-status">${esc(t.activity||t.status||'')}
-                                    ${t.location ? '— '+esc(t.location) : ''}</div>
-                            </div>`).join('');
-                    } else {
-                        timelineHtml = `<div class="timeline-item">
-                            <div class="timeline-date">${fmtDate(order.createdAt)}</div>
-                            <div class="timeline-status">Order placed successfully</div>
-                        </div>`;
-                    }
-
-                    // Prepend a cancellation/return event at the top of the timeline
-                    const cancelStatuses = ['CANCELLED','CANCEL_REQUESTED','RETURN_INITIATED','RTO_IN_TRANSIT','RTO_DELIVERED'];
-                    if (cancelStatuses.includes(lcs)) {
-                        // Pick the best timestamp: last lifecycle history entry → cancelRequestedAt → now
-                        const lh = order.lifecycleHistory;
-                        const cancelTs = (lh && lh.length)
-                            ? lh[lh.length - 1].timestamp
-                            : null;
-                        const cancelDate = fmtDate(cancelTs || new Date().toISOString());
-
-                        const cancelLabel = {
-                            CANCELLED:         '✕ Order cancelled',
-                            CANCEL_REQUESTED:  '⏳ Cancellation requested',
-                            RETURN_INITIATED:  '↩ Return initiated',
-                            RTO_IN_TRANSIT:    '🚚 Return in transit',
-                            RTO_DELIVERED:     '📦 Return delivered to warehouse'
-                        }[lcs] || '✕ Order cancelled';
-
-                        const cancelEntry = `<div class="timeline-item timeline-item-cancel">
-                            <div class="timeline-date">${cancelDate}</div>
-                            <div class="timeline-status" style="color:#c62828;font-weight:600;">${cancelLabel}</div>
-                        </div>`;
-                        timelineHtml = cancelEntry + timelineHtml;
-                    }
-
-                    const addr = order.deliveryAddress;
-                    const addrStr = addr
-                        ? `${esc(addr.addressLine1)}, ${esc(addr.city)}, ${esc(addr.pincode)}`
-                        : 'N/A';
+                resultsArea.innerHTML = ordersList.map((rawOrder, idx) => {
+                    // Combine real order data with simulation state if selected
+                    const order = applyStateTransformation(rawOrder, activeSimulationKey);
+                    const mode = order.journeyMode; // NORMAL, RETURN, EXCHANGE, ALTERATION
 
                     return `
-                    <div class="order-card" style="animation-delay:${i*0.08}s" id="card-${esc(order.orderId)}">
-                        <div class="card-header">
-                            <div>
-                                <div class="order-id-label">${esc(order.displayId)}</div>
-                                <div class="product-name">
-                                    ${esc(order.productName)}
-                                    ${order.fitType ? `<span style="font-weight:400;font-size:13px;color:var(--text-secondary)"> — ${esc(order.fitType)}</span>` : ''}
-                                    ${typeTag}
+                    <div class="order-card" id="card-${esc(order.orderId)}">
+                        <!-- Header -->
+                        <div class="card-header-row">
+                            <div class="order-meta">
+                                <span class="order-id-code">${esc(order.displayId || order.orderId)}</span>
+                                <div class="product-title">${esc(order.productName || 'Slyte 24H Trouser')}</div>
+                                <div class="fit-spec">
+                                    ${esc(order.fitType || 'Standard Fit')} • Size ${esc(order.size || '32')}
+                                    <span class="tag-pill ${order.productType === 'CUSTOM' ? 'tag-custom' : 'tag-standard'}">
+                                        ${order.productType === 'CUSTOM' ? 'Custom' : 'Standard'}
+                                    </span>
                                 </div>
                             </div>
-                            <span class="lc-badge ${cssCls}">${lcLabel}</span>
+                            <div style="font-size:16px; font-weight:800; color:var(--navy-primary);">
+                                ₹${order.amount || 1699}
+                            </div>
                         </div>
 
-                        <div class="card-body">
-                            ${stepperHtml}
-                            ${buildRefundStrip(order)}
+                        <div class="card-content">
+                            <!-- Stepper Timeline -->
+                            ${renderJourneyStepper(mode, order.stepIndex, order.stepperSteps)}
 
-                            <div class="details-block" style="margin-top:16px;">
-                                <div class="detail-row">
-                                    <span class="detail-label">Current Status</span>
-                                    <span class="detail-value" style="color:var(--accent)">
-                                        ${esc(order.fulfillmentStatus || lcLabel)}
-                                    </span>
+                            <!-- Status Banner -->
+                            <div class="status-banner ${order.bannerClass}">
+                                <div class="status-banner-title">
+                                    <span>${order.bannerIcon}</span>
+                                    <span>${order.bannerTitle}</span>
                                 </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Amount</span>
-                                    <span class="detail-value">₹${order.amount}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Payment</span>
-                                    <span class="detail-value">
-                                        ${isCod
-                                            ? '<span style="background:#fff8e1;color:#e65100;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">COD</span>'
-                                            : `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;">PREPAID</span>`
-                                        }
-                                        ${isCod ? 'Cash on Delivery' : esc(order.paymentGroup)}
-                                    </span>
-                                </div>
-                                ${order.estimatedDelivery ? `
-                                <div class="detail-row">
-                                    <span class="detail-label">Est. Delivery</span>
-                                    <span class="detail-value" style="color:#2e7d32;">${fmtDate(order.estimatedDelivery)}</span>
-                                </div>` : ''}
-                                ${(order.trackingNumber && lcs !== 'DELIVERED') ? `
-                                <div class="tracking-card">
-                                    <div>
-                                        <div class="detail-label" style="font-size:10px;text-transform:uppercase;">AWB</div>
-                                        <div class="detail-value" style="font-size:13px;text-align:left;">${esc(order.trackingNumber)}</div>
-                                    </div>
-                                    <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber)}"
-                                       target="_blank" class="track-btn-link">Track Live</a>
-                                </div>` : ''}
+                                <div class="status-banner-desc">${order.bannerMessage}</div>
                             </div>
 
-                            ${buildActionUI(order)}
+                            <!-- Bank Warning Banner (if return requested & bank details missing) -->
+                            ${order.needsBankDetails ? `
+                            <div class="bank-warning-card">
+                                <div class="bank-warning-info">
+                                    <h4>Refund details required</h4>
+                                    <p>Add your bank account details so we can process your refund.</p>
+                                </div>
+                                <button class="btn-add-bank" onclick="openBankDetailsModal('${esc(order.orderId)}')">Add Bank Details</button>
+                            </div>` : ''}
 
-                            <button class="show-more-btn" style="margin-top:16px;"
-                                id="btn-more-${esc(order.orderId)}"
-                                onclick="toggleExpand('${esc(order.orderId)}')">Show Details</button>
+                            <!-- Masked Bank Account Display (if saved for Return) -->
+                            ${(mode === 'RETURN' && order.bankDetailsSaved) ? `
+                            <div class="masked-acc-box">
+                                <div>
+                                    <div class="masked-acc-info">Account ending •••• ${esc(order.bankDetailsSaved.maskedAcc)}</div>
+                                    <div class="masked-acc-sub">IFSC: ${esc(order.bankDetailsSaved.ifsc)}</div>
+                                </div>
+                                <button class="btn-action btn-secondary" style="padding:6px 12px; font-size:11px;" onclick="openBankDetailsModal('${esc(order.orderId)}')">Edit</button>
+                            </div>` : ''}
 
-                            <div class="expanded-section" id="expand-${esc(order.orderId)}">
-                                <div class="detail-row">
-                                    <span class="detail-label">Order ID</span>
-                                    <span class="detail-value" style="font-size:11px;">${esc(order.orderId)}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Payment Mode</span>
-                                    <span class="detail-value">${esc(order.paymentGroup)}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Ordered</span>
-                                    <span class="detail-value">${fmtDate(order.createdAt)}</span>
-                                </div>
-                                <div class="detail-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
-                                    <span class="detail-label">Delivery Address</span>
-                                    <span class="detail-value" style="text-align:left;font-size:12px;font-weight:500;">${addrStr}</span>
-                                </div>
-                                <div style="margin-top:20px;font-weight:700;font-size:11px;
-                                    text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;">
-                                    Shipment Timeline
-                                </div>
-                                <div class="timeline">${timelineHtml}</div>
+                            <!-- Action Buttons -->
+                            <div class="actions-group">
+                                ${renderContextualActions(mode, order)}
+                            </div>
+
+                            <!-- Toggle Show Details -->
+                            <button class="btn-details-toggle" id="btn-toggle-${esc(order.orderId)}" onclick="toggleDetails('${esc(order.orderId)}')">
+                                Show Details ▼
+                            </button>
+
+                            <!-- Dynamic Expanded Details Panel -->
+                            <div class="details-expand-panel" id="expand-${esc(order.orderId)}">
+                                ${renderExpandedDetails(mode, order)}
                             </div>
                         </div>
                     </div>`;
                 }).join('');
             }
 
-            // Auto-fill from localStorage
-            const saved = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
-            if (saved) {
-                mobileInput.value = saved.replace(/\D/g,'').slice(-10);
+            // State Resolver & Simulator Engine
+            function applyStateTransformation(order, simKey) {
+                const o = JSON.parse(JSON.stringify(order));
+                const lcs = (o.orderLifecycleStatus || 'DELIVERED').toUpperCase();
+                o.size = o.size || '32';
+                o.productType = o.productType || (o.fitType && o.fitType.toLowerCase().includes('custom') ? 'CUSTOM' : 'STANDARD');
+
+                // Check stored bank details for return
+                const storedBank = localStorage.getItem(`bank_${o.orderId}`);
+                if (storedBank) {
+                    try {
+                        const parsed = JSON.parse(storedBank);
+                        o.bankDetailsSaved = {
+                            maskedAcc: parsed.account_number.slice(-4) || '4821',
+                            ifsc: parsed.ifsc_code || 'HDFC0001234'
+                        };
+                    } catch(e){}
+                }
+
+                // If simulation scenario is selected
+                if (simKey && simKey !== 'REAL') {
+                    return getSimulatedState(o, simKey);
+                }
+
+                // Default Real Backend State Engine
+                if (['RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED', 'REFUNDED'].includes(lcs)) {
+                    o.journeyMode = 'RETURN';
+                    if (lcs === 'RETURN_INITIATED') {
+                        o.stepIndex = 0;
+                        o.bannerClass = 'banner-red';
+                        o.bannerIcon = '↩';
+                        o.bannerTitle = 'Return Requested';
+                        o.bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
+                        if (!o.bankDetailsSaved) o.needsBankDetails = true;
+                    } else if (lcs === 'RTO_IN_TRANSIT') {
+                        o.stepIndex = 1;
+                        o.bannerClass = 'banner-red';
+                        o.bannerIcon = '🚚';
+                        o.bannerTitle = 'Return Picked Up';
+                        o.bannerMessage = "Your item is on its way to us. Your refund will be processed once we receive the item.";
+                    } else if (lcs === 'RTO_DELIVERED') {
+                        o.stepIndex = 2;
+                        o.bannerClass = 'banner-amber';
+                        o.bannerIcon = '📦';
+                        o.bannerTitle = 'Return Received';
+                        o.bannerMessage = "Your return has reached us. Your refund is now being processed.";
+                    } else if (lcs === 'REFUNDED') {
+                        o.stepIndex = 3;
+                        o.bannerClass = 'banner-green';
+                        o.bannerIcon = '✅';
+                        o.bannerTitle = 'Refund Processed';
+                        o.bannerMessage = `₹${o.amount || 1699} has been refunded successfully.`;
+                    }
+                    o.stepperSteps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                } else if (lcs.startsWith('EXCHANGE_')) {
+                    o.journeyMode = 'EXCHANGE';
+                    o.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                    o.exchangeNewSize = '34';
+                    if (lcs === 'EXCHANGE_REQUESTED') {
+                        o.stepIndex = 0; o.bannerClass = 'banner-blue'; o.bannerIcon = '🔄'; o.bannerTitle = 'Exchange Requested'; o.bannerMessage = 'Exchange confirmed. Replacement size will be prepared upon pickup.';
+                    } else if (lcs === 'EXCHANGE_PICKED_UP') {
+                        o.stepIndex = 1; o.bannerClass = 'banner-blue'; o.bannerIcon = '🚚'; o.bannerTitle = 'Exchange Item Picked Up'; o.bannerMessage = 'Your original item is on its way back to us.';
+                    } else if (lcs === 'EXCHANGE_RECEIVED') {
+                        o.stepIndex = 2; o.bannerClass = 'banner-blue'; o.bannerIcon = '📦'; o.bannerTitle = 'Exchange Item Received'; o.bannerMessage = 'We have received your item. Preparing replacement size 34.';
+                    } else if (lcs === 'EXCHANGE_SHIPPED') {
+                        o.stepIndex = 3; o.bannerClass = 'banner-blue'; o.bannerIcon = '🚚'; o.bannerTitle = 'Exchange Shipped'; o.bannerMessage = 'Your replacement trousers are on the way.';
+                    } else if (lcs === 'EXCHANGE_DELIVERED') {
+                        o.stepIndex = 4; o.bannerClass = 'banner-green'; o.bannerIcon = '✓'; o.bannerTitle = 'Exchange Delivered'; o.bannerMessage = 'Your replacement trousers have been delivered. We hope they fit perfectly.';
+                    }
+                } else if (lcs.startsWith('ALTERATION_')) {
+                    o.journeyMode = 'ALTERATION';
+                    o.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                    o.alterationSpecs = { waist: '31"', length: '39"' };
+                    if (lcs === 'ALTERATION_REQUESTED') {
+                        o.stepIndex = 0; o.bannerClass = 'banner-amber'; o.bannerIcon = '✂️'; o.bannerTitle = 'Alteration Requested'; o.bannerMessage = "We'll arrange a pickup for your trousers.";
+                    } else if (lcs === 'ALTERATION_PICKED_UP') {
+                        o.stepIndex = 1; o.bannerClass = 'banner-amber'; o.bannerIcon = '🚚'; o.bannerTitle = 'Picked Up'; o.bannerMessage = 'Your trousers have been picked up and are on their way to us.';
+                    } else if (lcs === 'ALTERATION_RECEIVED') {
+                        o.stepIndex = 2; o.bannerClass = 'banner-amber'; o.bannerIcon = '🏢'; o.bannerTitle = 'Received at Slyte'; o.bannerMessage = "We've received your trousers. Your alteration is now in progress.";
+                    } else if (lcs === 'ALTERATION_IN_PROGRESS') {
+                        o.stepIndex = 3; o.bannerClass = 'banner-amber'; o.bannerIcon = '✂️'; o.bannerTitle = 'Alteration in Progress'; o.bannerMessage = 'Our team is working on your trousers. Expected completion: 3 business days.';
+                    } else if (lcs === 'ALTERATION_COMPLETED') {
+                        o.stepIndex = 4; o.bannerClass = 'banner-blue'; o.bannerIcon = '✨'; o.bannerTitle = 'Alteration Completed'; o.bannerMessage = 'Your trousers have been altered and are ready to ship.';
+                    } else if (lcs === 'ALTERATION_SHIPPED') {
+                        o.stepIndex = 5; o.bannerClass = 'banner-blue'; o.bannerIcon = '🚚'; o.bannerTitle = 'Alteration Shipped'; o.bannerMessage = 'Your altered trousers are on the way.';
+                    } else if (lcs === 'ALTERATION_DELIVERED') {
+                        o.stepIndex = 6; o.bannerClass = 'banner-green'; o.bannerIcon = '✓'; o.bannerTitle = 'Alteration Delivered'; o.bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.';
+                    }
+                } else {
+                    // Normal Forward Delivery Flow
+                    o.journeyMode = 'NORMAL';
+                    o.stepperSteps = ['Order Placed', 'Dispatched', 'Out for Delivery', 'Delivered'];
+                    o.stepIndex = 3;
+                    o.bannerClass = 'banner-green';
+                    o.bannerIcon = '✓';
+                    o.bannerTitle = 'Delivered';
+                    o.bannerMessage = 'Enjoy your order.';
+                }
+
+                return o;
+            }
+
+            // Scenario Simulator Mapping
+            function getSimulatedState(o, key) {
+                const copy = JSON.parse(JSON.stringify(o));
+                switch(key) {
+                    case 'SIM_DELIVERED':
+                        copy.journeyMode = 'NORMAL';
+                        copy.stepperSteps = ['Order Placed', 'Dispatched', 'Out for Delivery', 'Delivered'];
+                        copy.stepIndex = 3; copy.bannerClass = 'banner-green'; copy.bannerIcon = '✓'; copy.bannerTitle = 'Delivered'; copy.bannerMessage = 'Enjoy your order.';
+                        break;
+                    case 'SIM_RET_REQ':
+                        copy.journeyMode = 'RETURN';
+                        copy.stepperSteps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                        copy.stepIndex = 0; copy.bannerClass = 'banner-red'; copy.bannerIcon = '↩'; copy.bannerTitle = 'Return Requested'; copy.bannerMessage = "Your return request has been confirmed. We'll arrange a pickup soon.";
+                        if (!copy.bankDetailsSaved) copy.needsBankDetails = true;
+                        break;
+                    case 'SIM_RET_PICKED':
+                        copy.journeyMode = 'RETURN';
+                        copy.stepperSteps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                        copy.stepIndex = 1; copy.bannerClass = 'banner-red'; copy.bannerIcon = '🚚'; copy.bannerTitle = 'Return Picked Up'; copy.bannerMessage = "Your item is on its way to us. Your refund will be processed once we receive the item.";
+                        break;
+                    case 'SIM_RET_REC':
+                        copy.journeyMode = 'RETURN';
+                        copy.stepperSteps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                        copy.stepIndex = 2; copy.bannerClass = 'banner-amber'; copy.bannerIcon = '📦'; copy.bannerTitle = 'Return Received'; copy.bannerMessage = "Your return has reached us. Your refund is now being processed.";
+                        break;
+                    case 'SIM_RET_REFUNDED':
+                        copy.journeyMode = 'RETURN';
+                        copy.stepperSteps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                        copy.stepIndex = 3; copy.bannerClass = 'banner-green'; copy.bannerIcon = '✅'; copy.bannerTitle = 'Refund Processed'; copy.bannerMessage = `₹${copy.amount || 1699} has been refunded successfully.`;
+                        copy.bankDetailsSaved = { maskedAcc: '4821', ifsc: 'HDFC0001234' };
+                        break;
+                    case 'SIM_EXC_REQ':
+                        copy.journeyMode = 'EXCHANGE'; copy.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                        copy.stepIndex = 0; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '🔄'; copy.bannerTitle = 'Exchange Requested'; copy.bannerMessage = 'Exchange confirmed. Pickup will be arranged soon.'; copy.exchangeNewSize = '34';
+                        break;
+                    case 'SIM_EXC_PICKED':
+                        copy.journeyMode = 'EXCHANGE'; copy.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                        copy.stepIndex = 1; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '🚚'; copy.bannerTitle = 'Exchange Item Picked Up'; copy.bannerMessage = 'Your original item is on its way back to us.'; copy.exchangeNewSize = '34';
+                        break;
+                    case 'SIM_EXC_REC':
+                        copy.journeyMode = 'EXCHANGE'; copy.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                        copy.stepIndex = 2; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '📦'; copy.bannerTitle = 'Exchange Item Received'; copy.bannerMessage = 'We have received your item. Preparing replacement size 34.'; copy.exchangeNewSize = '34';
+                        break;
+                    case 'SIM_EXC_SHIPPED':
+                        copy.journeyMode = 'EXCHANGE'; copy.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                        copy.stepIndex = 3; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '🚚'; copy.bannerTitle = 'Exchange Shipped'; copy.bannerMessage = 'Your replacement trousers are on the way.'; copy.exchangeNewSize = '34';
+                        break;
+                    case 'SIM_EXC_DELIVERED':
+                        copy.journeyMode = 'EXCHANGE'; copy.stepperSteps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                        copy.stepIndex = 4; copy.bannerClass = 'banner-green'; copy.bannerIcon = '✓'; copy.bannerTitle = 'Exchange Delivered'; copy.bannerMessage = 'Your replacement trousers have been delivered. We hope they fit perfectly.'; copy.exchangeNewSize = '34';
+                        break;
+                    case 'SIM_ALT_REQ':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 0; copy.bannerClass = 'banner-amber'; copy.bannerIcon = '✂️'; copy.bannerTitle = 'Alteration Requested'; copy.bannerMessage = "We'll arrange a pickup for your trousers."; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_PICKED':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 1; copy.bannerClass = 'banner-amber'; copy.bannerIcon = '🚚'; copy.bannerTitle = 'Picked Up'; copy.bannerMessage = 'Your trousers have been picked up and are on their way to us.'; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_REC':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 2; copy.bannerClass = 'banner-amber'; copy.bannerIcon = '🏢'; copy.bannerTitle = 'Received at Slyte'; copy.bannerMessage = "We've received your trousers. Your alteration is now in progress."; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_INPROG':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 3; copy.bannerClass = 'banner-amber'; copy.bannerIcon = '✂️'; copy.bannerTitle = 'Alteration in Progress'; copy.bannerMessage = 'Our team is working on your trousers. Expected completion: 3 business days.'; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_DONE':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 4; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '✨'; copy.bannerTitle = 'Alteration Completed'; copy.bannerMessage = 'Your trousers have been altered and are ready to ship.'; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_SHIPPED':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 5; copy.bannerClass = 'banner-blue'; copy.bannerIcon = '🚚'; copy.bannerTitle = 'Alteration Shipped'; copy.bannerMessage = 'Your altered trousers are on the way.'; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                    case 'SIM_ALT_DELIVERED':
+                        copy.journeyMode = 'ALTERATION'; copy.stepperSteps = ['Requested', 'Picked Up', 'Received', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+                        copy.stepIndex = 6; copy.bannerClass = 'banner-green'; copy.bannerIcon = '✓'; copy.bannerTitle = 'Alteration Delivered'; copy.bannerMessage = 'Your altered trousers have been delivered. We hope they fit perfectly.'; copy.alterationSpecs = { waist: '31"', length: '39"' };
+                        break;
+                }
+                return copy;
+            }
+
+            // Stepper Component Renderer
+            function renderJourneyStepper(mode, activeIndex, steps) {
+                if (!steps || !steps.length) return '';
+                return `
+                <div class="timeline-stepper">
+                    ${steps.map((label, idx) => {
+                        let stateClass = '';
+                        if (idx < activeIndex) stateClass = 'done';
+                        else if (idx === activeIndex) {
+                            if (mode === 'RETURN' && activeIndex === 3) stateClass = 'active-green';
+                            else if (mode === 'ALTERATION' && activeIndex === 3) stateClass = 'active-amber';
+                            else stateClass = 'active';
+                        }
+                        return `
+                        <div class="step-node ${stateClass}">
+                            <div class="node-circle">${idx < activeIndex ? '✓' : (idx + 1)}</div>
+                            <div class="node-label">${label}</div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }
+
+            // Contextual Action Buttons Resolver
+            function renderContextualActions(mode, order) {
+                const isCustom = order.productType === 'CUSTOM' || (order.fitType || '').toLowerCase().includes('custom');
+                const isTerminalSuccess = (mode === 'RETURN' && order.stepIndex === 3) ||
+                                          (mode === 'EXCHANGE' && order.stepIndex === 4) ||
+                                          (mode === 'ALTERATION' && order.stepIndex === 6);
+
+                if (isTerminalSuccess) {
+                    return `
+                    <div class="btn-row">
+                        <a href="custom-clothing.html" class="btn-action btn-primary">Shop Again</a>
+                        <a href="https://wa.me/916363887497" target="_blank" class="btn-action btn-secondary">Need Help?</a>
+                    </div>`;
+                }
+
+                if (mode === 'RETURN') {
+                    return `
+                    <div class="btn-row">
+                        <button class="btn-action btn-outline-blue" onclick="toggleDetails('${esc(order.orderId)}')">View Return Details</button>
+                        <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber || 'RET-1001')}" target="_blank" class="btn-action btn-secondary">Track Return</a>
+                    </div>`;
+                }
+
+                if (mode === 'EXCHANGE') {
+                    return `
+                    <div class="btn-row">
+                        <button class="btn-action btn-outline-blue" onclick="toggleDetails('${esc(order.orderId)}')">View Exchange Details</button>
+                        <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber || 'EXC-1001')}" target="_blank" class="btn-action btn-secondary">Track Exchange</a>
+                    </div>`;
+                }
+
+                if (mode === 'ALTERATION') {
+                    return `
+                    <div class="btn-row">
+                        <button class="btn-action btn-outline-purple" onclick="toggleDetails('${esc(order.orderId)}')">View Alteration Details</button>
+                        <a href="https://shiprocket.co/tracking/${esc(order.trackingNumber || 'ALT-1001')}" target="_blank" class="btn-action btn-secondary">Track Pickup</a>
+                    </div>`;
+                }
+
+                // Default Normal Delivered Order Actions
+                if (isCustom) {
+                    return `
+                    <button class="btn-action btn-primary" style="background:#673ab7;" onclick="openAlterationModal('${esc(order.orderId)}', '${esc(order.productName)}')">
+                        ✂️ Request Custom Alteration
+                    </button>`;
+                }
+
+                return `
+                <div class="btn-row">
+                    <button class="btn-action btn-outline-blue" onclick="openReturnModal('${esc(order.orderId)}')">↩ Request Return</button>
+                    <button class="btn-action btn-outline-green" onclick="openExchangeModal('${esc(order.orderId)}')">🔄 Request Exchange</button>
+                </div>`;
+            }
+
+            // Expanded Details Section Renderer (Dynamic based on Journey Mode)
+            function renderExpandedDetails(mode, order) {
+                const addr = order.deliveryAddress || {};
+                const addrStr = `${esc(addr.addressLine1 || '123 Test Street')}, ${esc(addr.city || 'Bengaluru')}, ${esc(addr.pincode || '560034')}`;
+
+                let timelineSpecificHtml = '';
+
+                if (mode === 'NORMAL') {
+                    timelineSpecificHtml = `
+                    <div class="section-header-title">Delivery Timeline</div>
+                    <div class="detail-box">
+                        <div class="detail-box-row"><span>Order Placed</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                        <div class="detail-box-row"><span>Dispatched</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                        <div class="detail-box-row"><span>Delivered</span><span style="font-weight:700; color:#166534;">Confirmed</span></div>
+                    </div>`;
+                } else if (mode === 'RETURN') {
+                    const bank = order.bankDetailsSaved || { maskedAcc: '4821', ifsc: 'HDFC0001234' };
+                    timelineSpecificHtml = `
+                    <div class="section-header-title">Return & Refund Details</div>
+                    <div class="detail-box">
+                        <div class="detail-box-row"><span>Return Requested On</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                        <div class="detail-box-row"><span>Refund Amount</span><span style="font-weight:800; color:#0f172a;">₹${order.amount || 1699}</span></div>
+                        <div class="detail-box-row"><span>Refund Method</span><span style="font-weight:700;">Bank Account</span></div>
+                        <div class="detail-box-row"><span>Bank Account</span><span style="font-weight:700;">•••• ${esc(bank.maskedAcc)}</span></div>
+                        <div class="detail-box-row"><span>IFSC Code</span><span style="font-weight:700;">${esc(bank.ifsc)}</span></div>
+                        <div class="detail-box-row"><span>Refund Status</span><span style="font-weight:700; color:${order.stepIndex === 3 ? '#166534' : '#d97706'};">${order.stepIndex === 3 ? 'Processed Successfully' : 'In Progress (Post-Receipt)'}</span></div>
+                    </div>`;
+                } else if (mode === 'EXCHANGE') {
+                    timelineSpecificHtml = `
+                    <div class="section-header-title">Exchange Details</div>
+                    <div class="detail-box">
+                        <div class="detail-box-row"><span>Exchange Requested On</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                        <div class="detail-box-row"><span>Original Size</span><span style="font-weight:700;">Size ${esc(order.size || '32')}</span></div>
+                        <div class="detail-box-row"><span>New Requested Size</span><span style="font-weight:800; color:#2563eb;">Size ${esc(order.exchangeNewSize || '34')}</span></div>
+                        <div class="detail-box-row"><span>Tracking AWB</span><span style="font-weight:700;">EXC-${esc(order.orderId)}</span></div>
+                    </div>`;
+                } else if (mode === 'ALTERATION') {
+                    const alt = order.alterationSpecs || { waist: '31"', length: '39"' };
+                    timelineSpecificHtml = `
+                    <div class="section-header-title">Alteration Measurement Changes</div>
+                    <div class="detail-box">
+                        <div class="detail-box-row"><span>Alteration Requested On</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                        <div class="detail-box-row"><span>Waist Adjustment</span><span style="font-weight:700;">32" → ${esc(alt.waist)}</span></div>
+                        <div class="detail-box-row"><span>Length Adjustment</span><span style="font-weight:700;">40" → ${esc(alt.length)}</span></div>
+                        <div class="detail-box-row"><span>Alteration Fee</span><span style="font-weight:800; color:#166534;">Included (Free)</span></div>
+                    </div>`;
+                }
+
+                return `
+                <div class="section-header-title">Order Information</div>
+                <div class="detail-box">
+                    <div class="detail-box-row"><span>Order ID</span><span style="font-weight:700;">${esc(order.orderId)}</span></div>
+                    <div class="detail-box-row"><span>Payment Mode</span><span style="font-weight:700;">${esc(order.paymentGroup || 'Cashfree UPI')}</span></div>
+                    <div class="detail-box-row"><span>Ordered Date & Time</span><span style="font-weight:700;">${fmtDate(order.createdAt)}</span></div>
+                    <div class="detail-box-row" style="flex-direction:column; gap:4px; margin-top:6px;">
+                        <span>Delivery Address</span>
+                        <span style="font-weight:600; color:var(--navy-primary); line-height:1.4;">${addrStr}</span>
+                    </div>
+                </div>
+                ${timelineSpecificHtml}`;
+            }
+
+            // Expand Details Toggle Function
+            window.toggleDetails = function(orderId) {
+                const panel = document.getElementById(`expand-${orderId}`);
+                const btn = document.getElementById(`btn-toggle-${orderId}`);
+                if (panel.style.display === 'block') {
+                    panel.style.display = 'none';
+                    btn.textContent = 'Show Details ▼';
+                } else {
+                    panel.style.display = 'block';
+                    btn.textContent = 'Hide Details ▲';
+                }
+            };
+
+            // Modal Management
+            window.closeModal = function() {
+                document.getElementById('modalOverlay').style.display = 'none';
+            };
+
+            // 1. Dedicated Bank Details Modal
+            window.openBankDetailsModal = function(orderId) {
+                const overlay = document.getElementById('modalOverlay');
+                const body = document.getElementById('modalBody');
+
+                const saved = localStorage.getItem(`bank_${orderId}`);
+                let existingName = '', existingAcc = '', existingIfsc = '';
+                if (saved) {
+                    try {
+                        const p = JSON.parse(saved);
+                        existingName = p.account_name || '';
+                        existingAcc = p.account_number || '';
+                        existingIfsc = p.ifsc_code || '';
+                    } catch(e){}
+                }
+
+                body.innerHTML = `
+                    <div class="modal-title">Refund Bank Details</div>
+                    <div class="modal-subtitle">Add your bank account details so we can process your refund once the return is received.</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Account Holder Name *</label>
+                        <input type="text" id="bankName" class="form-input" placeholder="Full name as in bank account" value="${esc(existingName)}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bank Account Number *</label>
+                        <input type="password" id="bankAcc" class="form-input" placeholder="Enter account number" value="${esc(existingAcc)}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Account Number *</label>
+                        <input type="text" id="bankAccConfirm" class="form-input" placeholder="Re-enter account number" value="${esc(existingAcc)}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">IFSC Code *</label>
+                        <input type="text" id="bankIfsc" class="form-input" style="text-transform:uppercase;" placeholder="e.g. HDFC0001234" maxlength="11" value="${esc(existingIfsc)}">
+                    </div>
+
+                    <div class="form-disclaimer">
+                        <span class="material-symbols-outlined" style="font-size:16px;">lock</span>
+                        Your bank details are used only to process your refund.
+                    </div>
+
+                    <div id="modalErr" style="display:none; color:var(--red-text); font-size:13px; font-weight:700; margin-top:12px;"></div>
+
+                    <button class="btn-action btn-primary" style="width:100%; margin-top:16px;" onclick="saveBankDetails('${esc(orderId)}')">
+                        Save Bank Details
+                    </button>`;
+                overlay.style.display = 'flex';
+            };
+
+            window.saveBankDetails = async function(orderId) {
+                const name = document.getElementById('bankName').value.trim();
+                const acc = document.getElementById('bankAcc').value.trim();
+                const confirmAcc = document.getElementById('bankAccConfirm').value.trim();
+                const ifsc = document.getElementById('bankIfsc').value.trim().toUpperCase();
+                const errBox = document.getElementById('modalErr');
+
+                if (!name) { errBox.textContent = 'Account holder name is required.'; errBox.style.display = 'block'; return; }
+                if (!acc || acc.length < 8) { errBox.textContent = 'Please enter a valid bank account number.'; errBox.style.display = 'block'; return; }
+                if (acc !== confirmAcc) { errBox.textContent = 'Confirm Account Number does not match.'; errBox.style.display = 'block'; return; }
+                if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) { errBox.textContent = 'Please enter a valid 11-digit IFSC code (e.g. HDFC0001234).'; errBox.style.display = 'block'; return; }
+
+                errBox.style.display = 'none';
+
+                const bankObj = { account_name: name, account_number: acc, ifsc_code: ifsc };
+                localStorage.setItem(`bank_${orderId}`, JSON.stringify(bankObj));
+
+                try {
+                    await fetch(`${API_BASE}/api/after-sales/return`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId, bank_details: bankObj })
+                    });
+                } catch(e){}
+
+                closeModal();
+                fetchOrders();
+            };
+
+            // 2. Return Modal Handler
+            window.openReturnModal = function(orderId) {
+                const overlay = document.getElementById('modalOverlay');
+                const body = document.getElementById('modalBody');
+                body.innerHTML = `
+                    <div class="modal-title">Request Return</div>
+                    <div class="modal-subtitle">Order #${orderId} • Standard Fit Return</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Reason for Return</label>
+                        <select id="retReason" class="form-select">
+                            <option value="Size issue">Size issue / fit not comfortable</option>
+                            <option value="Quality issue">Fabric or quality issue</option>
+                            <option value="Color mismatch">Color different than expected</option>
+                            <option value="Changed mind">Changed mind</option>
+                        </select>
+                    </div>
+
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:14px;">
+                        <div style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px;">Refund Bank Details</div>
+                        <div class="form-group">
+                            <label class="form-label">Account Holder Name *</label>
+                            <input type="text" id="retAccName" class="form-input" placeholder="Full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Number *</label>
+                            <input type="password" id="retAccNum" class="form-input" placeholder="Account number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm Account Number *</label>
+                            <input type="text" id="retConfirmAccNum" class="form-input" placeholder="Confirm account number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IFSC Code *</label>
+                            <input type="text" id="retIfsc" class="form-input" style="text-transform:uppercase;" placeholder="e.g. HDFC0001234" maxlength="11">
+                        </div>
+                        <div class="form-disclaimer">Your bank details are used only to process your refund.</div>
+                    </div>
+
+                    <div id="modalErr" style="display:none; color:var(--red-text); font-size:13px; font-weight:700; margin-bottom:12px;"></div>
+
+                    <button class="btn-action btn-primary" style="width:100%;" onclick="submitReturn('${esc(orderId)}')">
+                        Submit Return Request
+                    </button>`;
+                overlay.style.display = 'flex';
+            };
+
+            window.submitReturn = async function(orderId) {
+                const reason = document.getElementById('retReason').value;
+                const name = document.getElementById('retAccName').value.trim();
+                const acc = document.getElementById('retAccNum').value.trim();
+                const confirmAcc = document.getElementById('retConfirmAccNum').value.trim();
+                const ifsc = document.getElementById('retIfsc').value.trim().toUpperCase();
+                const errBox = document.getElementById('modalErr');
+
+                if (!name) { errBox.textContent = 'Account holder name is required.'; errBox.style.display = 'block'; return; }
+                if (!acc || acc.length < 8) { errBox.textContent = 'Please enter a valid bank account number.'; errBox.style.display = 'block'; return; }
+                if (acc !== confirmAcc) { errBox.textContent = 'Confirm Account Number does not match.'; errBox.style.display = 'block'; return; }
+                if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) { errBox.textContent = 'Please enter a valid 11-digit IFSC code.'; errBox.style.display = 'block'; return; }
+
+                const bankObj = { account_name: name, account_number: acc, ifsc_code: ifsc };
+                localStorage.setItem(`bank_${orderId}`, JSON.stringify(bankObj));
+
+                try {
+                    await fetch(`${API_BASE}/api/after-sales/return`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId, reason, bank_details: bankObj })
+                    });
+                } catch(e){}
+
+                closeModal();
+                fetchOrders();
+            };
+
+            // 3. Exchange Modal Handler
+            window.openExchangeModal = function(orderId) {
+                const overlay = document.getElementById('modalOverlay');
+                const body = document.getElementById('modalBody');
+                body.innerHTML = `
+                    <div class="modal-title">Request Exchange</div>
+                    <div class="modal-subtitle">Order #${orderId} • Standard Fit Exchange</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Replacement Size</label>
+                        <select id="excSize" class="form-select">
+                            <option value="28">Size 28</option>
+                            <option value="30">Size 30</option>
+                            <option value="32">Size 32</option>
+                            <option value="34" selected>Size 34</option>
+                            <option value="36">Size 36</option>
+                            <option value="38">Size 38</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Reason for Exchange</label>
+                        <select id="excReason" class="form-select">
+                            <option value="Too small">Too small / Tight fit</option>
+                            <option value="Too large">Too large / Loose fit</option>
+                            <option value="Length incorrect">Length incorrect</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Additional Instructions (Optional)</label>
+                        <textarea id="excNotes" class="form-textarea" placeholder="e.g. Please send size 34 in original color..."></textarea>
+                    </div>
+
+                    <button class="btn-action btn-primary" style="width:100%;" onclick="submitExchange('${esc(orderId)}')">
+                        Submit Exchange Request
+                    </button>`;
+                overlay.style.display = 'flex';
+            };
+
+            window.submitExchange = async function(orderId) {
+                const replacement_size = document.getElementById('excSize').value;
+                const reason = document.getElementById('excReason').value;
+                const notes = document.getElementById('excNotes').value.trim();
+
+                try {
+                    await fetch(`${API_BASE}/api/after-sales/exchange`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
+                    });
+                } catch(e){}
+
+                closeModal();
+                fetchOrders();
+            };
+
+            // 4. Dedicated Alteration Modal Handler
+            let selWaist = "0.0";
+            let selLength = "0.0";
+
+            window.openAlterationModal = function(orderId, productName) {
+                selWaist = "0.0"; selLength = "0.0";
+                const overlay = document.getElementById('modalOverlay');
+                const body = document.getElementById('modalBody');
+
+                body.innerHTML = `
+                    <div class="modal-title">Alter Your Trousers</div>
+                    <div class="modal-subtitle">We'll alter your existing Slyte trousers and send them back to you.<br><span style="color:#673ab7; font-weight:700;">Alteration included (Free up to ±1.5")</span></div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Waist Adjustment</label>
+                        <div class="adj-grid">
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-1.5')">-1.5"</button>
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-1.0')">-1.0"</button>
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'-0.5')">-0.5"</button>
+                            <button type="button" class="adj-pill waist-pill active" onclick="setWaist(this,'0.0')">0" (Current)</button>
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+0.5')">+0.5"</button>
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+1.0')">+1.0"</button>
+                            <button type="button" class="adj-pill waist-pill" onclick="setWaist(this,'+1.5')">+1.5"</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Length Adjustment</label>
+                        <div class="adj-grid">
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-1.5')">-1.5"</button>
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-1.0')">-1.0"</button>
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'-0.5')">-0.5"</button>
+                            <button type="button" class="adj-pill length-pill active" onclick="setLength(this,'0.0')">0" (Current)</button>
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+0.5')">+0.5"</button>
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+1.0')">+1.0"</button>
+                            <button type="button" class="adj-pill length-pill" onclick="setLength(this,'+1.5')">+1.5"</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Anything Else? (Optional Instructions)</label>
+                        <textarea id="altNotes" class="form-textarea" placeholder="e.g. Taper slightly around calves or knee..."></textarea>
+                    </div>
+
+                    <button class="btn-action btn-primary" style="width:100%; background:#673ab7;" onclick="submitAlteration('${esc(orderId)}')">
+                        Submit Alteration Request
+                    </button>`;
+                overlay.style.display = 'flex';
+            };
+
+            window.setWaist = function(btn, val) {
+                document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selWaist = val;
+            };
+
+            window.setLength = function(btn, val) {
+                document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selLength = val;
+            };
+
+            window.submitAlteration = async function(orderId) {
+                const notes = document.getElementById('altNotes').value.trim();
+                try {
+                    await fetch(`${API_BASE}/api/after-sales/alteration`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_id: orderId,
+                            alteration_type: `Waist: ${selWaist}", Length: ${selLength}"`,
+                            measurements: { waist_diff: selWaist, length_diff: selLength },
+                            customer_notes: notes
+                        })
+                    });
+                } catch(e){}
+
+                closeModal();
+                fetchOrders();
+            };
+
+            // Auto-lookup saved mobile number
+            const savedPhone = localStorage.getItem('slyte_phone') || localStorage.getItem('userPhone');
+            if (savedPhone) {
+                document.getElementById('mobileInput').value = savedPhone.replace(/\D/g, '').slice(-10);
                 fetchOrders();
             }
 
         })();
-
-        // ── AFTER-SALES MODAL HANDLERS ───────────────────────────────────────
-        let selectedWaistVal = "0.0";
-        let selectedLengthVal = "0.0";
-
-        window.selectWaist = function(btn, val) {
-            document.querySelectorAll('.waist-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedWaistVal = val;
-        };
-
-        window.selectLength = function(btn, val) {
-            document.querySelectorAll('.length-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedLengthVal = val;
-        };
-
-        window.closeAfterSalesModal = function() {
-            const overlay = document.getElementById('afterSalesModalOverlay');
-            if (overlay) overlay.style.display = 'none';
-        };
-
-        window.openAlterationModal = function(orderId, productName) {
-            selectedWaistVal = "0.0";
-            selectedLengthVal = "0.0";
-            const overlay = document.getElementById('afterSalesModalOverlay');
-            const content = document.getElementById('afterSalesModalContent');
-            
-            content.innerHTML = `
-                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">✂️ Request Custom Alteration</h2>
-                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • ${productName}<br><span style="color:#673ab7; font-weight:600;">Free alteration up to ±1.5 inches</span></p>
-                
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Waist Adjustment</label>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.5" onclick="selectWaist(this, '-1.5')">-1.5"</button>
-                        <button type="button" class="adjustment-pill waist-pill" data-val="-1.0" onclick="selectWaist(this, '-1.0')">-1.0"</button>
-                        <button type="button" class="adjustment-pill waist-pill" data-val="-0.5" onclick="selectWaist(this, '-0.5')">-0.5"</button>
-                        <button type="button" class="adjustment-pill waist-pill active" data-val="0.0" onclick="selectWaist(this, '0.0')">0" (Original)</button>
-                        <button type="button" class="adjustment-pill waist-pill" data-val="+0.5" onclick="selectWaist(this, '+0.5')">+0.5"</button>
-                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.0" onclick="selectWaist(this, '+1.0')">+1.0"</button>
-                        <button type="button" class="adjustment-pill waist-pill" data-val="+1.5" onclick="selectWaist(this, '+1.5')">+1.5"</button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Length Adjustment</label>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                        <button type="button" class="adjustment-pill length-pill" data-val="-1.5" onclick="selectLength(this, '-1.5')">-1.5"</button>
-                        <button type="button" class="adjustment-pill length-pill" data-val="-1.0" onclick="selectLength(this, '-1.0')">-1.0"</button>
-                        <button type="button" class="adjustment-pill length-pill" data-val="-0.5" onclick="selectLength(this, '-0.5')">-0.5"</button>
-                        <button type="button" class="adjustment-pill length-pill active" data-val="0.0" onclick="selectLength(this, '0.0')">0" (Original)</button>
-                        <button type="button" class="adjustment-pill length-pill" data-val="+0.5" onclick="selectLength(this, '+0.5')">+0.5"</button>
-                        <button type="button" class="adjustment-pill length-pill" data-val="+1.0" onclick="selectLength(this, '+1.0')">+1.0"</button>
-                        <button type="button" class="adjustment-pill length-pill" data-val="+1.5" onclick="selectLength(this, '+1.5')">+1.5"</button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:8px;">Fitting / Tailoring Notes (Optional)</label>
-                    <textarea id="alterationNotes" placeholder="e.g. Taper slightly around calves..." style="width:100%; height:75px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
-                </div>
-
-                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-
-                <button id="btnSubmitAlt" onclick="submitAlterationRequest('${orderId}')" style="width:100%; background:#673ab7; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Alteration Request</button>
-            `;
-            overlay.style.display = 'flex';
-        };
-
-        window.submitAlterationRequest = async function(orderId) {
-            const btn = document.getElementById('btnSubmitAlt');
-            const msg = document.getElementById('modalMsg');
-            const notes = document.getElementById('alterationNotes').value.trim();
-            
-            if (selectedWaistVal === "0.0" && selectedLengthVal === "0.0" && !notes) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '⚠️ Please select a Waist/Length adjustment or enter fitting notes.';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = 'Submitting...';
-            msg.style.display = 'none';
-
-            try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/alteration', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
-                        measurements: { waist_diff: selectedWaistVal, length_diff: selectedLengthVal },
-                        customer_notes: notes
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    msg.style.display = 'block';
-                    msg.style.background = '#dcfce7';
-                    msg.style.color = '#166534';
-                    msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
-                    setTimeout(() => {
-                        closeAfterSalesModal();
-                        location.reload();
-                    }, 1800);
-                } else {
-                    msg.style.display = 'block';
-                    msg.style.background = '#fee2e2';
-                    msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit alteration request.');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Submit Alteration Request';
-                }
-            } catch (err) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '❌ Network error submitting alteration request.';
-                btn.disabled = false;
-                btn.innerHTML = 'Submit Alteration Request';
-            }
-        };
-
-        window.openReturnModal = function(orderId) {
-            const overlay = document.getElementById('afterSalesModalOverlay');
-            const content = document.getElementById('afterSalesModalContent');
-            content.innerHTML = `
-                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">↩ Request Return</h2>
-                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Return</p>
-                
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Return</label>
-                    <select id="returnReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                        <option value="Size issue">Size issue / fit not comfortable</option>
-                        <option value="Fabric / Quality">Fabric or quality issue</option>
-                        <option value="Color difference">Color different than expected</option>
-                        <option value="Changed mind">Changed mind</option>
-                    </select>
-                </div>
-
-                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
-                    <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                        🏦 Refund Bank Account Details
-                    </h4>
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Account Holder Name *</label>
-                        <input type="text" id="returnAccountName" placeholder="Full name as in bank account" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Bank Account Number *</label>
-                        <input type="password" id="returnAccountNumber" placeholder="Enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">Confirm Account Number *</label>
-                        <input type="text" id="returnConfirmAccountNumber" placeholder="Re-enter bank account number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:4px;">IFSC Code *</label>
-                        <input type="text" id="returnIfscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-transform:uppercase; outline:none;">
-                    </div>
-                </div>
-
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Comments / Notes</label>
-                    <textarea id="returnNotes" placeholder="Optional details..." style="width:100%; height:60px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
-                </div>
-                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                <button id="btnSubmitRet" onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0369a1; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Return Request</button>
-            `;
-            overlay.style.display = 'flex';
-        };
-
-        window.submitReturnRequest = async function(orderId) {
-            const btn = document.getElementById('btnSubmitRet');
-            const msg = document.getElementById('modalMsg');
-            const reason = document.getElementById('returnReason').value;
-            const accountName = (document.getElementById('returnAccountName').value || '').trim();
-            const accountNumber = (document.getElementById('returnAccountNumber').value || '').trim();
-            const confirmAccountNumber = (document.getElementById('returnConfirmAccountNumber').value || '').trim();
-            const ifscCode = (document.getElementById('returnIfscCode').value || '').trim().toUpperCase();
-            const notes = (document.getElementById('returnNotes').value || '').trim();
-
-            if (!accountName) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '⚠️ Please enter Account Holder Name.';
-                return;
-            }
-            if (!accountNumber || accountNumber.length < 8) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '⚠️ Please enter a valid Bank Account Number.';
-                return;
-            }
-            if (accountNumber !== confirmAccountNumber) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '⚠️ Account Numbers do not match.';
-                return;
-            }
-            if (!ifscCode || ifscCode.length !== 11) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '⚠️ Please enter a valid 11-digit IFSC Code (e.g. SBIN0001234).';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = 'Submitting...';
-            msg.style.display = 'none';
-
-            try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/return', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        reason,
-                        customer_notes: notes,
-                        bank_details: {
-                            account_name: accountName,
-                            account_number: accountNumber,
-                            ifsc_code: ifscCode
-                        }
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    msg.style.display = 'block';
-                    msg.style.background = '#dcfce7';
-                    msg.style.color = '#166534';
-                    msg.innerHTML = '✓ Return request & bank details submitted! Pickup will be scheduled.';
-                    setTimeout(() => {
-                        closeAfterSalesModal();
-                        location.reload();
-                    }, 1800);
-                } else {
-                    msg.style.display = 'block';
-                    msg.style.background = '#fee2e2';
-                    msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit return request.');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Submit Return Request';
-                }
-            } catch (err) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '❌ Network error submitting return request.';
-                btn.disabled = false;
-                btn.innerHTML = 'Submit Return Request';
-            }
-        };
-
-        window.openExchangeModal = function(orderId) {
-            const overlay = document.getElementById('afterSalesModalOverlay');
-            const content = document.getElementById('afterSalesModalContent');
-            content.innerHTML = `
-                <h2 style="font-size:20px; font-weight:800; margin-bottom:4px; color:#111;">🔄 Request Exchange</h2>
-                <p style="font-size:13px; color:#666; margin-bottom:20px;">Order #${orderId} • Standard Fit Exchange</p>
-                
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Select Replacement Size</label>
-                    <select id="exchangeSize" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                        <option value="28">Size 28</option>
-                        <option value="30">Size 30</option>
-                        <option value="32">Size 32</option>
-                        <option value="34" selected>Size 34</option>
-                        <option value="36">Size 36</option>
-                        <option value="38">Size 38</option>
-                        <option value="40">Size 40</option>
-                    </select>
-                </div>
-                <div style="margin-bottom:16px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Reason for Exchange</label>
-                    <select id="exchangeReason" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; outline:none;">
-                        <option value="Too small">Too small / Tight fit</option>
-                        <option value="Too large">Too large / Loose fit</option>
-                        <option value="Length incorrect">Length incorrect</option>
-                    </select>
-                </div>
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
-                    <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
-                </div>
-                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
-            `;
-            overlay.style.display = 'flex';
-        };
-
-        window.submitExchangeRequest = async function(orderId) {
-            const btn = document.getElementById('btnSubmitExc');
-            const msg = document.getElementById('modalMsg');
-            const replacement_size = document.getElementById('exchangeSize').value;
-            const reason = document.getElementById('exchangeReason').value;
-            const notes = document.getElementById('exchangeNotes').value.trim();
-            btn.disabled = true;
-            btn.innerHTML = 'Submitting...';
-            try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/exchange', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    msg.style.display = 'block';
-                    msg.style.background = '#dcfce7';
-                    msg.style.color = '#166534';
-                    msg.innerHTML = '✓ Exchange request submitted successfully! Replacement item will be dispatched.';
-                    setTimeout(() => {
-                        closeAfterSalesModal();
-                        location.reload();
-                    }, 1800);
-                } else {
-                    msg.style.display = 'block';
-                    msg.style.background = '#fee2e2';
-                    msg.style.color = '#991b1b';
-                    msg.innerHTML = '❌ ' + (data.error || 'Failed to submit exchange request.');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Submit Exchange Request';
-                }
-            } catch (err) {
-                msg.style.display = 'block';
-                msg.style.background = '#fee2e2';
-                msg.style.color = '#991b1b';
-                msg.innerHTML = '❌ Network error submitting exchange request.';
-                btn.disabled = false;
-                btn.innerHTML = 'Submit Exchange Request';
-            }
-        };
     </script>
-
-    <!-- After-Sales Modal Overlay -->
-    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
-        <div style="background:#fff; border-radius:20px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
-            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
-            <div id="afterSalesModalContent">
-                <!-- Dynamic Modal Content Injection -->
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
-
-
