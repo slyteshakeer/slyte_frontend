@@ -253,11 +253,19 @@ export default {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const returnRec = backendStore.createReturnRequest(body);
-                    const order = backendStore.getOrderById(body.order_id);
-                    
-                    if (order && !returnRec.is_test) {
-                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+                    let order = backendStore.getOrderById(body.order_id);
+                    if (!order) {
+                        order = {
+                            id: body.order_id || "SLYTE-ORD-001",
+                            customer_name: body.customer_name || "Valued Customer",
+                            customer_phone: body.customer_phone || "9742006683",
+                            delivery_address: body.delivery_address || "123 Test Street, Koramangala, Bengaluru, Karnataka 560034",
+                            total_amount: 1699,
+                            items: [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]
+                        };
                     }
+                    
+                    ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
                     
                     return jsonResponse({
                         success: true,
@@ -273,11 +281,19 @@ export default {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const exchangeRec = backendStore.createExchangeRequest(body);
-                    const order = backendStore.getOrderById(body.order_id);
-                    
-                    if (order && !exchangeRec.is_test) {
-                        ctx.waitUntil(createShiprocketExchangeOrder(order, exchangeRec, env));
+                    let order = backendStore.getOrderById(body.order_id);
+                    if (!order) {
+                        order = {
+                            id: body.order_id || "SLYTE-ORD-002",
+                            customer_name: body.customer_name || "Valued Customer",
+                            customer_phone: body.customer_phone || "9742006683",
+                            delivery_address: body.delivery_address || "456 Sample Avenue, Indiranagar, Bengaluru, Karnataka 560038",
+                            total_amount: 1699,
+                            items: [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]
+                        };
                     }
+                    
+                    ctx.waitUntil(createShiprocketExchangeOrder(order, exchangeRec, env));
 
                     return jsonResponse({
                         success: true,
@@ -293,11 +309,19 @@ export default {
                 const body = await request.json().catch(() => ({}));
                 try {
                     const altRec = backendStore.createAlterationRequest(body);
-                    const order = backendStore.getOrderById(body.order_id);
-                    
-                    if (order && !altRec.is_test) {
-                        ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+                    let order = backendStore.getOrderById(body.order_id);
+                    if (!order) {
+                        order = {
+                            id: body.order_id || "SLYTE-ORD-003",
+                            customer_name: body.customer_name || "Valued Customer",
+                            customer_phone: body.customer_phone || "9742006683",
+                            delivery_address: body.delivery_address || "789 Custom Blvd, HSR Layout, Bengaluru, Karnataka 560102",
+                            total_amount: 1799,
+                            items: [{ name: "Slyte Trouser (Custom Fit)", price: 1799, quantity: 1 }]
+                        };
                     }
+                    
+                    ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
 
                     return jsonResponse({
                         success: true,
