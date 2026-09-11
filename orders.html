@@ -22,549 +22,159 @@
 
     <style>
         :root {
-            --bg: #ffffff;
+            --bg: #f8fafc;
             --surface: #ffffff;
-            --surface-2: #f8f8f8;
-            --border: #eeeeee;
-            --text-primary: #000000;
-            --text-secondary: #555555;
-            --text-muted: #999999;
+            --surface-2: #f1f5f9;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
             --accent: #154cbd;
-            --accent-light: #0d3a95;
-            --paid-bg: #e8f5e9;
-            --paid-color: #2e7d32;
-            --pending-pay-bg: #fff8e1;
-            --pending-pay-color: #e65100;
-            --error: #c62828;
-            --radius: 16px;
+            --accent-hover: #0f3ba0;
+            --accent-light: #eff6ff;
+            --accent-purple: #6366f1;
+            --accent-purple-light: #e0e7ff;
+            --paid-bg: #ecfdf5;
+            --paid-color: #047857;
+            --paid-border: #a7f3d0;
+            --pending-pay-bg: #fffbeb;
+            --pending-pay-color: #b45309;
+            --pending-pay-border: #fde68a;
+            --error: #e11d48;
+            --error-bg: #fff1f2;
+            --error-border: #fecdd3;
+            --radius: 20px;
             --radius-sm: 12px;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            --transition: 0.3s ease;
-        }
-
-        .adjustment-pill {
-            padding: 8px 4px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #334155;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .adjustment-pill.active {
-            background: #154cbd;
-            color: #ffffff;
-            border-color: #154cbd;
-            box-shadow: 0 2px 8px rgba(21, 76, 189, 0.3);
-        }
-
-        /* ── AFTER-SALES PREMIUM UI/UX STYLES ────────────────────────── */
-        .after-sales-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
-            font-family: 'Inter', -apple-system, sans-serif;
-            animation: slideUp 0.4s ease forwards;
-        }
-
-        .as-top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .as-title-box {
-            text-align: left;
-        }
-
-        .as-title-main {
-            font-size: 18px;
-            font-weight: 800;
-            color: #111827;
-            letter-spacing: -0.3px;
-        }
-
-        .as-order-id-sub {
-            font-size: 13px;
-            color: #6b7280;
-            font-weight: 600;
-        }
-
-        .as-more-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 4px;
-        }
-
-        .as-product-card {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px;
-            background: #f9fafb;
-            border-radius: 16px;
-            margin-bottom: 24px;
-        }
-
-        .as-product-thumb {
-            width: 72px;
-            height: 84px;
-            object-fit: cover;
-            border-radius: 12px;
-            background: #e5e7eb;
-            flex-shrink: 0;
-        }
-
-        .as-product-info {
-            flex: 1;
-        }
-
-        .as-product-name {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 2px;
-            line-height: 1.25;
-        }
-
-        .as-product-fit {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .as-tag-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .as-tag-badge.standard {
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .as-tag-badge.custom {
-            background: #f3e8ff;
-            color: #7e22ce;
-        }
-
-        /* Stepper Bar */
-        .as-stepper-container {
-            position: relative;
-            margin: 28px 0 32px;
-            padding: 0 4px;
-        }
-
-        .as-stepper-track {
-            position: absolute;
-            top: 17px;
-            left: 28px;
-            right: 28px;
-            height: 3px;
-            background: #e5e7eb;
-            z-index: 1;
-        }
-
-        .as-stepper-fill {
-            position: absolute;
-            top: 17px;
-            left: 28px;
-            height: 3px;
-            z-index: 1;
-            transition: width 0.4s ease;
-        }
-
-        .as-stepper-steps {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 2;
-        }
-
-        .as-step-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-        }
-
-        .as-step-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f3f4f6;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            border: 3px solid #ffffff;
-            box-shadow: 0 0 0 1px #e5e7eb;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .as-step-item.active .as-step-circle,
-        .as-step-item.completed .as-step-circle {
-            color: #ffffff;
-            box-shadow: none;
-        }
-
-        .as-step-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #6b7280;
-            text-align: center;
-            line-height: 1.2;
-            max-width: 72px;
-        }
-
-        .as-step-item.active .as-step-title {
-            color: #111827;
-            font-weight: 800;
-        }
-
-        .as-step-subdate {
-            font-size: 10px;
-            color: #9ca3af;
-            margin-top: 3px;
-            font-weight: 600;
-        }
-
-        /* Workflow Themes */
-        .as-theme-return .as-stepper-fill { background: #dc2626; }
-        .as-theme-return .as-step-item.completed .as-step-circle,
-        .as-theme-return .as-step-item.active .as-step-circle {
-            background: #dc2626;
-        }
-
-        .as-banner-return {
-            background: #fef2f2;
-            border: 1px solid #fee2e2;
-        }
-
-        .as-banner-return .as-banner-icon-bg {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .as-banner-return .as-banner-head { color: #991b1b; }
-
-        .as-theme-exchange .as-stepper-fill { background: #2563eb; }
-        .as-theme-exchange .as-step-item.completed .as-step-circle,
-        .as-theme-exchange .as-step-item.active .as-step-circle {
-            background: #2563eb;
-        }
-
-        .as-banner-exchange {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
-        }
-
-        .as-banner-exchange .as-banner-icon-bg {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .as-banner-exchange .as-banner-head { color: #1e40af; }
-
-        .as-theme-alteration .as-stepper-fill { background: #16a34a; }
-        .as-theme-alteration .as-step-item.completed .as-step-circle,
-        .as-theme-alteration .as-step-item.active .as-step-circle {
-            background: #16a34a;
-        }
-
-        .as-banner-alteration {
-            background: #f0fdf4;
-            border: 1px solid #dcfce7;
-        }
-
-        .as-banner-alteration .as-banner-icon-bg {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .as-banner-alteration .as-banner-head { color: #166534; }
-
-        /* Status Highlight Card */
-        .as-status-card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 16px 18px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-        }
-
-        .as-banner-icon-bg {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-
-        .as-banner-content {
-            flex: 1;
-        }
-
-        .as-banner-head {
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 2px;
-        }
-
-        .as-banner-sub {
-            font-size: 13px;
-            color: #374151;
-            line-height: 1.35;
-            margin-bottom: 4px;
-        }
-
-        .as-banner-time {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6b7280;
-        }
-
-        /* Details Section */
-        .as-details-container {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 16px;
-        }
-
-        .as-details-head-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 14px;
-        }
-
-        .as-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 11px 0;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 13px;
-        }
-
-        .as-row:last-child {
-            border-bottom: none;
-        }
-
-        .as-row-label-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .as-row-icon {
-            font-size: 16px;
-            color: #374151;
-            width: 20px;
-            text-align: center;
-        }
-
-        .as-row-val {
-            font-weight: 700;
-            color: #111827;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .as-copy-btn {
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 2px 6px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: background 0.2s;
-            color: #374151;
-        }
-
-        .as-copy-btn:hover { background: #e5e7eb; }
-
-        /* Info Callout */
-        .as-notice-box {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #1e40af;
-            line-height: 1.4;
-        }
-
-        .as-notice-icon {
-            font-size: 18px;
-            color: #2563eb;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        /* Support Button Card */
-        .as-support-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-decoration: none;
-            color: inherit;
-            margin-bottom: 20px;
-            transition: border-color 0.2s, background 0.2s;
-        }
-
-        .as-support-card:hover {
-            border-color: #cbd5e1;
-            background: #f9fafb;
-        }
-
-        .as-support-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .as-support-icon-wrap {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: #111827;
-        }
-
-        .as-support-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .as-support-desc {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .as-support-arrow {
-            font-size: 18px;
-            color: #9ca3af;
-        }
-
-        /* Primary Tracking Action Button */
-        .as-primary-track-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            background: #eef2ff;
-            color: #3730a3;
-            border: 1px solid #c7d2fe;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 800;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .as-primary-track-btn:hover {
-            background: #e0e7ff;
+            --radius-md: 16px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
             background-color: var(--bg);
             color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             padding-bottom: 100px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header Back Button & Styling ── */
+        .header {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .back-nav-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(-2px);
+        }
+
+        .adjustment-pill {
+            padding: 10px 8px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .adjustment-pill:hover {
+            border-color: var(--accent-purple);
+            background: #f8fafc;
+        }
+        .adjustment-pill.active {
+            background: var(--accent-purple);
+            color: #ffffff;
+            border-color: var(--accent-purple);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+            transform: scale(1.02);
         }
 
         .page-container {
-            max-width: 600px;
+            max-width: 640px;
             margin: 0 auto;
-            padding: 24px 16px;
+            padding: 28px 16px;
         }
 
+        /* ── Hero Section ── */
         .lookup-hero {
             text-align: center;
             margin-bottom: 32px;
+            position: relative;
         }
 
         .lookup-hero .tag {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             color: var(--accent);
-            margin-bottom: 12px;
+            background: var(--accent-light);
+            border: 1px solid #bfdbfe;
+            padding: 6px 14px;
+            border-radius: 30px;
+            margin-bottom: 14px;
         }
 
         .lookup-hero h1 {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            letter-spacing: -0.8px;
+            color: var(--text-primary);
         }
 
         .lookup-hero p {
             font-size: 14px;
             color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
 
+        /* ── Lookup Card ── */
         .lookup-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
             margin-bottom: 32px;
+            transition: var(--transition);
         }
 
         .field-label {
             display: block;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--text-secondary);
         }
 
@@ -584,72 +194,125 @@
             top: 50%;
             transform: translateY(-50%);
             font-weight: 700;
+            font-size: 15px;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         #mobileInput {
             width: 100%;
             height: 52px;
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 0 16px 0 50px;
+            padding: 0 16px 0 68px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             font-family: inherit;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: #fafafa;
+            transition: var(--transition);
+            background: #f8fafc;
+            color: var(--text-primary);
+            letter-spacing: 1px;
         }
 
         #mobileInput:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.1);
-            background: #fff;
+            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.12);
+            background: #ffffff;
         }
 
         #trackBtn {
             height: 52px;
             padding: 0 24px;
-            background: var(--primary-black);
-            color: #fff;
+            background: var(--text-primary);
+            color: #ffffff;
             border: none;
             border-radius: var(--radius-sm);
             font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        #trackBtn:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
         }
 
         #trackBtn:active {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
         }
 
-        /* Results Area */
+        /* ── Logged In User Card ── */
+        .user-logged-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #dbeafe;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+        }
+        .user-info-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(21, 76, 189, 0.25);
+        }
+
+        /* ── Order Cards ── */
         .order-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            animation: slideUp 0.4s ease forwards;
+            box-shadow: var(--shadow-md);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: var(--transition);
+        }
+
+        .order-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-hover);
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .card-header {
-            padding: 20px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            background: #ffffff;
         }
 
         .order-id-label {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -657,32 +320,20 @@
         }
 
         .product-name {
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        .payment-badge {
-            font-size: 10px;
+            font-size: 17px;
             font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            line-height: 1.3;
+            color: var(--text-primary);
         }
-
-        .payment-badge.paid { background: #e8f5e9; color: #2e7d32; }
-        .payment-badge.pending { background: #fff8e1; color: #e65100; }
-        .payment-badge.cancelled { background: #ffebee; color: #c62828; }
 
         .card-body {
-            padding: 20px;
+            padding: 24px;
         }
 
-        /* Stepper */
+        /* ── Stepper ── */
         .stepper {
             display: flex;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             padding-top: 10px;
         }
 
@@ -695,12 +346,13 @@
         .step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 11px;
+            top: 13px;
             left: 50%;
             width: 100%;
-            height: 2px;
-            background: #eee;
+            height: 3px;
+            background: #e2e8f0;
             z-index: 1;
+            transition: var(--transition);
         }
 
         .step.done:not(:last-child)::after {
@@ -708,55 +360,67 @@
         }
 
         .step-dot {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: #fff;
-            border: 2px solid #eee;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
             margin: 0 auto 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ccc;
+            font-size: 13px;
+            font-weight: 800;
+            color: #94a3b8;
             position: relative;
             z-index: 2;
+            transition: var(--transition);
         }
 
         .step.active .step-dot {
             border-color: var(--accent);
             color: var(--accent);
+            background: var(--accent-light);
+            box-shadow: 0 0 0 4px rgba(21, 76, 189, 0.15);
         }
 
         .step.done .step-dot {
             background: var(--accent);
             border-color: var(--accent);
-            color: #fff;
+            color: #ffffff;
         }
 
         .step-text {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .step.active .step-text {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .step.done .step-text {
             color: var(--text-primary);
         }
 
+        /* ── Details Block ── */
         .details-block {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 20px;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 10px;
             font-size: 13px;
         }
 
@@ -764,53 +428,71 @@
 
         .detail-label {
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .detail-value {
             font-weight: 700;
+            color: var(--text-primary);
             text-align: right;
         }
 
         .tracking-card {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 12px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-top: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: var(--shadow-sm);
         }
 
         .track-btn-link {
             background: var(--accent);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
+            color: #ffffff;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 700;
             text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .track-btn-link:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
         }
 
         .show-more-btn {
             width: 100%;
-            background: none;
-            border: 1px solid var(--border);
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .show-more-btn:hover { background: #f5f5f5; }
+        .show-more-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
 
         .expanded-section {
             display: none;
             padding-top: 20px;
-            border-top: 1px dashed var(--border);
+            border-top: 1px dashed #cbd5e1;
             margin-top: 20px;
         }
 
@@ -818,13 +500,13 @@
 
         .timeline {
             margin-top: 16px;
-            border-left: 2px solid #eee;
+            border-left: 2px solid #e2e8f0;
             padding-left: 20px;
             position: relative;
         }
 
         .timeline-item {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             position: relative;
         }
 
@@ -836,8 +518,8 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #fff;
-            border: 2px solid #eee;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
         }
 
         .timeline-item:first-child::before {
@@ -853,45 +535,44 @@
 
         .timeline-date {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-muted);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .timeline-status {
             font-size: 13px;
             line-height: 1.4;
+            color: var(--text-primary);
         }
 
-        .cancel-btn {
-            width: 100%;
-            background: #fff;
-            border: 1px solid #ffcdd2;
-            color: #d32f2f;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        .cancel-btn:hover { background: #ffebee; }
-
+        /* ── Skeleton Loaders ── */
         #loader { text-align: center; padding: 40px 0; display: none; }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #eee;
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
+        .skeleton-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .skeleton-line {
+            height: 16px;
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
 
         @media (max-width: 480px) {
             .input-row { flex-direction: column; }
             #trackBtn { width: 100%; }
+            .card-header { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -900,10 +581,15 @@
 
     <!-- Header -->
     <header class="header">
-        <div class="logo">
-            <a href="index.html">
-                <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+        <div class="header-left">
+            <a href="index.html" class="back-nav-btn" title="Back to Home">
+                <span class="material-symbols-outlined">arrow_back</span>
             </a>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/logos/slyte-logo-black.png" alt="Slyte Logo" width="120" height="35">
+                </a>
+            </div>
         </div>
         <div class="header-icons">
             <a href="wishlist.html" class="icon-btn">
@@ -922,9 +608,12 @@
     <!-- Main Container -->
     <main class="page-container">
         <section class="lookup-hero">
-            <span class="tag">Tracking</span>
-            <h1>Track Orders</h1>
-            <p>Get real-time updates on your slyte shipments.</p>
+            <span class="tag">
+                <span class="material-symbols-outlined" style="font-size:14px;">package_2</span>
+                Tracking & After-Sales
+            </span>
+            <h1>Track & Manage Orders</h1>
+            <p>Get real-time updates on your Slyte orders, initiate seamless returns, or request precision custom fit alterations.</p>
         </section>
 
         <div class="lookup-card" id="lookupCard">
@@ -932,46 +621,61 @@
                 <label class="field-label">Mobile Number</label>
                 <div class="input-row">
                     <div class="phone-wrapper">
-                        <span class="phone-prefix">+91</span>
+                        <span class="phone-prefix">🇮🇳 +91</span>
                         <input type="tel" id="mobileInput" maxlength="10" placeholder="98XXXXXXXX" />
                     </div>
-                    <button type="button" id="trackBtn">Get OTP</button>
+                    <button type="button" id="trackBtn">
+                        Get OTP
+                        <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+                    </button>
                 </div>
             </div>
 
             <div id="otpStep" style="display:none;">
-                <p style="font-size: 14px; margin-bottom: 16px; font-weight: 500;">
-                    OTP sent to <span id="displaySentMobile" style="font-weight: 700;"></span>
-                    <a href="#" id="editMobileBtn" style="color: var(--accent); margin-left: 8px; font-size: 13px; text-decoration: none;">Edit</a>
+                <p style="font-size: 14px; margin-bottom: 16px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+                    <span>OTP sent to <strong id="displaySentMobile" style="color: var(--accent);"></strong></span>
+                    <a href="#" id="editMobileBtn" style="color: var(--accent); font-size: 13px; text-decoration: none; font-weight: 700; background: var(--accent-light); padding: 4px 10px; border-radius: 6px;">Edit Number</a>
                 </p>
-                <label class="field-label">Enter 6-digit OTP</label>
+                <label class="field-label">Enter 6-digit Verification OTP</label>
                 <div class="input-row">
                     <div class="phone-wrapper">
-                        <input type="tel" id="otpInput" maxlength="6" placeholder="------" style="width: 100%; height: 52px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 16px; font-weight: 600; text-align: center; letter-spacing: 4px;" />
+                        <input type="tel" id="otpInput" maxlength="6" placeholder="• • • • • •" style="width: 100%; height: 52px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 18px; font-weight: 800; text-align: center; letter-spacing: 6px; background: #f8fafc; color: var(--text-primary);" />
                     </div>
-                    <button type="button" id="verifyBtn">Verify OTP</button>
+                    <button type="button" id="verifyBtn" style="height: 52px; padding: 0 24px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 800; font-size: 14px; cursor: pointer; transition: var(--transition);">Verify OTP</button>
                 </div>
-                <div style="margin-top: 12px; font-size: 13px; text-align: right;">
-                    <span id="resendTimer" style="color: var(--text-muted);">Resend in 60s</span>
-                    <a href="#" id="resendBtn" style="color: var(--accent); display: none; text-decoration: none; font-weight: 600;">Resend OTP</a>
+                <div style="margin-top: 14px; font-size: 13px; text-align: right;">
+                    <span id="resendTimer" style="color: var(--text-muted); font-weight: 600;">Resend in 60s</span>
+                    <a href="#" id="resendBtn" style="color: var(--accent); display: none; text-decoration: none; font-weight: 700;">Resend OTP</a>
                 </div>
             </div>
 
-            <div id="loggedInStep" style="display:none; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="field-label" style="margin-bottom: 4px;">Verified Mobile</div>
-                    <div id="loggedInMobile" style="font-weight: 700; font-size: 16px;"></div>
+            <div id="loggedInStep" style="display:none;" class="user-logged-card">
+                <div class="user-info-meta">
+                    <div class="user-avatar-badge">✓</div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #047857; background: #dcfce7; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.5px;">Verified Session</span>
+                        </div>
+                        <div id="loggedInMobile" style="font-weight: 800; font-size: 16px; color: var(--text-primary);"></div>
+                    </div>
                 </div>
-                <button type="button" id="logoutBtn" style="background: none; border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;">Logout</button>
+                <button type="button" id="logoutBtn" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; font-size: 13px; color: var(--text-secondary); transition: var(--transition);">Switch Account</button>
             </div>
 
-            <div id="errorBanner" style="display:none; color: var(--error); font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
-            <div id="successBanner" style="display:none; color: var(--paid-color); background: var(--paid-bg); padding: 10px; border-radius: 8px; font-size: 13px; margin-top: 12px; font-weight: 500;"></div>
+            <div id="errorBanner" style="display:none; color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;"></div>
+            <div id="successBanner" style="display:none; color: var(--paid-color); background: var(--paid-bg); border: 1px solid var(--paid-border); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;"></div>
         </div>
 
         <div id="loader">
-            <div class="spinner"></div>
-            <p style="font-size:14px; color:var(--text-secondary); font-weight: 500;">Fetching your order details...</p>
+            <div class="skeleton-card">
+                <div class="skeleton-line" style="width: 40%;"></div>
+                <div class="skeleton-line" style="width: 70%;"></div>
+                <div class="skeleton-line" style="width: 90%; height: 60px; margin-top: 16px;"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line" style="width: 35%;"></div>
+                <div class="skeleton-line" style="width: 65%;"></div>
+            </div>
         </div>
 
         <div id="resultsArea"></div>
@@ -1047,58 +751,118 @@
     <style>
         /* ── Extra styles for lifecycle dashboard ── */
         .lc-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 800; padding: 5px 12px;
-            border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 1px solid transparent;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         }
-        .lc-badge.created    { background:#f3f4f6; color:#374151; }
-        .lc-badge.paid       { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.confirmed,.lc-badge.ready { background:#e3f2fd; color:#1565c0; }
-        .lc-badge.shipped,.lc-badge.transit,.lc-badge.out_for { background:#fff8e1; color:#e65100; }
-        .lc-badge.delivered  { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.cancelled  { background:#ffebee; color:#c62828; }
-        .lc-badge.return_init,.lc-badge.rto_transit { background:#fce4ec; color:#880e4f; }
-        .lc-badge.rto_delivered { background:#f3e5f5; color:#6a1b9a; }
-        .lc-badge.refund_pending { background:#fff8e1; color:#e65100; }
-        .lc-badge.refunded   { background:#e8f5e9; color:#2e7d32; }
-        .lc-badge.refund_failed { background:#ffebee; color:#c62828; }
+        .lc-badge.created        { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .lc-badge.paid           { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .lc-badge.confirmed,
+        .lc-badge.ready          { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+        .lc-badge.shipped,
+        .lc-badge.transit,
+        .lc-badge.out_for        { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+        .lc-badge.delivered      { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .lc-badge.cancelled      { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+        .lc-badge.return_init,
+        .lc-badge.rto_transit    { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+        .lc-badge.rto_delivered { background: #faf5ff; color: #6b21a8; border-color: #e9d5ff; }
+        .lc-badge.refund_pending { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+        .lc-badge.refunded       { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .lc-badge.refund_failed   { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
 
         .product-type-tag {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; padding: 3px 8px; border-radius: 6px;
-            margin-left: 8px; vertical-align: middle;
+            display: inline-flex;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
         }
-        .tag-standard { background:#e3f2fd; color:#1565c0; }
-        .tag-custom   { background:#f3e5f5; color:#6a1b9a; }
+        .tag-standard { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+        .tag-custom   { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
 
         .msg-banner {
-            border-radius: 10px; padding: 12px 16px;
-            font-size: 13px; font-weight: 600; margin-top: 16px; line-height: 1.5;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 16px;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
         }
-        .msg-info    { background:#e3f2fd; color:#1565c0; }
-        .msg-warn    { background:#fff8e1; color:#e65100; }
-        .msg-success { background:#e8f5e9; color:#2e7d32; }
-        .msg-error   { background:#ffebee; color:#c62828; }
-        .msg-purple  { background:#f3e5f5; color:#6a1b9a; }
+        .msg-info    { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+        .msg-warn    { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+        .msg-success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .msg-error   { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+        .msg-purple  { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
 
         .action-btn {
-            width:100%; padding:13px; border-radius:10px; font-weight:700;
-            font-size:14px; cursor:pointer; border:none; margin-top:12px;
-            transition:opacity 0.2s, transform 0.15s;
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            margin-top: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
         }
-        .action-btn:active { transform:scale(0.98); }
-        .btn-cancel  { background:#ffebee; color:#c62828; border:1px solid #ffcdd2; }
-        .btn-rto     { background:#fff8e1; color:#e65100; border:1px solid #ffe0b2; }
-        .btn-track   { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
-        .btn-support { background:#f5f5f5; color:#333; border:1px solid #e0e0e0; text-decoration:none;
-                       display:block; text-align:center; }
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .action-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .btn-cancel  { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+        .btn-cancel:hover { background: #ffe4e6; }
+        .btn-rto     { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .btn-rto:hover { background: #fef3c7; }
+        .btn-track   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .btn-track:hover { background: #dbeafe; }
+        .btn-support {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            text-decoration: none;
+            display: inline-flex;
+        }
+        .btn-support:hover { background: #f8fafc; }
 
         .refund-strip {
-            display:flex; align-items:center; justify-content:space-between;
-            background:#f9f9f9; border-radius:10px; padding:12px 16px; margin-top:12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 16px;
+            box-shadow: var(--shadow-sm);
         }
-        .refund-strip .label { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; }
-        .refund-strip .value { font-size:13px; font-weight:700; }
+        .refund-strip .label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .refund-strip .value { font-size: 14px; font-weight: 800; color: var(--text-primary); }
     </style>
 
     <script>
@@ -1678,14 +1442,11 @@
             };
 
 
-            // ── Build stepper HTML ─────────────────────────────────────────
-            function buildStepper(lcs) {
-                const cancelStatuses = [
-                    'CANCELLED', 'REFUNDED', 'REFUND_FAILED', 'REFUND_PENDING', 
-                    'CANCEL_REQUESTED', 'RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED'
-                ];
-                
-                if (cancelStatuses.includes(lcs)) {
+            // ── Build dynamic stepper HTML for all 4 flows ─────────────────
+            function buildStepper(order) {
+                const lcs = (typeof order === 'object' ? (order.orderLifecycleStatus || 'CREATED') : order).toUpperCase();
+
+                if (lcs === 'CANCELLED' || lcs === 'CANCEL_REQUESTED') {
                     return `<div class="stepper">
                         <div class="step done">
                             <div class="step-dot">✓</div>
@@ -1693,17 +1454,64 @@
                         </div>
                         <div class="step active" style="--accent: var(--error);">
                             <div class="step-dot" style="background: var(--error); border-color: var(--error); color: #fff;">✕</div>
-                            <div class="step-text" style="color: var(--error); font-weight: 700;">Canceled (completed)</div>
+                            <div class="step-text" style="color: var(--error); font-weight: 700;">Cancelled</div>
                         </div>
                     </div>`;
                 }
 
-                const rank = FORWARD_RANK[lcs] ?? 0;
+                let steps = [];
+                let rank = 0;
+
+                if (lcs.startsWith('ALTERATION_')) {
+                    // Alteration Flow: Alteration Requested → Picked Up → Received → Alteration in Progress → Shipped → Delivered
+                    steps = ['Alteration Requested', 'Picked Up', 'Received', 'Alteration in Progress', 'Shipped', 'Delivered'];
+                    const map = {
+                        ALTERATION_REQUESTED: 0, ALTERATION_INITIATED: 0,
+                        ALTERATION_PICKED_UP: 1, ALTERATION_IN_TRANSIT: 1,
+                        ALTERATION_RECEIVED: 2,
+                        ALTERATION_IN_PROGRESS: 3,
+                        ALTERATION_SHIPPED: 4,
+                        ALTERATION_DELIVERED: 5, ALTERATION_COMPLETED: 5
+                    };
+                    rank = map[lcs] ?? 0;
+                } else if (lcs.startsWith('EXCHANGE_')) {
+                    // Exchange Flow: Exchange Requested → Picked Up → Received → Exchange Shipped → Delivered
+                    steps = ['Exchange Requested', 'Picked Up', 'Received', 'Exchange Shipped', 'Delivered'];
+                    const map = {
+                        EXCHANGE_REQUESTED: 0, EXCHANGE_INITIATED: 0,
+                        EXCHANGE_PICKED_UP: 1, EXCHANGE_IN_TRANSIT: 1,
+                        EXCHANGE_RECEIVED: 2,
+                        EXCHANGE_SHIPPED: 3,
+                        EXCHANGE_DELIVERED: 4, EXCHANGE_COMPLETED: 4
+                    };
+                    rank = map[lcs] ?? 0;
+                } else if (['RETURN_INITIATED', 'RTO_IN_TRANSIT', 'RTO_DELIVERED', 'REFUND_PENDING', 'REFUNDED'].includes(lcs)) {
+                    // Return Flow: Return Requested → Picked Up → Received → Refund Processed
+                    steps = ['Return Requested', 'Picked Up', 'Received', 'Refund Processed'];
+                    const map = {
+                        RETURN_INITIATED: 0,
+                        RTO_IN_TRANSIT: 1,
+                        RTO_DELIVERED: 2,
+                        REFUND_PENDING: 3, REFUNDED: 3
+                    };
+                    rank = map[lcs] ?? 0;
+                } else {
+                    // Normal Order Flow: Order Placed → Dispatched → Out for Delivery → Delivered
+                    steps = ['Order Placed', 'Dispatched', 'Out for Delivery', 'Delivered'];
+                    const map = {
+                        CREATED: 0, PAID: 0, CONFIRMED: 0, READY_TO_SHIP: 0,
+                        SHIPPED: 1, IN_TRANSIT: 1,
+                        OUT_FOR_DELIVERY: 2,
+                        DELIVERED: 3
+                    };
+                    rank = map[lcs] ?? 0;
+                }
+
                 return `<div class="stepper">
-                    ${FORWARD_STEPS.map((s,i) => `
+                    ${steps.map((label, i) => `
                         <div class="step ${i < rank ? 'done' : i === rank ? 'active' : ''}">
                             <div class="step-dot">${i <= rank ? '✓' : ''}</div>
-                            <div class="step-text">${s.label}</div>
+                            <div class="step-text">${label}</div>
                         </div>`).join('')}
                 </div>`;
             }
@@ -1848,331 +1656,20 @@
                 </div>`;
             }
 
-            window.copyTrackingId = function(id, btn) {
-                if (!id) return;
-                navigator.clipboard.writeText(id).then(() => {
-                    const orig = btn.innerHTML;
-                    btn.innerHTML = 'Copied!';
-                    setTimeout(() => { btn.innerHTML = orig; }, 1500);
-                }).catch(() => {
-                    alert('Tracking ID: ' + id);
-                });
-            };
-
-            function renderAfterSalesCard(order, type) {
-                const isCustom = order.productType === 'CUSTOM' ||
-                                 (order.fitType || '').toLowerCase().includes('custom') ||
-                                 (order.items || []).some(it => it.fit_type === 'CUSTOM' || it.size === 'Custom Fit');
-
-                const displayId = order.displayId || `#${order.orderId}`;
-                const productName = order.productName || (order.items && order.items[0] && order.items[0].name) || 'Slyte 24H Trouser';
-                const fitSubtitle = isCustom ? 'Custom Fit' : (order.fitType || 'Standard Fit');
-                const tagBadge = isCustom ? `<span class="as-tag-badge custom">CUSTOM FIT</span>` : `<span class="as-tag-badge standard">STANDARD</span>`;
-
-                let imgPath = 'images/products/BEIGE_1.jpeg';
-                const pNameLower = productName.toLowerCase();
-                if (pNameLower.includes('black')) imgPath = 'images/products/BLACK_1.jpeg';
-                else if (pNameLower.includes('navy')) imgPath = 'images/products/NAVY_1.jpeg';
-                else if (pNameLower.includes('brown')) imgPath = 'images/products/BROWN_1.jpeg';
-
-                const awb = order.rtoAwbNumber || order.trackingNumber || order.awb || 'SR123456789';
-                const reqDate = fmtDate(order.createdAt || new Date());
-                const pickupDate = fmtDate(new Date());
-
-                let themeClass = 'as-theme-return';
-                let bannerClass = 'as-banner-return';
-                let detailsTitle = 'Return Details';
-                let infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-                let steps = [];
-                let activeStepIdx = 1;
-                let bannerIcon = '🚚';
-                let bannerTitle = 'Picked Up';
-                let bannerDesc = 'Your return has been picked up and is on its way to our warehouse.';
-                let detailRowsHtml = '';
-
-                if (type === 'RETURN') {
-                    themeClass = 'as-theme-return';
-                    bannerClass = 'as-banner-return';
-                    detailsTitle = 'Return Details';
-                    infoText = 'Once we receive your return at our warehouse, your refund will be processed automatically.';
-                    
-                    steps = [
-                        { label: 'Return Requested', icon: '📦', date: reqDate },
-                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
-                        { label: 'Refund Processing', icon: '₹', date: '' },
-                        { label: 'Refunded', icon: '✓', date: '' }
-                    ];
-
-                    const lcs = order.orderLifecycleStatus || '';
-                    if (lcs === 'RETURN_INITIATED') {
-                        activeStepIdx = 0;
-                        bannerTitle = 'Return Requested';
-                        bannerDesc = 'Your return request has been registered. Reverse pickup is being scheduled.';
-                    } else if (lcs === 'RTO_IN_TRANSIT') {
-                        activeStepIdx = 1;
-                        bannerTitle = 'Picked Up';
-                        bannerDesc = 'Your return has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'RTO_DELIVERED' || lcs === 'REFUND_PENDING') {
-                        activeStepIdx = 2;
-                        bannerTitle = 'Refund Processing';
-                        bannerDesc = 'Your return item has arrived at our warehouse. Refund will be credited shortly.';
-                    } else if (lcs === 'REFUNDED') {
-                        activeStepIdx = 3;
-                        bannerTitle = 'Refunded';
-                        bannerDesc = 'Your refund has been successfully processed to your bank account.';
-                    }
-
-                    const returnReasonVal = order.returnReason || order.reason || (order.returnRequest && order.returnRequest.reason) || "Size didn't fit";
-                    detailRowsHtml = `
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📦</span> Return Reason</div>
-                            <div class="as-row-val">${esc(returnReasonVal)}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Return Requested On</div>
-                            <div class="as-row-val">${reqDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
-                            <div class="as-row-val">${pickupDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
-                            <div class="as-row-val">
-                                ${esc(awb)}
-                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
-                            </div>
-                        </div>
-                    `;
-                } else if (type === 'EXCHANGE') {
-                    themeClass = 'as-theme-exchange';
-                    bannerClass = 'as-banner-exchange';
-                    detailsTitle = 'Exchange Details';
-                    infoText = "Once we receive your return at our warehouse, we'll ship your exchange item.";
-
-                    steps = [
-                        { label: 'Exchange Requested', icon: '📦', date: reqDate },
-                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
-                        { label: 'Exchange Shipped', icon: '🏬', date: '' },
-                        { label: 'Delivered', icon: '✓', date: '' }
-                    ];
-
-                    const lcs = order.orderLifecycleStatus || '';
-                    if (lcs === 'EXCHANGE_INITIATED' || lcs === 'REQUESTED') {
-                        activeStepIdx = 0;
-                        bannerTitle = 'Exchange Requested';
-                        bannerDesc = 'Your exchange request has been registered. Reverse pickup is being scheduled.';
-                    } else if (lcs === 'EXCHANGE_PICKED_UP' || lcs === 'RTO_IN_TRANSIT') {
-                        activeStepIdx = 1;
-                        bannerTitle = 'Picked Up';
-                        bannerDesc = 'Your exchange item has been picked up and is on its way to our warehouse.';
-                    } else if (lcs === 'EXCHANGE_SHIPPED') {
-                        activeStepIdx = 2;
-                        bannerTitle = 'Exchange Shipped';
-                        bannerDesc = 'Your replacement item has been dispatched and is on its way to you.';
-                    } else if (lcs === 'DELIVERED') {
-                        activeStepIdx = 3;
-                        bannerTitle = 'Delivered';
-                        bannerDesc = 'Your replacement item has been delivered successfully.';
-                    }
-
-                    const excSize = order.exchangeSize || (order.exchangeRequest && order.exchangeRequest.replacement_size) || '34';
-                    const excReasonVal = order.exchangeReason || order.reason || (order.exchangeRequest && order.exchangeRequest.reason) || "Size change (32 → " + excSize + ")";
-                    detailRowsHtml = `
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📦</span> Exchange Reason</div>
-                            <div class="as-row-val">${esc(excReasonVal)}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Exchange Requested On</div>
-                            <div class="as-row-val">${reqDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
-                            <div class="as-row-val">${pickupDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
-                            <div class="as-row-val">
-                                ${esc(awb)}
-                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
-                            </div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">⇄</span> Exchange Item</div>
-                            <div class="as-row-val">Same Product (Size ${esc(excSize)})</div>
-                        </div>
-                    `;
-                } else if (type === 'ALTERATION') {
-                    themeClass = 'as-theme-alteration';
-                    bannerClass = 'as-banner-alteration';
-                    detailsTitle = 'Alteration Details';
-                    infoText = "Once the alteration is completed, we'll ship your item back to you. You'll be notified at each step.";
-
-                    steps = [
-                        { label: 'Alteration Requested', icon: '📦', date: reqDate },
-                        { label: 'Picked Up', icon: '🚚', date: pickupDate },
-                        { label: 'Under Alteration', icon: '✂️', date: '' },
-                        { label: 'Out for Delivery', icon: '🚚', date: '' },
-                        { label: 'Delivered', icon: '✓', date: '' }
-                    ];
-
-                    const altStatus = order.alterationStatus || order.orderLifecycleStatus || '';
-                    if (altStatus === 'ALTERATION_INITIATED' || altStatus === 'REQUESTED') {
-                        activeStepIdx = 0;
-                        bannerTitle = 'Alteration Requested';
-                        bannerDesc = 'Your alteration request has been submitted. Pickup to tailoring hub is being scheduled.';
-                    } else if (altStatus === 'ALTERATION_PICKED_UP' || altStatus === 'RTO_IN_TRANSIT') {
-                        activeStepIdx = 1;
-                        bannerTitle = 'Picked Up';
-                        bannerDesc = 'Your item for alteration has been picked up and is on its way to our warehouse.';
-                    } else if (altStatus === 'UNDER_ALTERATION' || altStatus === 'ALTERATION_IN_PROGRESS') {
-                        activeStepIdx = 2;
-                        bannerTitle = 'Under Alteration';
-                        bannerDesc = 'Your trouser is currently being tailored by our master tailors to your exact measurements.';
-                    } else if (altStatus === 'OUT_FOR_DELIVERY' || altStatus === 'ALTERATION_SHIPPED') {
-                        activeStepIdx = 3;
-                        bannerTitle = 'Out for Delivery';
-                        bannerDesc = 'Your tailored trouser is out for delivery to your doorstep.';
-                    } else if (altStatus === 'DELIVERED') {
-                        activeStepIdx = 4;
-                        bannerTitle = 'Delivered';
-                        bannerDesc = 'Your tailored trouser has been delivered successfully.';
-                    }
-
-                    const altType = order.alterationType || (order.alterationRequest && order.alterationRequest.alteration_type) || 'Waist adjustment (-1 inch)';
-                    const altNotes = order.alterationNotes || (order.alterationRequest && order.alterationRequest.customer_notes) || 'Minor waist adjustment';
-                    detailRowsHtml = `
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">✂️</span> Alteration Reason</div>
-                            <div class="as-row-val">${esc(altNotes)}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📅</span> Alteration Requested On</div>
-                            <div class="as-row-val">${reqDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">🚚</span> Picked Up On</div>
-                            <div class="as-row-val">${pickupDate}</div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">📍</span> Tracking ID</div>
-                            <div class="as-row-val">
-                                ${esc(awb)}
-                                <button class="as-copy-btn" onclick="copyTrackingId('${esc(awb)}', this)">📋</button>
-                            </div>
-                        </div>
-                        <div class="as-row">
-                            <div class="as-row-label-wrap"><span class="as-row-icon">👖</span> Alteration Type</div>
-                            <div class="as-row-val">${esc(altType)}</div>
-                        </div>
-                    `;
-                }
-
-                const fillPercent = Math.round((activeStepIdx / (steps.length - 1)) * 100);
-
-                const stepsHtml = steps.map((s, idx) => {
-                    const isDone = idx < activeStepIdx;
-                    const isActive = idx === activeStepIdx;
-                    const cls = isDone ? 'completed' : (isActive ? 'active' : '');
-                    return `
-                        <div class="as-step-item ${cls}">
-                            <div class="as-step-circle">${s.icon}</div>
-                            <div class="as-step-title">${s.label}</div>
-                            ${s.date ? `<div class="as-step-subdate">${s.date}</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
-
-                return `
-                <div class="after-sales-card ${themeClass}" id="card-${esc(order.orderId)}">
-                    <div class="as-top-header">
-                        <div class="as-title-box">
-                            <div class="as-title-main">Order Details</div>
-                            <div class="as-order-id-sub">${displayId}</div>
-                        </div>
-                        <button class="as-more-btn" title="Options">⋮</button>
-                    </div>
-
-                    <div class="as-product-card">
-                        <img src="${imgPath}" alt="${esc(productName)}" class="as-product-thumb">
-                        <div class="as-product-info">
-                            <div class="as-product-name">${esc(productName)}</div>
-                            <div class="as-product-fit">${esc(fitSubtitle)}</div>
-                            ${tagBadge}
-                        </div>
-                    </div>
-
-                    <div class="as-stepper-container">
-                        <div class="as-stepper-track"></div>
-                        <div class="as-stepper-fill" style="width: ${fillPercent}%;"></div>
-                        <div class="as-stepper-steps">
-                            ${stepsHtml}
-                        </div>
-                    </div>
-
-                    <div class="as-status-card ${bannerClass}">
-                        <div class="as-banner-icon-bg">${bannerIcon}</div>
-                        <div class="as-banner-content">
-                            <div class="as-banner-head">${bannerTitle}</div>
-                            <div class="as-banner-sub">${bannerDesc}</div>
-                            <div class="as-banner-time">15 Sep, 4:20 PM</div>
-                        </div>
-                    </div>
-
-                    <div class="as-details-container">
-                        <div class="as-details-head-title">${detailsTitle}</div>
-                        ${detailRowsHtml}
-                    </div>
-
-                    <div class="as-notice-box">
-                        <span class="as-notice-icon">ⓘ</span>
-                        <div>${infoText}</div>
-                    </div>
-
-                    <a href="https://wa.me/916363887497" target="_blank" class="as-support-card">
-                        <div class="as-support-left">
-                            <div class="as-support-icon-wrap">🎧</div>
-                            <div>
-                                <div class="as-support-title">Need Help?</div>
-                                <div class="as-support-desc">Contact our support team</div>
-                            </div>
-                        </div>
-                        <div class="as-support-arrow">›</div>
-                    </a>
-
-                    <a href="https://shiprocket.co/tracking/${esc(awb)}" target="_blank" class="as-primary-track-btn">
-                        View Tracking ↗
-                    </a>
-                </div>
-                `;
-            }
-
             // ── Main render ────────────────────────────────────────────────
             function renderOrders(orders) {
                 if (!orders.length) {
-                    resultsArea.innerHTML = `<div style="text-align:center;padding:40px;
-                        color:var(--text-secondary);font-weight:500;">No orders found.</div>`;
+                    resultsArea.innerHTML = `<div style="text-align:center; padding:48px 24px; background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; box-shadow: var(--shadow-sm); margin-top:20px;">
+                        <span class="material-symbols-outlined" style="font-size:48px; color:var(--text-muted); margin-bottom:12px; background:#f1f5f9; padding:16px; border-radius:50%;">inventory_2</span>
+                        <h3 style="font-size:18px; font-weight:800; color:var(--text-primary); margin-bottom:6px;">No Orders Found</h3>
+                        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px; max-width:360px; margin-left:auto; margin-right:auto;">We couldn't find any active or past orders associated with this mobile number.</p>
+                        <a href="shop.html" style="display:inline-flex; align-items:center; gap:8px; background:var(--text-primary); color:#ffffff; padding:12px 24px; border-radius:12px; font-weight:700; font-size:14px; text-decoration:none; transition:var(--transition);">Explore Slyte Collection <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></a>
+                    </div>`;
                     return;
                 }
 
                 resultsArea.innerHTML = orders.map((order, i) => {
-                    let afterSalesType = localStorage.getItem('after_sales_' + order.orderId) || order.afterSalesType;
-                    const lcs    = order.orderLifecycleStatus || order.order_status || 'CREATED';
-
-                    if (!afterSalesType) {
-                        if (order.id === 'SLYTE-TEST-RETURN-001' || ['RETURN_INITIATED','RTO_IN_TRANSIT','RTO_DELIVERED','REFUNDED','REFUND_PENDING'].includes(lcs)) {
-                            afterSalesType = 'RETURN';
-                        } else if (order.id === 'SLYTE-TEST-EXCHANGE-001' || ['EXCHANGE_INITIATED','EXCHANGE_PICKED_UP','EXCHANGE_SHIPPED','EXCHANGE_DELIVERED'].includes(lcs)) {
-                            afterSalesType = 'EXCHANGE';
-                        } else if (order.id === 'SLYTE-TEST-ALTERATION-002' || ['ALTERATION_INITIATED','ALTERATION_PICKED_UP','UNDER_ALTERATION','ALTERATION_SHIPPED','ALTERATION_DELIVERED'].includes(lcs) || order.alterationStatus) {
-                            afterSalesType = 'ALTERATION';
-                        }
-                    }
-
-                    if (afterSalesType) {
-                        return renderAfterSalesCard(order, afterSalesType);
-                    }
+                    const lcs    = order.orderLifecycleStatus || 'CREATED';
                     const cssCls = LC_CSS[lcs] || 'created';
                     const lcLabel = LC_LABEL[lcs] || lcs;
                     const isRtoPath = ['RETURN_INITIATED','RTO_IN_TRANSIT',
@@ -2186,17 +1683,8 @@
                         ? `<span class="product-type-tag tag-custom">Custom</span>`
                         : `<span class="product-type-tag tag-standard">Standard</span>`;
 
-                    // Stepper: show RTO path or normal path
-                    let stepperHtml = '';
-                    if (!isCancelled && !isRtoPath) {
-                        stepperHtml = buildStepper(lcs);
-                    } else if (isRtoPath) {
-                        stepperHtml = `<div class="msg-banner msg-purple">
-                            🔄 ${lcLabel}</div>`;
-                    } else {
-                        stepperHtml = `<div class="msg-banner msg-error">
-                            ✕ ${lcLabel}</div>`;
-                    }
+                    // Dynamic Stepper for all 4 flows
+                    const stepperHtml = buildStepper(order);
 
                     // Tracking timeline
                     let timelineHtml = `<div class="timeline-status"
@@ -2443,15 +1931,14 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    localStorage.setItem('after_sales_' + orderId, 'ALTERATION');
                     msg.style.display = 'block';
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
                     setTimeout(() => {
                         closeAfterSalesModal();
-                        fetchOrders();
-                    }, 1200);
+                        location.reload();
+                    }, 1800);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
@@ -2580,15 +2067,14 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    localStorage.setItem('after_sales_' + orderId, 'RETURN');
                     msg.style.display = 'block';
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Return request & bank details submitted! Pickup will be scheduled.';
                     setTimeout(() => {
                         closeAfterSalesModal();
-                        fetchOrders();
-                    }, 1200);
+                        location.reload();
+                    }, 1800);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
@@ -2661,15 +2147,14 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    localStorage.setItem('after_sales_' + orderId, 'EXCHANGE');
                     msg.style.display = 'block';
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
                     msg.innerHTML = '✓ Exchange request submitted successfully! Replacement item will be dispatched.';
                     setTimeout(() => {
                         closeAfterSalesModal();
-                        fetchOrders();
-                    }, 1200);
+                        location.reload();
+                    }, 1800);
                 } else {
                     msg.style.display = 'block';
                     msg.style.background = '#fee2e2';
@@ -2690,14 +2175,20 @@
     </script>
 
     <!-- After-Sales Modal Overlay -->
-    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
-        <div style="background:#fff; border-radius:20px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; font-family:inherit;">
-            <button onclick="closeAfterSalesModal()" style="position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; color:#333;">✕</button>
+    <div id="afterSalesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#ffffff; border-radius:24px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; padding:28px; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.25); border:1px solid #e2e8f0; position:relative; font-family:inherit; animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+            <button onclick="closeAfterSalesModal()" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:800; cursor:pointer; color:#334155; transition:var(--transition); display:flex; align-items:center; justify-content:center;">✕</button>
             <div id="afterSalesModalContent">
                 <!-- Dynamic Modal Content Injection -->
             </div>
         </div>
     </div>
+    <style>
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
 </body>
 
 </html>
