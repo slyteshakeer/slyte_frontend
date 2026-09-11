@@ -35,7 +35,7 @@ const INITIAL_PRODUCTS = [
         fit_type: "Straight Fit",
         description: "Crafted from a premium smooth-blend fabric, these black straight-fit trousers offer a refined finish with comfortable all-day wear.",
         link: "product.html?id=1",
-        shiprocket_package: { weight: 0.5, length: 30, breadth: 25, height: 5 },
+        shiprocket_package: { weight: 0.5, length: 45, breadth: 35, height: 1.5 },
         is_active: true
     },
     {
@@ -58,7 +58,7 @@ const INITIAL_PRODUCTS = [
         fit_type: "Relaxed Straight Fit",
         description: "Versatile beige trousers designed for comfort and modern aesthetic.",
         link: "product.html?id=2",
-        shiprocket_package: { weight: 0.5, length: 30, breadth: 25, height: 5 },
+        shiprocket_package: { weight: 0.5, length: 45, breadth: 35, height: 1.5 },
         is_active: true
     },
     {
@@ -81,7 +81,7 @@ const INITIAL_PRODUCTS = [
         fit_type: "Tailored Fit",
         description: "Classic navy trousers engineered with breathable stretch material.",
         link: "product.html?id=3",
-        shiprocket_package: { weight: 0.5, length: 30, breadth: 25, height: 5 },
+        shiprocket_package: { weight: 0.5, length: 45, breadth: 35, height: 1.5 },
         is_active: true
     }
 ];

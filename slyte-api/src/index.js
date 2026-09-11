@@ -651,9 +651,9 @@ async function createShiprocketReturnPickup(order, items, env) {
             })),
             payment_method: "PREPAID",
             sub_total: order.total_amount || order.amount || 1699,
-            length: 30,
-            breadth: 25,
-            height: 5,
+            length: 45,
+            breadth: 35,
+            height: 1.5,
             weight: 0.5
         };
 
@@ -736,13 +736,13 @@ async function createShiprocketExchangeOrder(order, exchangeRec, env) {
             giftwrap_charges: "0",
             total_discount: "0",
             transaction_charges: "0",
-            return_length: "30.00",
-            return_breadth: "25.00",
-            return_height: "5.00",
+            return_length: "45.00",
+            return_breadth: "35.00",
+            return_height: "1.50",
             return_weight: "0.500",
-            exchange_length: "30.00",
-            exchange_breadth: "25.00",
-            exchange_height: "5.00",
+            exchange_length: "45.00",
+            exchange_breadth: "35.00",
+            exchange_height: "1.50",
             exchange_weight: "0.500",
             return_reason: "29",
             qc_check: "false"
