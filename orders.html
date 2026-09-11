@@ -22,19 +22,23 @@
 
     <style>
         :root {
+            --primary-black: #000000;
+            --primary-white: #ffffff;
+            --primary-blue: #154cbd;
+            --accent-gold: #c5a45b;
             --bg: #f8fafc;
             --surface: #ffffff;
             --surface-2: #f1f5f9;
             --border: #e2e8f0;
             --border-hover: #cbd5e1;
-            --text-primary: #0f172a;
+            --text-primary: #000000;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
             --accent: #154cbd;
             --accent-hover: #0f3ba0;
             --accent-light: #eff6ff;
-            --accent-purple: #6366f1;
-            --accent-purple-light: #e0e7ff;
+            --accent-purple: #154cbd;
+            --accent-purple-light: #eff6ff;
             --paid-bg: #ecfdf5;
             --paid-color: #047857;
             --paid-border: #a7f3d0;
@@ -1185,34 +1189,50 @@
 
             const TEST_ORDERS_FALLBACK = [
                 {
+                    orderId: "SLYTE-ORD-8821",
+                    displayId: "#SLYTE-ORD-8821",
+                    productName: "Slyte 24H Navy Trouser",
+                    productType: "STANDARD",
+                    fitType: "Standard Fit",
+                    orderLifecycleStatus: "SHIPPED",
+                    fulfillmentStatus: "Dispatched",
+                    amount: 1699,
+                    paymentGroup: "CASHFREE_UPI",
+                    isCodOrder: false,
+                    createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+                    trackingNumber: "AWB9742006683-01",
+                    deliveryAddress: { addressLine1: "123 Main Street, Koramangala", city: "Bengaluru", pincode: "560034" },
+                    is_test: true
+                },
+                {
                     orderId: "SLYTE-TEST-RETURN-001",
                     displayId: "#SLYTE-TEST-RETURN-001",
                     productName: "Slyte 24H Beige Trouser",
                     productType: "STANDARD",
                     fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
+                    orderLifecycleStatus: "RETURN_INITIATED",
+                    fulfillmentStatus: "Return Requested",
                     amount: 1699,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-01",
+                    trackingNumber: "AWB9742006683-02",
                     deliveryAddress: { addressLine1: "123 Test Street, Koramangala", city: "Bengaluru", pincode: "560034" },
                     is_test: true
                 },
                 {
                     orderId: "SLYTE-TEST-EXCHANGE-001",
                     displayId: "#SLYTE-TEST-EXCHANGE-001",
-                    productName: "Slyte 24H Navy Trouser",
+                    productName: "Slyte 24H Charcoal Trouser",
                     productType: "STANDARD",
                     fitType: "Standard Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
+                    orderLifecycleStatus: "EXCHANGE_REQUESTED",
+                    fulfillmentStatus: "Exchange Requested",
                     amount: 1699,
                     paymentGroup: "CASHFREE_CARD",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-02",
+                    trackingNumber: "AWB9742006683-03",
                     deliveryAddress: { addressLine1: "456 Sample Avenue, Indiranagar", city: "Bengaluru", pincode: "560038" },
                     is_test: true
                 },
@@ -1222,29 +1242,29 @@
                     productName: "Slyte 24H Black Trouser (Custom Fit)",
                     productType: "CUSTOM",
                     fitType: "Custom Fit",
-                    orderLifecycleStatus: "DELIVERED",
-                    fulfillmentStatus: "Delivered",
+                    orderLifecycleStatus: "ALTERATION_REQUESTED",
+                    fulfillmentStatus: "Alteration Requested",
                     amount: 1799,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-03",
+                    trackingNumber: "AWB9742006683-04",
                     deliveryAddress: { addressLine1: "789 Custom Blvd, HSR Layout", city: "Bengaluru", pincode: "560102" },
                     is_test: true
                 },
                 {
-                    orderId: "SLYTE-TEST-ALTERATION-002",
-                    displayId: "#SLYTE-TEST-ALTERATION-002",
-                    productName: "Slyte 24H Beige Trouser (Custom Fit)",
-                    productType: "CUSTOM",
-                    fitType: "Custom Fit",
+                    orderId: "SLYTE-TEST-DELIVERED-001",
+                    displayId: "#SLYTE-TEST-DELIVERED-001",
+                    productName: "Slyte 24H Olive Trouser",
+                    productType: "STANDARD",
+                    fitType: "Standard Fit",
                     orderLifecycleStatus: "DELIVERED",
                     fulfillmentStatus: "Delivered",
-                    amount: 1799,
+                    amount: 1699,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                    trackingNumber: "AWB9742006683-04",
+                    trackingNumber: "AWB9742006683-05",
                     deliveryAddress: { addressLine1: "101 Fitting Lane, Jayanagar", city: "Bengaluru", pincode: "560041" },
                     is_test: true
                 }
@@ -1450,7 +1470,7 @@
                     return `<div class="stepper">
                         <div class="step done">
                             <div class="step-dot">✓</div>
-                            <div class="step-text">Placed</div>
+                            <div class="step-text">Order Placed</div>
                         </div>
                         <div class="step active" style="--accent: var(--error);">
                             <div class="step-dot" style="background: var(--error); border-color: var(--error); color: #fff;">✕</div>
