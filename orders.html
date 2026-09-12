@@ -1103,6 +1103,14 @@
 
             // ── Authentication Check ───────────────────────────────────────
             document.addEventListener('DOMContentLoaded', async () => {
+                // Purge test phone numbers
+                ['slyte_phone', 'userPhone', 'dash_phone', 'slyteUser'].forEach(key => {
+                    const val = localStorage.getItem(key);
+                    if (val && (val.includes('9742006683') || val.includes('9999999999'))) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
                 // Priority 1: Already OTP-verified (has JWT token)
                 const token = localStorage.getItem('slyte_otp_token');
                 if (token) {
@@ -1113,7 +1121,7 @@
 
                 // Priority 2: Logged in via checkout (Cashfree set userPhone)
                 const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
-                if (checkoutPhone && checkoutPhone.length === 10) {
+                if (checkoutPhone && checkoutPhone.length === 10 && checkoutPhone !== '9742006683' && checkoutPhone !== '9999999999') {
                     // Silently exchange the checkout phone for a JWT
                     try {
                         const res = await fetch(`${API_BASE}/auto-login`, {

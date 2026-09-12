@@ -411,13 +411,13 @@ ${detailedCart}
                             console.log(message);
                             console.log("---------------------------------");
 
-                            if (row.customerPhone) {
+                            if (row.customerPhone && row.customerPhone !== "9742006683" && row.customerPhone !== "9999999999") {
                                 const phoneVal = String(row.customerPhone).replace(/\D/g, '');
                                 localStorage.setItem('slyte_phone', phoneVal);
                                 localStorage.setItem('slyteUser', phoneVal);
                                 localStorage.setItem('username', row.customerName || 'Customer');
 
-                                console.log("âœ… Auto-logged in user via order history:", phoneVal);
+                                console.log("Auto-logged in user via order history:", phoneVal);
 
                                 setTimeout(() => {
                                     const newUrl = window.location.pathname;
