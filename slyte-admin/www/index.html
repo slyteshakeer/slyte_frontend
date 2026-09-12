@@ -467,7 +467,7 @@
                 // Get JWT token for query
                 const loginRes = await fetch(`${SUPABASE_BASE}/auto-login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}` },
                     body: JSON.stringify({ phone: '9742006683' })
                 });
                 const loginData = await loginRes.json();
@@ -477,7 +477,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'apikey': SUPABASE_ANON,
                         'Authorization': `Bearer ${jwt}`
                     },
                     body: JSON.stringify({ phone: '9742006683' })

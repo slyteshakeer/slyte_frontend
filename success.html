@@ -155,8 +155,7 @@
                 const ANON_KEY = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.SUPABASE_ANON_KEY) || "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
                 const response = await fetch(`${apiBase}/verify-order/${orderId}`, {
                     headers: {
-                        "Authorization": `Bearer ${ANON_KEY}`,
-                        "apikey": ANON_KEY
+                        "Authorization": `Bearer ${ANON_KEY}`
                     }
                 });
                 const result = await response.json();
@@ -185,7 +184,6 @@
                                 method: 'POST',
                                 headers: {
                                     "Authorization": `Bearer ${ANON_KEY}`,
-                                    "apikey": ANON_KEY,
                                     "Content-Type": "application/json"
                                 },
                                 body: JSON.stringify({ phone: cleanPhone })

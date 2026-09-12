@@ -993,7 +993,7 @@
                 ? window.SLYTE_CONFIG.SUPABASE_ANON_KEY
                 : 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
             function apiHeaders(token) {
-                const h = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ANON_KEY}`, 'apikey': ANON_KEY };
+                const h = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ANON_KEY}` };
                 return h;
             }
 
@@ -2131,7 +2131,7 @@
                 const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
                 const res = await fetch(apiBase + '/alteration-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
                     body: JSON.stringify({
                         order_id: orderId,
                         alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
@@ -2144,7 +2144,7 @@
                     msg.style.display = 'block';
                     msg.style.background = '#dcfce7';
                     msg.style.color = '#166534';
-                    msg.innerHTML = '✓ Alteration request submitted successfully! Pickup will be arranged.';
+                    msg.innerHTML = '✓ Alteration request submitted successfully! We will arrange pickup.';
                     try {
                         localStorage.setItem('slyte_order_status_' + orderId, 'ALTERATION_REQUESTED');
                         localStorage.setItem('slyte_order_status_' + String(orderId).replace(/^#/, ''), 'ALTERATION_REQUESTED');
@@ -2273,7 +2273,7 @@
                 const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
                 const res = await fetch(apiBase + '/return-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
                     body: JSON.stringify({
                         order_id: orderId,
                         reason,
@@ -2333,7 +2333,6 @@
                         <option value="34" selected>Size 34</option>
                         <option value="36">Size 36</option>
                         <option value="38">Size 38</option>
-                        <option value="40">Size 40</option>
                     </select>
                 </div>
                 <div style="margin-bottom:16px;">
@@ -2345,6 +2344,32 @@
                     </select>
                 </div>
                 <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
+                    <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+                </div>
+                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
+            `;
+            overlay.style.display = 'flex';
+        };
+
+        window.submitExchangeRequest = async function(orderId) {
+            const btn = document.getElementById('btnSubmitExc');
+            const msg = document.getElementById('modalMsg');
+            const replacement_size = document.getElementById('exchangeSize').value;
+            const reason = document.getElementById('exchangeReason').value;
+            const notes = document.getElementById('exchangeNotes').value.trim();
+            btn.disabled = true;
+            btn.innerHTML = 'Submitting...';
+            try {
+                const token = localStorage.getItem('slyte_otp_token');
+                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
+                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
+                const res = await fetch(apiBase + '/exchange-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
+                    body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
+                });">
                     <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
                     <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
                 </div>
