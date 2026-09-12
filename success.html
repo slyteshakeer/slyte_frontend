@@ -150,9 +150,15 @@
             try {
                 const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
                     ? window.SLYTE_CONFIG.API_BASE_URL
-                    : "https://api.slyte.in";
+                    : "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
 
-                const response = await fetch(`${apiBase}/verify-order/${orderId}`);
+                const ANON_KEY = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.SUPABASE_ANON_KEY) || "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
+                const response = await fetch(`${apiBase}/verify-order/${orderId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${ANON_KEY}`,
+                        "apikey": ANON_KEY
+                    }
+                });
                 const result = await response.json();
 
                 if (result.success) {

@@ -12,7 +12,18 @@
         });
     }
 
-    const DEFAULT_API = "https://api.slyte.in";
+    const DEFAULT_API = "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
+    const SUPABASE_ANON_KEY = (typeof window !== "undefined" && window.SLYTE_CONFIG && window.SLYTE_CONFIG.SUPABASE_ANON_KEY)
+        ? window.SLYTE_CONFIG.SUPABASE_ANON_KEY
+        : "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
+
+    function apiHeaders() {
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "apikey": SUPABASE_ANON_KEY
+        };
+    }
 
     function apiBase() {
         if (typeof window !== "undefined" && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) {
@@ -153,7 +164,7 @@
 
         const res = await fetch(`${apiBase()}/create-order`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: apiHeaders(),
             body: JSON.stringify(body)
         });
 
