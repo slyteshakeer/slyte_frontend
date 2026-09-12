@@ -170,12 +170,14 @@
             throw err;
         }
 
-        // ── Save user phone only if customer explicitly provided their phone ──
-        if (customerPhone && String(customerPhone).replace(/\D/g, '').length === 10 && customerPhone !== "9999999999" && customerPhone !== "9742006683") {
+        // ── Save user phone if Cashfree returned a real customer phone ──
+        if (data && data.data && data.data.user && data.data.user.phone) {
             try {
-                const cleanP = String(customerPhone).replace(/\D/g, '').slice(-10);
-                localStorage.setItem("userPhone", cleanP);
-                localStorage.setItem("slyte_phone", cleanP);
+                const cleanP = String(data.data.user.phone).replace(/\D/g, '').slice(-10);
+                if (/^[6-9]\d{9}$/.test(cleanP)) {
+                    localStorage.setItem("userPhone", cleanP);
+                    localStorage.setItem("slyte_phone", cleanP);
+                }
             } catch (e) {
                 console.warn("[slyte] Could not save user info:", e);
             }

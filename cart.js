@@ -289,15 +289,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         if (typeof window.ensureVerifiedPhone === "function") {
-            window.ensureVerifiedPhone(executeCheckoutWithPhone);
+            const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
+            const validSaved = savedPhone && /^[6-9]\d{9}$/.test(savedPhone) ? savedPhone : null;
+            executeCheckoutWithPhone(validSaved);
         } else {
             const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
-            if (!savedPhone || savedPhone === "9999999999" || savedPhone === "9742006683") {
-                showErr("Please enter your mobile number before proceeding to payment.");
-                isProcessing = false;
-                return;
-            }
-            executeCheckoutWithPhone(savedPhone);
+            const validSaved = savedPhone && /^[6-9]\d{9}$/.test(savedPhone) ? savedPhone : null;
+            executeCheckoutWithPhone(validSaved);
         }
     });
 

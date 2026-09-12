@@ -462,14 +462,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 if (typeof window.ensureVerifiedPhone === "function") {
-                    window.ensureVerifiedPhone(executeCheckoutWithPhone);
+                    // If user is already logged in, pass their phone for prefill; otherwise Cashfree collects it
+                    const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
+                    const validSaved = savedPhone && /^[6-9]\d{9}$/.test(savedPhone) ? savedPhone : null;
+                    executeCheckoutWithPhone(validSaved);
                 } else {
                     const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
-                    if (!savedPhone || savedPhone === "9999999999" || savedPhone === "9742006683") {
-                        window.showToast("Please enter your mobile number first.");
-                        return;
-                    }
-                    executeCheckoutWithPhone(savedPhone);
+                    const validSaved = savedPhone && /^[6-9]\d{9}$/.test(savedPhone) ? savedPhone : null;
+                    executeCheckoutWithPhone(validSaved);
                 }
             }
         });

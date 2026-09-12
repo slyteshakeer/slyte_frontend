@@ -184,14 +184,10 @@ export default {
                 if (method === "POST") {
                     const body = await request.json().catch(() => ({}));
 
+                    // Accept any valid phone; Cashfree will collect/verify via native OTP itself
                     const rawPhone = body.customerPhone || body.customer_phone || "";
-                    const hasUserPhone = Boolean(rawPhone && String(rawPhone).replace(/\D/g, '').length === 10 && rawPhone !== "9999999999");
-                    const cleanPhone = hasUserPhone ? String(rawPhone).replace(/\D/g, '').slice(-10) : "9999999999";
-
-                    const newOrder = backendStore.createOrder({
-                        ...body,
-                        customerPhone: hasUserPhone ? cleanPhone : null
-                    });
+                    const cleanedPhone = String(rawPhone).replace(/\D/g, "").slice(-10);
+                    const cfPhone = /^[6-9]\d{9}$/.test(cleanedPhone) ? cleanedPhone : "9999999999";
 
                     const appId = env && env.CASHFREE_APP_ID;
                     const secretKey = env && env.CASHFREE_SECRET_KEY;
@@ -200,98 +196,117 @@ export default {
                         ? "https://sandbox.cashfree.com/pg"
                         : "https://api.cashfree.com/pg";
 
-                    // Call Cashfree API if credentials are provided in environment
-                    if (appId && secretKey) {
-                        try {
-                            let returnDomain = "https://slyte.in";
-                            const reqOrigin = request.headers.get("Origin") || "";
-                            if (reqOrigin && !reqOrigin.includes("api.slyte.in")) {
-                                returnDomain = reqOrigin.replace(/\/$/, "");
-                            }
-                            const returnUrl = `${returnDomain}/index.html?order_id={order_id}`;
-                            const customerId = "cust_" + cleanPhone;
-
-                            const cfPayload = {
-                                order_id: newOrder.id,
-                                order_amount: Number(newOrder.total_amount),
-                                order_currency: "INR",
-                                customer_details: {
-                                    customer_id: customerId,
-                                    customer_name: newOrder.customer_name || "Customer",
-                                    customer_email: newOrder.customer_email || "customer@slyte.in",
-                                    customer_phone: cleanPhone
-                                },
-                                order_meta: {
-                                    return_url: returnUrl
-                                }
-                            };
-
-                            console.log(`[slyte-api] Requesting Cashfree payment session for order ${newOrder.id} (${cfEnv})...`);
-
-                            const cfRes = await fetch(`${cfBaseUrl}/orders`, {
-                                method: "POST",
-                                headers: {
-                                    "x-api-version": "2023-08-01",
-                                    "x-client-id": appId,
-                                    "x-client-secret": secretKey,
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(cfPayload)
-                            });
-
-                            const cfData = await cfRes.json().catch(() => ({}));
-
-                            if (!cfRes.ok || !cfData.payment_session_id) {
-                                console.error("[slyte-api] Cashfree API error:", cfRes.status, cfData);
-                                return jsonResponse({
-                                    success: false,
-                                    error: cfData.message || cfData.error || `Cashfree API returned status ${cfRes.status}`,
-                                    code: cfData.code,
-                                    details: cfData
-                                }, 400, corsHeaders);
-                            }
-
-                            console.log(`[slyte-api] Cashfree payment session created successfully: ${cfData.payment_session_id}`);
-
-                            return jsonResponse({
-                                success: true,
-                                message: "Order initiated successfully",
-                                data: {
-                                    order_id: newOrder.id,
-                                    payment_session_id: cfData.payment_session_id,
-                                    cf_order_id: cfData.cf_order_id,
-                                    amount: newOrder.total_amount,
-                                    user: hasUserPhone ? {
-                                        phone: cleanPhone,
-                                        name: newOrder.customer_name
-                                    } : null
-                                }
-                            }, 200, corsHeaders);
-
-                        } catch (err) {
-                            console.error("[slyte-api] Exception calling Cashfree API:", err);
-                            return jsonResponse({
-                                success: false,
-                                error: "Failed to connect to Cashfree Payment Gateway: " + err.message
-                            }, 500, corsHeaders);
-                        }
+                    if (!appId || !secretKey) {
+                        return jsonResponse({ success: false, error: "Cashfree credentials missing" }, 500, corsHeaders);
                     }
 
-                    // Clear error response when CASHFREE_APP_ID or CASHFREE_SECRET_KEY are missing in Worker secrets
-                    console.warn("[slyte-api] CASHFREE_APP_ID / CASHFREE_SECRET_KEY missing in Cloudflare Worker environment.");
-                    return jsonResponse({
-                        success: false,
-                        error: "Cashfree payment gateway credentials are not configured on the server. Please set CASHFREE_APP_ID and CASHFREE_SECRET_KEY using 'npx wrangler secret put'.",
-                        message: "Cashfree credentials missing"
-                    }, 500, corsHeaders);
+                    // Generate unique order ID
+                    const orderId = "SLYTE_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+                    const customerName = body.customerName || body.customer_name || "Guest";
+                    const customerEmail = body.customerEmail || body.customer_email || "guest@slyte.in";
+                    const amount = Number(body.amount || 0);
+
+                    // Build order note from cart items
+                    const cartItems = Array.isArray(body.cart_details) ? body.cart_details : [];
+                    const orderNote = cartItems.map(item =>
+                        `${item.quantity || 1}x ${item.name || "Item"}${item.size ? " (Size: " + item.size + ")" : ""}`
+                    ).join(", ").substring(0, 250) || "Slyte Order";
+
+                    // Determine return URL
+                    let returnDomain = "https://slyte.in";
+                    const reqOrigin = request.headers.get("Origin") || "";
+                    if (reqOrigin && !reqOrigin.includes("api.slyte.in")) {
+                        returnDomain = reqOrigin.replace(/\/$/, "");
+                    }
+
+                    // Cashfree One-Click Checkout with native phone OTP + address collection
+                    const cfPayload = {
+                        order_id: orderId,
+                        order_amount: amount,
+                        order_currency: "INR",
+                        order_note: orderNote,
+                        order_shipping_charges: 0,
+                        customer_details: {
+                            customer_id: "CUST_" + cfPhone,
+                            customer_name: customerName,
+                            customer_email: customerEmail,
+                            customer_phone: cfPhone
+                        },
+                        order_meta: {
+                            return_url: `${returnDomain}/success.html?order_id={order_id}`,
+                            notify_url: `https://api.slyte.in/webhook/cashfree`
+                        },
+                        products: {
+                            one_click_checkout: {
+                                enabled: true,
+                                conditions: [{
+                                    action: "ALLOW",
+                                    values: ["checkoutAuthenticate", "checkoutCollectAddress"],
+                                    key: "features"
+                                }]
+                            }
+                        }
+                    };
+
+                    try {
+                        console.log(`[slyte-api] Creating Cashfree OCC order ${orderId}...`);
+                        const cfRes = await fetch(`${cfBaseUrl}/orders`, {
+                            method: "POST",
+                            headers: {
+                                "x-api-version": "2023-08-01",
+                                "x-client-id": appId,
+                                "x-client-secret": secretKey,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(cfPayload)
+                        });
+                        const cfData = await cfRes.json().catch(() => ({}));
+
+                        if (!cfRes.ok || !cfData.payment_session_id) {
+                            console.error("[slyte-api] Cashfree error:", cfRes.status, cfData);
+                            return jsonResponse({
+                                success: false,
+                                error: cfData.message || `Cashfree API returned status ${cfRes.status}`,
+                                details: cfData
+                            }, 400, corsHeaders);
+                        }
+
+                        // Save pending order to in-memory store
+                        backendStore.createOrder({
+                            id: orderId,
+                            customerPhone: cfPhone,
+                            customerName,
+                            customerEmail,
+                            total_amount: amount,
+                            cart_details: cartItems,
+                            order_note: orderNote,
+                            order_status: "PENDING"
+                        });
+
+                        console.log(`[slyte-api] Cashfree session created: ${cfData.payment_session_id}`);
+                        return jsonResponse({
+                            success: true,
+                            data: {
+                                order_id: orderId,
+                                payment_session_id: cfData.payment_session_id,
+                                cf_order_id: cfData.cf_order_id,
+                                amount
+                            }
+                        }, 200, corsHeaders);
+
+                    } catch (err) {
+                        console.error("[slyte-api] Cashfree exception:", err);
+                        return jsonResponse({ success: false, error: "Failed to connect to Cashfree: " + err.message }, 500, corsHeaders);
+                    }
                 }
             }
+
 
             if (pathStr.startsWith("/verify-order/") || pathStr.startsWith("/api/verify-order/") || pathStr.startsWith("/api/payment/verify/")) {
                 const parts = pathStr.split("/");
                 const rawId = parts[parts.length - 1] || "";
                 const orderId = rawId.split("?")[0].trim();
-                let order = backendStore.getOrderById(orderId);
 
                 const appId = env && env.CASHFREE_APP_ID;
                 const secretKey = env && env.CASHFREE_SECRET_KEY;
@@ -301,83 +316,185 @@ export default {
                     : "https://api.cashfree.com/pg";
 
                 let isPaid = false;
+                let cfOrderData = {};
+                let cfExtendedData = {};
 
-                // Verify status with Cashfree if credentials present
+                // Fetch order + extended order from Cashfree
                 if (appId && secretKey && orderId) {
                     try {
-                        const cfRes = await fetch(`${cfBaseUrl}/orders/${orderId}`, {
-                            method: "GET",
-                            headers: {
-                                "x-api-version": "2023-08-01",
-                                "x-client-id": appId,
-                                "x-client-secret": secretKey
-                            }
-                        });
+                        const [cfRes, cfExtRes] = await Promise.all([
+                            fetch(`${cfBaseUrl}/orders/${orderId}`, {
+                                headers: { "x-api-version": "2023-08-01", "x-client-id": appId, "x-client-secret": secretKey }
+                            }),
+                            fetch(`${cfBaseUrl}/orders/${orderId}/extended`, {
+                                headers: { "x-api-version": "2023-08-01", "x-client-id": appId, "x-client-secret": secretKey }
+                            }).catch(() => ({ ok: false }))
+                        ]);
+
                         if (cfRes.ok) {
-                            const cfData = await cfRes.json().catch(() => ({}));
-                            if (cfData.order_status === "PAID") {
-                                isPaid = true;
-                                backendStore.updateOrderStatus(orderId, "PAID");
-                            }
+                            cfOrderData = await cfRes.json().catch(() => ({}));
+                            isPaid = cfOrderData.order_status === "PAID";
+                        }
+                        if (cfExtRes.ok) {
+                            cfExtendedData = await cfExtRes.json().catch(() => ({}));
                         }
                     } catch (err) {
                         console.warn("[slyte-api] Could not verify with Cashfree API:", err.message);
                     }
                 }
 
-                if (order) {
-                    if (isPaid) order.order_status = "PAID";
-                    
-                    let notificationLogged = false;
-                    if (order.order_status === "PAID" && !backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
-                        backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");
-                        notificationLogged = true;
-                        console.log(`[slyte-api] Telegram notification sent once for order ${orderId}`);
+                let order = backendStore.getOrderById(orderId);
+                if (isPaid && order) {
+                    backendStore.updateOrderStatus(orderId, "PAID");
+                    order.order_status = "PAID";
+                }
+
+                // ── Extract real customer info from Cashfree extended data ──
+                const extShip = cfExtendedData?.customer_details?.shipping_address
+                    || cfExtendedData?.shipping_address || {};
+                const extCustomer = cfExtendedData?.customer_details || cfOrderData?.customer_details || {};
+                const realPhone = [
+                    extShip?.phone,
+                    extCustomer?.customer_phone,
+                    cfOrderData?.customer_details?.customer_phone
+                ].find(p => p && String(p).replace(/\D/g, "").length >= 10 && !String(p).includes("9999999999")) || "";
+
+                const customerName = extShip?.name || extCustomer?.customer_name || order?.customer_name || "Customer";
+                const customerPhone = realPhone || order?.customer_phone || "N/A";
+                const deliveryAddr = extShip
+                    ? `${extShip.address || ""}, ${extShip.city || ""}, ${extShip.state || ""} - ${extShip.pin_code || extShip.pincode || ""}`
+                    : "Address collected by Cashfree";
+                const amount = cfOrderData?.order_amount || order?.total_amount || 0;
+                const cartItems = order?.cart_details || [];
+
+                if (isPaid && !backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
+                    backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");
+
+                    // ── Send Telegram Notification ──
+                    const BOT_TOKEN = env && env.BOT_TOKEN;
+                    const CHAT_ID = env && env.CHAT_ID;
+                    if (BOT_TOKEN && CHAT_ID) {
+                        const cartText = cartItems.map((item, i) =>
+                            `${i + 1}. ${item.quantity || 1}x ${item.name || "Item"}${item.size ? " (Size: " + item.size + ")" : ""}`
+                        ).join("\n") || order?.order_note || "N/A";
+
+                        const payTime = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+                        const payMethod = cfOrderData?.payment_details?.payment_group || "Online";
+
+                        const msg = `🛒 <b>New Order Received (PAID)</b>\n\n` +
+                            `👤 <b>Name:</b> ${customerName}\n` +
+                            `📞 <b>Phone:</b> ${customerPhone}\n\n` +
+                            `🏠 <b>Shipping Address:</b>\n📍 ${deliveryAddr}\n\n` +
+                            `📦 <b>Items:</b>\n${cartText}\n\n` +
+                            `💰 <b>Amount:</b> ₹${amount}\n` +
+                            `💳 <b>Payment:</b> ${payMethod}\n` +
+                            `🆔 <b>Order ID:</b> ${orderId}\n` +
+                            `⏰ <b>Time:</b> ${payTime}`;
+
+                        ctx.waitUntil(
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "HTML" })
+                            }).then(r => r.json()).then(d => {
+                                if (d.ok) console.log(`[slyte-api] Telegram sent for order ${orderId}`);
+                                else console.error("[slyte-api] Telegram error:", d.description);
+                            }).catch(e => console.error("[slyte-api] Telegram failed:", e.message))
+                        );
                     }
 
-                    return jsonResponse({
-                        success: true,
-                        order_id: orderId,
-                        order_status: order.order_status,
-                        payment_status: order.order_status === "PAID" ? "PAID" : "PENDING",
-                        notification_sent: notificationLogged,
-                        data: order
-                    }, 200, corsHeaders);
+                    // ── Create Shiprocket Forward Order ──
+                    ctx.waitUntil(
+                        createShiprocketForwardOrder(orderId, {
+                            customerName, customerPhone, deliveryAddr, extShip, amount, cartItems, order
+                        }, env)
+                    );
                 }
 
                 return jsonResponse({
                     success: true,
                     order_id: orderId,
-                    order_status: isPaid ? "PAID" : "PENDING",
+                    order_status: isPaid ? "PAID" : (cfOrderData?.order_status || "PENDING"),
                     payment_status: isPaid ? "PAID" : "PENDING",
                     data: {
                         id: orderId,
-                        total_amount: 1699,
-                        customer_name: "Valued Customer",
-                        customer_phone: "9742006683",
+                        customer_name: customerName,
+                        customer_phone: customerPhone,
+                        shipping_address: deliveryAddr,
+                        total_amount: amount,
                         order_status: isPaid ? "PAID" : "PENDING"
                     }
                 }, 200, corsHeaders);
             }
 
-            // Webhook handler for Cashfree payment notifications
-            if (pathStr === "/api/payment/webhook" || pathStr === "/webhook/cashfree" || pathStr === "/api/webhook/cashfree" || pathStr === "/webhook") {
+            // Cashfree Webhook — fires Telegram + Shiprocket on PAID
+            if (pathStr === "/webhook/cashfree" || pathStr === "/api/payment/webhook" || pathStr === "/webhook/cashfree" || pathStr === "/api/webhook/cashfree" || pathStr === "/webhook") {
                 if (method === "POST") {
-                    const webhookBody = await request.json().catch(() => ({}));
-                    console.log("[slyte-api] Cashfree Webhook received:", webhookBody);
+                    const rawBody = await request.text().catch(() => "{}");
+                    const webhookBody = JSON.parse(rawBody || "{}");
+                    console.log("[slyte-api] Cashfree Webhook received:", JSON.stringify(webhookBody).substring(0, 300));
 
-                    if (webhookBody.data && webhookBody.data.order) {
-                        const orderId = webhookBody.data.order.order_id;
-                        const status = webhookBody.data.order.order_status;
-                        if (orderId && status === "PAID") {
-                            backendStore.updateOrderStatus(orderId, "PAID");
-                            console.log(`[slyte-api] Webhook marked order ${orderId} as PAID`);
+                    // Respond immediately (Cashfree 5s timeout)
+                    const immediateResponse = jsonResponse({ success: true, received: true }, 200, corsHeaders);
+
+                    const d = webhookBody?.data;
+                    if (d?.payment?.payment_status === "PAID" && d?.order?.order_id) {
+                        const orderId = d.order.order_id;
+                        const paymentStatus = d.payment.payment_status;
+                        const customer = d.customer_details || {};
+                        const extShip = d.order?.shipping_address || {};
+
+                        backendStore.updateOrderStatus(orderId, "PAID");
+                        let order = backendStore.getOrderById(orderId);
+
+                        const realPhone = [extShip?.phone, customer?.customer_phone]
+                            .find(p => p && String(p).replace(/\D/g, "").length >= 10 && !String(p).includes("9999999999")) || customer?.customer_phone || "N/A";
+                        const customerName = extShip?.name || customer?.customer_name || "Customer";
+                        const deliveryAddr = extShip
+                            ? `${extShip.address || ""}, ${extShip.city || ""}, ${extShip.state || ""} - ${extShip.pin_code || extShip.pincode || ""}`
+                            : "N/A";
+                        const amount = d.order?.order_amount || order?.total_amount || 0;
+                        const cartItems = order?.cart_details || [];
+
+                        if (!backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
+                            backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");
+
+                            const BOT_TOKEN = env && env.BOT_TOKEN;
+                            const CHAT_ID = env && env.CHAT_ID;
+                            if (BOT_TOKEN && CHAT_ID) {
+                                const cartText = cartItems.map((item, i) =>
+                                    `${i + 1}. ${item.quantity || 1}x ${item.name || "Item"}${item.size ? " (Size: " + item.size + ")" : ""}`
+                                ).join("\n") || "N/A";
+                                const payTime = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+                                const msg = `🛒 <b>New Order Received (PAID)</b>\n\n` +
+                                    `👤 <b>Name:</b> ${customerName}\n📞 <b>Phone:</b> ${realPhone}\n\n` +
+                                    `🏠 <b>Shipping Address:</b>\n📍 ${deliveryAddr}\n\n` +
+                                    `📦 <b>Items:</b>\n${cartText}\n\n` +
+                                    `💰 <b>Amount:</b> ₹${amount}\n` +
+                                    `💳 <b>Payment:</b> ${d.payment?.payment_group || "Online"}\n` +
+                                    `🆔 <b>Order ID:</b> ${orderId}\n⏰ <b>Time:</b> ${payTime}`;
+
+                                ctx.waitUntil(
+                                    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "HTML" })
+                                    }).catch(e => console.error("[slyte-api] Telegram webhook failed:", e.message))
+                                );
+                            }
+
+                            ctx.waitUntil(
+                                createShiprocketForwardOrder(orderId, {
+                                    customerName, customerPhone: realPhone, extShip, amount, cartItems, order
+                                }, env)
+                            );
                         }
                     }
 
-                    return jsonResponse({ success: true, received: true }, 200, corsHeaders);
+                    return immediateResponse;
                 }
             }
+
 
             if (pathStr === "/api/orders/cancel" && method === "POST") {
                 const body = await request.json().catch(() => ({}));
@@ -928,5 +1045,81 @@ async function createShiprocketExchangeOrder(order, exchangeRec, env) {
     } catch (err) {
         console.error(`[Shiprocket Exchange Error] Order ${order.id}:`, err);
         return null;
+    }
+}
+
+/**
+ * Create a Shiprocket forward (delivery) order when a new order is paid.
+ * Called from verify-order and cashfree-webhook handlers.
+ */
+async function createShiprocketForwardOrder(orderId, params, env) {
+    try {
+        const token = await getShiprocketToken(env);
+        if (!token) {
+            console.warn("[Shiprocket Forward] No token — skipping");
+            return;
+        }
+
+        const { customerName, customerPhone, extShip, amount, cartItems } = params;
+
+        const addr1 = extShip?.address || extShip?.address_line_one || "N/A";
+        const addr2 = extShip?.address_line_two || extShip?.address_line2 || "";
+        const city = extShip?.city || "N/A";
+        const state = extShip?.state || "N/A";
+        const pincode = String(extShip?.pin_code || extShip?.pincode || "").replace(/\D/g, "");
+        const country = extShip?.country || "India";
+
+        if (!pincode || !/^\d{6}$/.test(pincode)) {
+            console.warn(`[Shiprocket Forward] Invalid/missing pincode for order ${orderId} — address not yet collected`);
+            return;
+        }
+
+        const orderItems = (cartItems || []).length > 0
+            ? cartItems.map(item => ({
+                name: item.name || "Slyte Product",
+                sku: (item.name || "ITEM").split(" ").map(w => w[0] || "").join("").toUpperCase() + "-" + (item.size || "NA"),
+                units: Number(item.quantity) || 1,
+                selling_price: Number(item.price) || Math.round(Number(amount) / Math.max(cartItems.length, 1)),
+                discount: 0,
+                tax: 0,
+            }))
+            : [{ name: "Slyte Product", sku: "SLYTE-PROD", units: 1, selling_price: Number(amount) || 1699, discount: 0, tax: 0 }];
+
+        const payload = {
+            order_id: orderId,
+            order_date: new Date().toISOString().replace("T", " ").split(".")[0],
+            pickup_location: env?.SHIPROCKET_PICKUP_LOCATION || "home-1",
+            billing_customer_name: customerName || "Customer",
+            billing_last_name: "",
+            billing_address: addr1,
+            billing_address_2: addr2,
+            billing_city: city,
+            billing_pincode: pincode,
+            billing_state: state,
+            billing_country: country,
+            billing_email: "customer@slyte.in",
+            billing_phone: (customerPhone || "").replace(/\D/g, "").slice(-10) || "9999999999",
+            shipping_is_billing: true,
+            order_items: orderItems,
+            payment_method: "Prepaid",
+            sub_total: Number(amount),
+            length: 45, breadth: 35, height: 1.5, weight: 0.5,
+        };
+
+        console.log(`[Shiprocket Forward] Creating order for ${orderId}...`);
+        const res = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            console.log(`[Shiprocket Forward] Order created for ${orderId}:`, data.order_id, data.shipment_id);
+        } else {
+            console.error(`[Shiprocket Forward] Failed for ${orderId}:`, JSON.stringify(data));
+        }
+        return data;
+    } catch (err) {
+        console.error(`[Shiprocket Forward] Error for order ${orderId}:`, err.message);
     }
 }
