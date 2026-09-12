@@ -988,7 +988,14 @@
         (function () {
             const API_BASE = (typeof window !== 'undefined' && window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
                 ? window.SLYTE_CONFIG.API_BASE_URL
-                : ((typeof window !== 'undefined' && window.SLYTE_API_BASE) || 'https://api.slyte.in');
+                : 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1';
+            const ANON_KEY = (typeof window !== 'undefined' && window.SLYTE_CONFIG && window.SLYTE_CONFIG.SUPABASE_ANON_KEY)
+                ? window.SLYTE_CONFIG.SUPABASE_ANON_KEY
+                : 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
+            function apiHeaders(token) {
+                const h = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ANON_KEY}`, 'apikey': ANON_KEY };
+                return h;
+            }
 
             // ── Lifecycle status config ────────────────────────────────────
             const LC_LABEL = {
@@ -1104,10 +1111,10 @@
 
             // ── Authentication Check ───────────────────────────────────────
             document.addEventListener('DOMContentLoaded', async () => {
-                // Purge test phone numbers
+                // Purge only placeholder phone numbers (not real user numbers)
                 ['slyte_phone', 'userPhone', 'dash_phone', 'slyteUser'].forEach(key => {
                     const val = localStorage.getItem(key);
-                    if (val && (val.includes('9742006683') || val.includes('9999999999'))) {
+                    if (val && val.includes('9999999999')) {
                         localStorage.removeItem(key);
                     }
                 });
@@ -1120,21 +1127,20 @@
                     return;
                 }
 
-                // Priority 2: Logged in via checkout (Cashfree set userPhone)
+                // Priority 2: Logged in via checkout (Cashfree set userPhone) — auto-login to get JWT
                 const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
-                if (checkoutPhone && checkoutPhone.length === 10 && checkoutPhone !== '9742006683' && checkoutPhone !== '9999999999') {
+                if (checkoutPhone && checkoutPhone.length === 10 && checkoutPhone !== '9999999999') {
                     // Silently exchange the checkout phone for a JWT
                     try {
                         const res = await fetch(`${API_BASE}/auto-login`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: apiHeaders(ANON_KEY),
                             body: JSON.stringify({ phone: checkoutPhone })
                         });
                         const data = await res.json();
                         if (data.success && data.token) {
                             localStorage.setItem('slyte_otp_token', data.token);
                             localStorage.setItem('slyte_phone', checkoutPhone);
-                            // 'username' is what script.js reads to show name in hamburger menu
                             const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
                                 ? data.user.name
                                 : (localStorage.getItem('userName') || localStorage.getItem('username') || checkoutPhone);
@@ -1228,7 +1234,7 @@
                 try {
                     const res = await fetch(`${API_BASE}/send-otp`, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: apiHeaders(ANON_KEY),
                         body: JSON.stringify({ phone: currentMobile })
                     });
                     const data = await res.json();
@@ -1261,7 +1267,7 @@
                 try {
                     const res = await fetch(`${API_BASE}/verify-otp`, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: apiHeaders(ANON_KEY),
                         body: JSON.stringify({ phone: currentMobile, otp })
                     });
                     const data = await res.json();
@@ -1463,10 +1469,7 @@
 
                 fetch(`${API_BASE}/orders-lookup`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: apiHeaders(token),
                     body: JSON.stringify({ phone: userPhone })
                 })
                 .then(r => {
@@ -1558,10 +1561,7 @@
                 const token = localStorage.getItem('slyte_otp_token');
                 fetch(`${API_BASE}/orders-cancel`, {
                     method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: apiHeaders(token),
                     body: JSON.stringify({ orderId })
                 })
                 .then(r => r.json())
@@ -1594,10 +1594,7 @@
                 setLoading(true, 'Retrying Refund...');
                 fetch(`${API_BASE}/refund-retry`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: apiHeaders(token),
                     body: JSON.stringify({ orderId })
                 })
                 .then(r => r.json())
@@ -1620,12 +1617,9 @@
                 btn.textContent = '...'; btn.disabled = true;
 
                 const token = localStorage.getItem('slyte_otp_token');
-                fetch(`${API_BASE}/orders/delete`, {
+                fetch(`${API_BASE}/orders-delete`, {
                     method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: apiHeaders(token),
                     body: JSON.stringify({ orderId })
                 })
                 .then(r => r.json())
@@ -2132,10 +2126,12 @@
             msg.style.display = 'none';
 
             try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/alteration', {
+                const token = localStorage.getItem('slyte_otp_token');
+                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
+                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
+                const res = await fetch(apiBase + '/alteration-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
                     body: JSON.stringify({
                         order_id: orderId,
                         alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
@@ -2268,10 +2264,12 @@
             msg.style.display = 'none';
 
             try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/return', {
+                const token = localStorage.getItem('slyte_otp_token');
+                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
+                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
+                const res = await fetch(apiBase + '/return-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
                     body: JSON.stringify({
                         order_id: orderId,
                         reason,
@@ -2361,10 +2359,12 @@
             btn.disabled = true;
             btn.innerHTML = 'Submitting...';
             try {
-                const apiBase = (window.SLYTE_API_BASE || window.SLYTE_CONFIG?.API_BASE_URL || 'https://api.slyte.in').replace(/\/+$/, '');
-                const res = await fetch(apiBase + '/api/after-sales/exchange', {
+                const token = localStorage.getItem('slyte_otp_token');
+                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
+                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
+                const res = await fetch(apiBase + '/exchange-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
                     body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
                 });
                 const data = await res.json();
