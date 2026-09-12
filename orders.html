@@ -1055,27 +1055,51 @@
             }
 
             // ── DOM refs ───────────────────────────────────────────────────
-            const mobileInput = document.getElementById('mobileInput');
-            const trackBtn    = document.getElementById('trackBtn');
-            const otpInput    = document.getElementById('otpInput');
-            const verifyBtn   = document.getElementById('verifyBtn');
-            const resendBtn   = document.getElementById('resendBtn');
-            const resendTimer = document.getElementById('resendTimer');
-            const editMobileBtn = document.getElementById('editMobileBtn');
-            const logoutBtn   = document.getElementById('logoutBtn');
-            const displaySentMobile = document.getElementById('displaySentMobile');
-            const loggedInMobile = document.getElementById('loggedInMobile');
-            
-            const mobileStep = document.getElementById('mobileStep');
-            const otpStep    = document.getElementById('otpStep');
-            const loggedInStep = document.getElementById('loggedInStep');
+            let mobileInput, trackBtn, otpInput, verifyBtn, resendBtn, resendTimer, editMobileBtn, logoutBtn, displaySentMobile, loggedInMobile;
+            let mobileStep, otpStep, loggedInStep, errorBanner, successBanner, loader, resultsArea;
+            let currentMobile = '';
+            let countdownInterval = null;
 
-            const errorBanner = document.getElementById('errorBanner');
-            const successBanner = document.getElementById('successBanner');
-            const loader      = document.getElementById('loader');
-            const resultsArea = document.getElementById('resultsArea');
-            let   currentMobile = '';
-            let   countdownInterval = null;
+            function bindDomElements() {
+                mobileInput = document.getElementById('mobileInput');
+                trackBtn    = document.getElementById('trackBtn');
+                otpInput    = document.getElementById('otpInput');
+                verifyBtn   = document.getElementById('verifyBtn');
+                resendBtn   = document.getElementById('resendBtn');
+                resendTimer = document.getElementById('resendTimer');
+                editMobileBtn = document.getElementById('editMobileBtn');
+                logoutBtn   = document.getElementById('logoutBtn');
+                displaySentMobile = document.getElementById('displaySentMobile');
+                loggedInMobile = document.getElementById('loggedInMobile');
+                
+                mobileStep = document.getElementById('mobileStep');
+                otpStep    = document.getElementById('otpStep');
+                loggedInStep = document.getElementById('loggedInStep');
+
+                errorBanner = document.getElementById('errorBanner');
+                successBanner = document.getElementById('successBanner');
+                loader      = document.getElementById('loader');
+                resultsArea = document.getElementById('resultsArea');
+
+                if (trackBtn) trackBtn.onclick = requestOtp;
+                if (verifyBtn) verifyBtn.onclick = verifyOtp;
+                if (resendBtn) resendBtn.onclick = (e) => { e.preventDefault(); requestOtp(); };
+                if (editMobileBtn) editMobileBtn.onclick = (e) => { e.preventDefault(); showMobileStep(); };
+                if (logoutBtn) {
+                    logoutBtn.onclick = () => {
+                        localStorage.removeItem('slyte_otp_token');
+                        localStorage.removeItem('slyte_phone');
+                        localStorage.removeItem('userPhone');
+                        localStorage.removeItem('userName');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('slyteUser');
+                        showMobileStep();
+                        location.reload();
+                    };
+                }
+                if (mobileInput) mobileInput.onkeyup = e => { if (e.key === 'Enter') requestOtp(); };
+                if (otpInput) otpInput.onkeyup = e => { if (e.key === 'Enter') verifyOtp(); };
+            }
 
             function esc(s) {
                 if (!s) return '';
@@ -1090,23 +1114,27 @@
                     { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
             }
             function setLoading(on, text = '...') {
-                loader.style.display = on ? 'block' : 'none';
-                if(text !== '...') trackBtn.textContent = text;
+                if (loader) loader.style.display = on ? 'block' : 'none';
+                if (trackBtn && text !== '...') trackBtn.textContent = text;
             }
 
             function showError(msg) {
-                successBanner.style.display = 'none';
-                errorBanner.textContent = msg;
-                errorBanner.style.display = 'block';
+                if (successBanner) successBanner.style.display = 'none';
+                if (errorBanner) {
+                    errorBanner.textContent = msg;
+                    errorBanner.style.display = 'block';
+                }
             }
             function showSuccess(msg) {
-                errorBanner.style.display = 'none';
-                successBanner.textContent = msg;
-                successBanner.style.display = 'block';
+                if (errorBanner) errorBanner.style.display = 'none';
+                if (successBanner) {
+                    successBanner.textContent = msg;
+                    successBanner.style.display = 'block';
+                }
             }
             function clearMessages() {
-                errorBanner.style.display = 'none';
-                successBanner.style.display = 'none';
+                if (errorBanner) errorBanner.style.display = 'none';
+                if (successBanner) successBanner.style.display = 'none';
             }
 
             // ── Authentication Check ───────────────────────────────────────
@@ -1129,6 +1157,8 @@
             }
 
             document.addEventListener('DOMContentLoaded', async () => {
+                bindDomElements();
+
                 // Purge placeholder phone numbers
                 ['slyte_phone', 'userPhone', 'dash_phone', 'slyteUser'].forEach(key => {
                     const val = localStorage.getItem(key);
@@ -1301,6 +1331,7 @@
                         const name = (data.user && data.user.name) || '';
                         localStorage.setItem('slyte_phone', phone);
                         localStorage.setItem('userPhone', phone);
+                        localStorage.setItem('dash_phone', phone);
                         localStorage.setItem('username', name || phone);
                         localStorage.setItem('userName', name || phone);
                         
@@ -1530,25 +1561,7 @@
                 });
             }
 
-            // Bindings
-            trackBtn.onclick = requestOtp;
-            verifyBtn.onclick = verifyOtp;
-            resendBtn.onclick = (e) => { e.preventDefault(); requestOtp(); };
-            editMobileBtn.onclick = (e) => { e.preventDefault(); showMobileStep(); };
-            logoutBtn.onclick = () => {
-                localStorage.removeItem('slyte_otp_token');
-                localStorage.removeItem('slyte_phone');
-                localStorage.removeItem('userPhone');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('username');
-                localStorage.removeItem('slyteUser');
-                showMobileStep();
-                // Reload so script.js updates the hamburger menu to logged-out state
-                location.reload();
-            };
-            
-            mobileInput.onkeyup = e => { if (e.key === 'Enter') requestOtp(); };
-            otpInput.onkeyup = e => { if (e.key === 'Enter') verifyOtp(); };
+
 
             // ── Toggle expand ──────────────────────────────────────────────
             window.toggleExpand = function(id) {
@@ -2373,31 +2386,7 @@
             overlay.style.display = 'flex';
         };
 
-        window.submitExchangeRequest = async function(orderId) {
-            const btn = document.getElementById('btnSubmitExc');
-            const msg = document.getElementById('modalMsg');
-            const replacement_size = document.getElementById('exchangeSize').value;
-            const reason = document.getElementById('exchangeReason').value;
-            const notes = document.getElementById('exchangeNotes').value.trim();
-            btn.disabled = true;
-            btn.innerHTML = 'Submitting...';
-            try {
-                const token = localStorage.getItem('slyte_otp_token');
-                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
-                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
-                const res = await fetch(apiBase + '/exchange-request', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
-                    body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
-                });">
-                    <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:#444; margin-bottom:6px;">Notes</label>
-                    <textarea id="exchangeNotes" placeholder="Optional details..." style="width:100%; height:70px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
-                </div>
-                <div id="modalMsg" style="display:none; padding:10px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
-                <button id="btnSubmitExc" onclick="submitExchangeRequest('${orderId}')" style="width:100%; background:#15803d; color:#fff; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer;">Submit Exchange Request</button>
-            `;
-            overlay.style.display = 'flex';
-        };
+
 
         window.submitExchangeRequest = async function(orderId) {
             const btn = document.getElementById('btnSubmitExc');

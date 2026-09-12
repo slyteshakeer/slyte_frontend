@@ -19,12 +19,20 @@
 
     function getVerifiedCustomerPhone() {
         cleanupDummyPhone();
-        var phone = localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "";
-        var token = localStorage.getItem("slyte_otp_token") || "";
-        var clean = String(phone).replace(/\D/g, "").slice(-10);
-        if (clean.length === 10 && clean !== "9999999999" && token) {
-            return clean;
+        var rawKeys = ["slyte_phone", "userPhone", "dash_phone"];
+        for (var i = 0; i < rawKeys.length; i++) {
+            var val = (localStorage.getItem(rawKeys[i]) || "").replace(/\D/g, "").slice(-10);
+            if (/^[6-9]\d{9}$/.test(val) && val !== "9999999999") {
+                return val;
+            }
         }
+        try {
+            var userObj = JSON.parse(localStorage.getItem("slyteUser") || "{}");
+            var uPhone = String(userObj.phone || userObj.customerPhone || "").replace(/\D/g, "").slice(-10);
+            if (/^[6-9]\d{9}$/.test(uPhone) && uPhone !== "9999999999") {
+                return uPhone;
+            }
+        } catch(e) {}
         return null;
     }
 
@@ -307,8 +315,12 @@
                 var data = await res.json().catch(function () { return {}; });
 
                 if (res.ok && data.success) {
+                    var cName = (data.user && data.user.name && data.user.name !== 'Customer') ? data.user.name : currentEnteredPhone;
                     localStorage.setItem("slyte_phone", currentEnteredPhone);
                     localStorage.setItem("userPhone", currentEnteredPhone);
+                    localStorage.setItem("dash_phone", currentEnteredPhone);
+                    localStorage.setItem("username", cName);
+                    localStorage.setItem("userName", cName);
                     localStorage.setItem("slyte_otp_token", data.token || ("jwt_slyte_cust_" + currentEnteredPhone + "_" + Date.now()));
                     overlay.style.display = "none";
                     updateHamburgerUserProfile();

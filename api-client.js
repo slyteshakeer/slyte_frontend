@@ -6,7 +6,7 @@
     if (typeof localStorage !== "undefined") {
         ["slyte_phone", "userPhone", "dash_phone", "slyteUser"].forEach(function(k) {
             var v = localStorage.getItem(k);
-            if (v && (v.includes("9742006683") || v.includes("9999999999"))) {
+            if (v && v.includes("9999999999")) {
                 localStorage.removeItem(k);
             }
         });
