@@ -438,7 +438,8 @@ export default {
                     const immediateResponse = jsonResponse({ success: true, received: true }, 200, corsHeaders);
 
                     const d = webhookBody?.data;
-                    if (d?.payment?.payment_status === "PAID" && d?.order?.order_id) {
+                    const pmtStatus = d?.payment?.payment_status || "";
+                    if ((pmtStatus === "SUCCESS" || pmtStatus === "PAID") && d?.order?.order_id) {
                         const orderId = d.order.order_id;
                         const paymentStatus = d.payment.payment_status;
                         const customer = d.customer_details || {};

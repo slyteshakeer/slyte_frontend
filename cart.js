@@ -271,9 +271,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (typeof Cashfree !== "undefined") {
                     const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
                     const cf = Cashfree({ mode: mode.toLowerCase() });
+                    const orderId = res.data && res.data.order_id;
                     cf.checkout({
                         paymentSessionId: sid,
-                        redirectTarget: "_modal"
+                        redirectTarget: "_self",
+                        onSuccess: function(data) {
+                            const oid = (data && data.order && data.order.orderId) || orderId;
+                            window.location.href = `success.html?order_id=${oid || orderId}`;
+                        },
+                        onFailure: function(data) {
+                            console.error("Payment failed:", data);
+                            showErr("Payment failed. Please try again.");
+                            payBtn.innerHTML = originalBtnHtml;
+                            payBtn.disabled = false;
+                            isProcessing = false;
+                        }
                     });
                 } else {
                     throw new Error("Cashfree SDK not loaded on this page.");

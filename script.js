@@ -445,9 +445,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (typeof Cashfree !== "undefined") {
                             const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
                             const cf = Cashfree({ mode: mode.toLowerCase() });
+                            const orderId = res.data && res.data.order_id;
+                            // Use _self so Cashfree redirects to success.html after payment
+                            // This ensures verify-order is called which triggers Telegram + Shiprocket
                             cf.checkout({
                                 paymentSessionId: sid,
-                                redirectTarget: "_modal"
+                                redirectTarget: "_self",
+                                onSuccess: function(data) {
+                                    const oid = (data && data.order && data.order.orderId) || orderId;
+                                    window.location.href = `success.html?order_id=${oid || orderId}`;
+                                },
+                                onFailure: function(data) {
+                                    console.error("Payment failed:", data);
+                                    window.showToast("Payment failed. Please try again.");
+                                    buyNowBtn.innerHTML = originalText;
+                                    buyNowBtn.disabled = false;
+                                }
                             });
                         } else {
                             window.location.href = 'cart.html';

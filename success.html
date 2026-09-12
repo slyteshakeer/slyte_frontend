@@ -142,42 +142,48 @@
                 return;
             }
 
+            statusEl.textContent = 'Confirming your order...';
+
+            // Clear cart immediately on success page load
+            try { localStorage.removeItem('slyteCart'); localStorage.removeItem('dashCart'); } catch(e) {}
+
             try {
-                // Use the backend URL from api-client.js
-                const url = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) ? window.SLYTE_CONFIG.API_BASE_URL : (window.BACKEND_URL || "https://api.slyte.in"); 
-                
-                const response = await fetch(`${url}/verify-order/${orderId}`);
+                const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL)
+                    ? window.SLYTE_CONFIG.API_BASE_URL
+                    : "https://api.slyte.in";
+
+                const response = await fetch(`${apiBase}/verify-order/${orderId}`);
                 const result = await response.json();
 
-                if (result.success && result.data) {
-                    const order = result.data;
-                    
-                    // AUTO LOGIN: User number and name from the order
-                    localStorage.setItem('slyteUser', JSON.stringify({
-                        phone: order.customerPhone,
-                        name: order.customerName,
-                        email: order.customerEmail,
-                        address: order.deliveryAddress
-                    }));
-                    localStorage.setItem('username', order.customerName || 'Customer');
+                if (result.success) {
+                    const order = result.data || {};
 
-                    statusEl.textContent = `Welcome, ${order.customerName || 'Customer'}! Logging you in...`;
-                    
-                    // Clear cart
-                    localStorage.removeItem('slyteCart');
-                    
-                    // Simple delay for UX
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
+                    // Save real phone from Cashfree OCC to localStorage (shows in hamburger)
+                    const realPhone = order.customer_phone || order.customerPhone || '';
+                    const cleanPhone = String(realPhone).replace(/\D/g, '').slice(-10);
+                    if (/^[6-9]\d{9}$/.test(cleanPhone)) {
+                        localStorage.setItem('slyte_phone', cleanPhone);
+                        localStorage.setItem('userPhone', cleanPhone);
+                        localStorage.setItem('slyteUser', JSON.stringify({
+                            phone: cleanPhone,
+                            name: order.customer_name || order.customerName || 'Customer',
+                            address: order.shipping_address || order.deliveryAddress || ''
+                        }));
+                        localStorage.setItem('username', order.customer_name || order.customerName || 'Customer');
+                        // Dispatch auth change so hamburger updates
+                        window.dispatchEvent(new Event('slyteauthchange'));
+                    }
+
+                    statusEl.textContent = `Order confirmed! Redirecting home...`;
                 } else {
-                    statusEl.textContent = "Order verified. Redirecting...";
-                    setTimeout(() => window.location.href = 'index.html', 3000);
+                    statusEl.textContent = 'Order received. Redirecting...';
                 }
             } catch (err) {
-                console.error("Auto login failed:", err);
-                statusEl.textContent = "Verification complete.";
+                console.error('Verify order failed:', err);
+                statusEl.textContent = 'Order placed! Redirecting...';
             }
+
+            setTimeout(() => { window.location.href = 'index.html'; }, 2500);
         });
     </script>
 </body>
