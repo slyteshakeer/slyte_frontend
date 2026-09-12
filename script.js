@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sizeGrid = document.querySelector('.size-grid');
         if (!sizeGrid) return;
 
-        const ALL_SIZES = ['28', '30', '32', '34', '36', '38', '40'];
+        const ALL_SIZES = ['28', '30', '32', '34', '36', '38'];
         let firstInStock = null;
         let html = '';
 
@@ -506,15 +506,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const inStock = count > 0;
             if (inStock && firstInStock === null) firstInStock = sz;
 
-            let badge = '';
-            if (count > 0 && count <= 2) {
-                badge = `<span style="position:absolute; top:-8px; right:-6px; background:#ea580c; color:white; font-size:8px; font-weight:800; padding:1px 4px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.15);">Only ${count}!</span>`;
-            }
-
             html += `
-                <button type="button" class="size-box ${inStock ? '' : 'disabled'}" data-size="${sz}" style="position:relative;" ${inStock ? '' : 'disabled title="Out of Stock"'}>
+                <button type="button" class="size-box ${inStock ? '' : 'disabled'}" data-size="${sz}" ${inStock ? '' : 'disabled title="Out of Stock"'}>
                     ${sz}
-                    ${badge}
                 </button>
             `;
         });
