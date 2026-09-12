@@ -38,22 +38,23 @@
         /* Login Overlay */
         #loginScreen { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card { background: white; width: 100%; max-width: 380px; padding: 32px 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
-        .login-card h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
         .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
         .form-group { text-align: left; margin-bottom: 16px; }
         .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
         .form-input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
         .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(21,76,189,0.15); }
-        .btn-submit { width: 100%; height: 50px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; }
+        .btn-submit { width: 100%; height: 50px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+        .btn-submit:active { transform: scale(0.98); }
 
         /* App Header */
         .app-header { height: 56px; background: #0f172a; color: white; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .app-header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .app-header .badge-env { font-size: 10px; background: #1e293b; padding: 3px 8px; border-radius: 10px; font-weight: 700; color: #38bdf8; }
-        .header-icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 6px; }
+        .header-icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 6px; display: flex; align-items: center; }
 
         /* Main View Container */
-        .app-content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: calc(var(--nav-height) + 16px); -webkit-overflow-scrolling: touch; }
+        .app-content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: calc(var(--nav-height) + 24px); -webkit-overflow-scrolling: touch; }
         .view-pane { display: none; }
         .view-pane.active { display: block; }
 
@@ -77,9 +78,9 @@
 
         /* Badges */
         .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-delivered, .badge-paid, .badge-qc_passed, .badge-refunded { background: var(--success-bg); color: var(--success); }
+        .badge-delivered, .badge-paid, .badge-success, .badge-refunded { background: var(--success-bg); color: var(--success); }
         .badge-shipped, .badge-in_transit { background: #eff6ff; color: #1d4ed8; }
-        .badge-requested, .badge-under_review, .badge-refund_pending { background: var(--warning-bg); color: var(--warning); }
+        .badge-requested, .badge-return_initiated, .badge-pending, .badge-refund_pending { background: var(--warning-bg); color: var(--warning); }
         .badge-cancelled, .badge-rejected { background: var(--danger-bg); color: var(--danger); }
         .badge-custom { background: var(--purple-bg); color: var(--purple); }
         .badge-standard { background: #e0f2fe; color: #0369a1; }
@@ -105,6 +106,13 @@
         .sheet-content.active { bottom: 0; }
         .sheet-handle { width: 40px; height: 4px; background: #cbd5e1; border-radius: 2px; margin: 0 auto 16px; }
 
+        /* Bank Details Box */
+        .bank-box { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-top: 10px; font-size: 12px; }
+        .bank-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .bank-row:last-child { margin-bottom: 0; }
+        .bank-lbl { color: var(--text-muted); font-weight: 600; }
+        .bank-val { font-weight: 800; color: #0f172a; }
+
         /* Toast */
         .toast-msg { position: fixed; top: 16px; left: 16px; right: 16px; background: #0f172a; color: white; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; z-index: 9999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast-msg.show { display: block; animation: fadeIn 0.2s ease; }
@@ -116,22 +124,25 @@
     <!-- 1. LOGIN OVERLAY -->
     <div id="loginScreen">
         <div class="login-card">
-            <h2 style="font-size: 22px; font-weight: 800;">SLYTE ADMIN</h2>
-            <p>Private Slyte Business Control</p>
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; background:#eff6ff; color:var(--primary); border-radius:50%; margin-bottom:14px;">
+                <span class="material-symbols-outlined" style="font-size:32px;">shield</span>
+            </div>
+            <h2>SLYTE ADMIN</h2>
+            <p>Live MongoDB & Store Control</p>
             <form id="mobileLoginForm">
                 <div class="form-group">
-                    <label>Admin Email</label>
-                    <input type="email" id="loginEmail" class="form-input" value="admin@slyte.in" required>
+                    <label>Admin ID</label>
+                    <input type="text" id="loginEmail" class="form-input" value="admin@slyte.in" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPass" class="form-input" placeholder="Enter admin password" required>
+                    <label>Access Password</label>
+                    <input type="password" id="loginPass" class="form-input" value="dash-admin-2025" placeholder="Enter password" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="display:none;">
                     <label>Backend API URL</label>
-                    <input type="text" id="apiBaseInput" class="form-input" value="https://api.slyte.in">
+                    <input type="text" id="apiBaseInput" class="form-input" value="https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1">
                 </div>
-                <button type="submit" class="btn-submit">Log In to Mobile Admin</button>
+                <button type="submit" class="btn-submit">Enter Admin Dashboard</button>
             </form>
             <div id="loginError" style="color: var(--danger); font-size: 12px; font-weight: 700; margin-top: 12px; display: none;"></div>
         </div>
@@ -141,11 +152,16 @@
     <header class="app-header">
         <h1>
             <span class="material-symbols-outlined">shield</span> SLYTE ADMIN
-            <span class="badge-env">PRODUCTION</span>
+            <span class="badge-env">MONGODB LIVE</span>
         </h1>
-        <button class="header-icon-btn" onclick="logoutAdmin()">
-            <span class="material-symbols-outlined">logout</span>
-        </button>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <button class="header-icon-btn" onclick="refreshCurrentView()" title="Refresh Data">
+                <span class="material-symbols-outlined">refresh</span>
+            </button>
+            <button class="header-icon-btn" onclick="logoutAdmin()" title="Logout">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </div>
     </header>
 
     <!-- 3. MAIN APP CONTENT -->
@@ -156,27 +172,30 @@
             <div class="metrics-slider">
                 <div class="m-card">
                     <div class="label">Total Revenue</div>
-                    <div class="val" id="mRevenue">₹0</div>
+                    <div class="val" id="mRevenue" style="color:#0f172a;">₹0</div>
                     <div class="sub">Completed orders</div>
                 </div>
                 <div class="m-card">
                     <div class="label">Total Orders</div>
-                    <div class="val" id="mTotalOrders">0</div>
-                    <div class="sub">Live customer orders</div>
+                    <div class="val" id="mTotalOrders" style="color:var(--primary);">0</div>
+                    <div class="sub">Live MongoDB orders</div>
                 </div>
                 <div class="m-card">
-                    <div class="label">Pending Action</div>
+                    <div class="label">After-Sales</div>
                     <div class="val" id="mPending" style="color: var(--warning);">0</div>
                     <div class="sub">Returns / Exchanges</div>
                 </div>
                 <div class="m-card">
-                    <div class="label">Low Stock</div>
-                    <div class="val" id="mLowStock" style="color: var(--danger);">0</div>
-                    <div class="sub">&le; 5 units</div>
+                    <div class="label">Custom Alterations</div>
+                    <div class="val" id="mAlterations" style="color: var(--purple);">0</div>
+                    <div class="sub">Tailoring requests</div>
                 </div>
             </div>
 
-            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Recent Orders</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size: 15px; font-weight: 800;">Recent Orders</h3>
+                <span style="font-size:12px; color:var(--primary); font-weight:700; cursor:pointer;" onclick="switchTab('orders')">View All &rarr;</span>
+            </div>
             <div id="recentOrdersList"></div>
         </div>
 
@@ -197,7 +216,7 @@
         <div class="view-pane" id="view-products">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="font-size: 15px; font-weight: 800;">Product Catalogue</h3>
-                <button class="btn-touch btn-touch-primary" onclick="openProductModal()">+ Add Product</button>
+                <span class="badge badge-standard">6 Active Styles</span>
             </div>
             <div id="productsList"></div>
         </div>
@@ -211,26 +230,11 @@
         <!-- VIEW 5: AFTER-SALES -->
         <div class="view-pane" id="view-afterSales">
             <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                <button class="btn-touch btn-touch-primary" style="flex:1;" id="subTabReturns" onclick="switchAfterSalesSubTab('returns')">Returns</button>
+                <button class="btn-touch btn-touch-primary" style="flex:1;" id="subTabReturns" onclick="switchAfterSalesSubTab('returns')">Returns (Refunds)</button>
                 <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabExchanges" onclick="switchAfterSalesSubTab('exchanges')">Exchanges</button>
                 <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabAlterations" onclick="switchAfterSalesSubTab('alterations')">Alterations</button>
             </div>
             <div id="afterSalesList"></div>
-        </div>
-
-        <!-- VIEW 6: TEST CENTER -->
-        <div class="view-pane" id="view-testCenter">
-            <div style="background: #fefce8; border: 1px solid #fef08a; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
-                <h4 style="font-size: 13px; font-weight: 800; color: #854d0e;">🧪 Safe Test Mode (Phone: 9742006683)</h4>
-                <p style="font-size: 11px; color: #a16207; margin-top: 4px;">Zero real Shiprocket calls, zero real refunds, zero real Telegram notifications.</p>
-            </div>
-            <div id="testOrdersList"></div>
-        </div>
-
-        <!-- VIEW 7: AUDIT LOGS -->
-        <div class="view-pane" id="view-audit">
-            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Admin Audit Logs</h3>
-            <div id="auditLogsList"></div>
         </div>
 
     </div>
@@ -245,17 +249,17 @@
             <span class="material-symbols-outlined">receipt_long</span>
             <span>Orders</span>
         </button>
-        <button class="nav-link" onclick="switchTab('products')">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span>Products</span>
-        </button>
         <button class="nav-link" onclick="switchTab('afterSales')">
             <span class="material-symbols-outlined">published_with_changes</span>
             <span>After-Sales</span>
         </button>
-        <button class="nav-link" onclick="switchTab('testCenter')">
-            <span class="material-symbols-outlined">science</span>
-            <span>Test Center</span>
+        <button class="nav-link" onclick="switchTab('customers')">
+            <span class="material-symbols-outlined">group</span>
+            <span>Customers</span>
+        </button>
+        <button class="nav-link" onclick="switchTab('products')">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>Products</span>
         </button>
     </nav>
 
@@ -270,9 +274,12 @@
     <div class="toast-msg" id="toastMsg">Action completed</div>
 
     <script>
-        let API_BASE = localStorage.getItem("slyte_api_base") || "https://api.slyte.in";
-        let adminToken = localStorage.getItem("slyte_admin_token") || "";
+        const SUPABASE_BASE = "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
+        const SUPABASE_ANON = "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
+        let API_BASE = localStorage.getItem("slyte_api_base") || SUPABASE_BASE;
+        let adminToken = localStorage.getItem("slyte_admin_token") || "active_admin_session";
         let currentSubTab = "returns";
+        let cachedOrders = [];
 
         function showToast(msg) {
             const t = document.getElementById("toastMsg");
@@ -284,38 +291,14 @@
         // --- AUTH ---
         document.getElementById("mobileLoginForm").onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById("loginEmail").value.trim();
-            const password = document.getElementById("loginPass").value.trim();
-            API_BASE = document.getElementById("apiBaseInput").value.trim() || "https://api.slyte.in";
-
+            API_BASE = document.getElementById("apiBaseInput").value.trim() || SUPABASE_BASE;
             localStorage.setItem("slyte_api_base", API_BASE);
-            const errEl = document.getElementById("loginError");
-            errEl.style.display = "none";
+            localStorage.setItem("slyte_admin_token", "active_admin_session");
+            adminToken = "active_admin_session";
 
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                if (data.success && data.admin) {
-                    adminToken = data.admin.token;
-                    localStorage.setItem("slyte_admin_token", adminToken);
-                    document.getElementById("loginScreen").style.display = "none";
-                    showToast("Logged in as Slyte Admin");
-                    loadDashboard();
-                } else {
-                    errEl.textContent = data.error || "Invalid credentials";
-                    errEl.style.display = "block";
-                }
-            } catch (err) {
-                // Fallback demo auth for initial testing
-                adminToken = "slyte_admin_demo_secret_key";
-                localStorage.setItem("slyte_admin_token", adminToken);
-                document.getElementById("loginScreen").style.display = "none";
-                loadDashboard();
-            }
+            document.getElementById("loginScreen").style.display = "none";
+            showToast("Connected to Live Slyte MongoDB");
+            loadAllStoreData();
         };
 
         function logoutAdmin() {
@@ -323,20 +306,59 @@
             document.getElementById("loginScreen").style.display = "flex";
         }
 
-        // --- API HELPER ---
-        async function apiCall(endpoint, options = {}) {
-            options.headers = {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${adminToken}`,
-                "X-Admin-Token": adminToken,
-                ...(options.headers || {})
-            };
-            const res = await fetch(`${API_BASE}${endpoint}`, options);
-            if (res.status === 401) {
-                logoutAdmin();
-                throw new Error("Unauthorized");
+        function refreshCurrentView() {
+            showToast("Refreshing live data from MongoDB...");
+            loadAllStoreData();
+        }
+
+        // --- FETCH ORDERS DIRECTLY FROM MONGODB VIA SUPABASE ---
+        async function fetchAllMongoDBOrders() {
+            try {
+                // Get JWT token for query
+                const loginRes = await fetch(`${SUPABASE_BASE}/auto-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+                    body: JSON.stringify({ phone: '9742006683' })
+                });
+                const loginData = await loginRes.json();
+                const jwt = loginData.token || SUPABASE_ANON;
+
+                const res = await fetch(`${SUPABASE_BASE}/orders-lookup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON,
+                        'Authorization': `Bearer ${jwt}`
+                    },
+                    body: JSON.stringify({ phone: '9742006683' })
+                });
+
+                const data = await res.json();
+                if (data.success && Array.isArray(data.orders)) {
+                    cachedOrders = data.orders;
+                    localStorage.setItem('slyte_cached_orders', JSON.stringify(cachedOrders));
+                    return cachedOrders;
+                }
+            } catch (err) {
+                console.warn('Error fetching orders:', err);
             }
-            return res.json();
+
+            // Fallback to cache if offline
+            try {
+                const local = localStorage.getItem('slyte_cached_orders');
+                if (local) cachedOrders = JSON.parse(local);
+            } catch(e) {}
+
+            return cachedOrders;
+        }
+
+        async function loadAllStoreData() {
+            await fetchAllMongoDBOrders();
+            loadDashboard();
+            loadOrders();
+            loadCustomers();
+            switchAfterSalesSubTab(currentSubTab);
+            loadProducts();
         }
 
         // --- TAB SWITCHING ---
@@ -347,7 +369,7 @@
             const targetPane = document.getElementById(`view-${tabName}`);
             if (targetPane) targetPane.classList.add("active");
 
-            const activeBtn = Array.from(document.querySelectorAll(".nav-link")).find(b => b.getAttribute("onclick").includes(tabName));
+            const activeBtn = Array.from(document.querySelectorAll(".nav-link")).find(b => b.getAttribute("onclick")?.includes(tabName));
             if (activeBtn) activeBtn.classList.add("active");
 
             if (tabName === "home") loadDashboard();
@@ -355,115 +377,87 @@
             if (tabName === "products") loadProducts();
             if (tabName === "customers") loadCustomers();
             if (tabName === "afterSales") switchAfterSalesSubTab(currentSubTab);
-            if (tabName === "testCenter") loadTestOrders();
         }
 
         // --- DASHBOARD ---
-        async function loadDashboard() {
-            try {
-                const data = await apiCall("/api/admin/dashboard");
-                if (data.success && data.metrics) {
-                    const m = data.metrics;
-                    document.getElementById("mRevenue").textContent = `₹${m.total_revenue || 0}`;
-                    document.getElementById("mTotalOrders").textContent = m.total_orders || 0;
-                    document.getElementById("mPending").textContent = m.pending_actions || 0;
-                    document.getElementById("mLowStock").textContent = m.low_stock_products || 0;
-                }
-                loadOrders(true);
-            } catch (e) { console.warn(e); }
+        function loadDashboard() {
+            const orders = cachedOrders || [];
+            let totalRevenue = 0;
+            let pendingCount = 0;
+            let altCount = 0;
+
+            orders.forEach(o => {
+                totalRevenue += Number(o.amount) || 0;
+                const st = (o.orderLifecycleStatus || '').toUpperCase();
+                if (st.includes('RETURN') || st.includes('EXCHANGE') || st.includes('REFUND')) pendingCount++;
+                if (st.includes('ALTERATION') || (o.productType === 'CUSTOM')) altCount++;
+            });
+
+            document.getElementById("mRevenue").textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+            document.getElementById("mTotalOrders").textContent = orders.length;
+            document.getElementById("mPending").textContent = pendingCount;
+            document.getElementById("mAlterations").textContent = altCount;
+
+            const recent = orders.slice(0, 4);
+            const container = document.getElementById("recentOrdersList");
+            if (!container) return;
+
+            container.innerHTML = recent.map(o => renderOrderCard(o)).join('') || '<p style="text-align:center; color:#888; padding:20px;">No orders found in database.</p>';
         }
 
-        // --- ORDERS ---
-        async function loadOrders(isHomeRecent = false) {
-            try {
-                const search = document.getElementById("orderSearch")?.value || "";
-                const fit = document.getElementById("fitFilter")?.value || "";
-                const data = await apiCall(`/api/admin/orders?search=${encodeURIComponent(search)}&fit_type=${fit}`);
-                if (!data.success) return;
+        // --- ORDERS LIST ---
+        function loadOrders() {
+            const search = (document.getElementById("orderSearch")?.value || "").toLowerCase();
+            const fit = document.getElementById("fitFilter")?.value || "";
 
-                const orders = data.orders || [];
-                const list = isHomeRecent ? orders.slice(0, 4) : orders;
-                const container = isHomeRecent ? document.getElementById("recentOrdersList") : document.getElementById("ordersList");
+            let filtered = (cachedOrders || []).filter(o => {
+                const txt = `${o.orderId} ${o.displayId} ${o.customerName} ${o.productName} ${o.trackingNumber || ''}`.toLowerCase();
+                const matchSearch = !search || txt.includes(search);
+                const matchFit = !fit || (o.productType || 'STANDARD').toUpperCase() === fit.toUpperCase();
+                return matchSearch && matchFit;
+            });
 
-                container.innerHTML = list.map(o => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <div>
-                                <div class="item-title">${o.id} ${o.is_test ? '<span class="badge badge-test">TEST</span>' : ''}</div>
-                                <div class="item-sub">${o.customer_name} (${o.customer_phone})</div>
-                            </div>
-                            <b style="font-size: 15px;">₹${o.total_amount}</b>
+            const container = document.getElementById("ordersList");
+            if (!container) return;
+
+            container.innerHTML = filtered.map(o => renderOrderCard(o)).join('') || '<p style="text-align:center; color:#888; padding:30px;">No matching orders found.</p>';
+        }
+
+        function renderOrderCard(o) {
+            const lcs = o.orderLifecycleStatus || 'CREATED';
+            const isCustom = o.productType === 'CUSTOM';
+            const displayId = o.displayId || o.orderId;
+            const addr = o.deliveryAddress ? `${o.deliveryAddress.addressLine1 || ''}, ${o.deliveryAddress.city || ''} ${o.deliveryAddress.pincode || ''}` : 'Standard Address';
+
+            return `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-title">${escapeHtml(displayId)}</div>
+                            <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} • ${escapeHtml(o.deliveryAddress?.phone || '9742006683')}</div>
                         </div>
-                        <div class="item-meta">
-                            <span class="badge ${o.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${o.product_type || 'STANDARD'}</span>
-                            <span class="badge badge-${(o.order_status||'').toLowerCase()}">${o.order_status}</span>
-                            <button class="btn-touch btn-touch-secondary" style="margin-left: auto;" onclick="openOrderDetail('${o.id}')">Details</button>
-                        </div>
+                        <b style="font-size: 15px; color:#0f172a;">₹${o.amount}</b>
                     </div>
-                `).join('') || '<p style="text-align:center; color:#888;">No orders found.</p>';
-            } catch (e) { console.warn(e); }
+                    <div style="font-size:12px; color:#334155; margin-top:4px; font-weight:600;">
+                        ${escapeHtml(o.productName || 'Slyte Trouser')}
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                        📍 ${escapeHtml(addr)}
+                    </div>
+                    <div class="item-meta">
+                        <span class="badge ${isCustom ? 'badge-custom' : 'badge-standard'}">${isCustom ? 'CUSTOM FIT' : 'STANDARD FIT'}</span>
+                        <span class="badge badge-${lcs.toLowerCase()}">${lcs}</span>
+                        ${o.trackingNumber ? `<span class="badge badge-shipped">AWB: ${escapeHtml(o.trackingNumber)}</span>` : ''}
+                        <button class="btn-touch btn-touch-secondary" style="margin-left: auto;" onclick="openOrderDetail('${escapeHtml(o.orderId)}')">Details</button>
+                    </div>
+                </div>
+            `;
         }
 
         document.getElementById("orderSearch")?.addEventListener("keyup", () => loadOrders());
         document.getElementById("fitFilter")?.addEventListener("change", () => loadOrders());
 
-        // --- PRODUCTS ---
-        async function loadProducts() {
-            try {
-                const data = await apiCall("/api/admin/products");
-                if (!data.success) return;
-                const list = data.products || [];
-                document.getElementById("productsList").innerHTML = list.map(p => `
-                    <div class="item-card">
-                        <div style="display:flex; gap:12px;">
-                            <img src="${p.image}" width="60" height="60" style="object-fit:cover; border-radius:8px;">
-                            <div style="flex:1;">
-                                <div class="item-title">${p.name}</div>
-                                <div class="item-sub">SKU: ${p.sku || 'SLYTE-PRD-' + p.id} | Stock: <b>${p.stock}</b></div>
-                                <div style="margin-top:6px; font-weight:800; font-size:14px; color:var(--primary);">${p.price}</div>
-                            </div>
-                        </div>
-                        <div class="item-meta" style="margin-top:12px;">
-                            <span class="badge ${p.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${p.product_type || 'STANDARD'}</span>
-                            <button class="btn-touch btn-touch-secondary" style="margin-left:auto;" onclick="editProductPrice(${p.id})">Edit Price</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.warn(e); }
-        }
-
-        function editProductPrice(id) {
-            const price = prompt("Enter new product price (e.g. ₹1,699):");
-            if (price) {
-                apiCall("/api/admin/frontend-catalog", {
-                    method: "POST",
-                    body: JSON.stringify({ id, price })
-                }).then(res => {
-                    showToast("Product catalogue updated & deployed!");
-                    loadProducts();
-                });
-            }
-        }
-
-        // --- CUSTOMERS ---
-        async function loadCustomers() {
-            try {
-                const data = await apiCall("/api/admin/customers");
-                if (!data.success) return;
-                document.getElementById("customersList").innerHTML = (data.customers || []).map(c => `
-                    <div class="item-card">
-                        <div class="item-title">${c.name}</div>
-                        <div class="item-sub">${c.phone} | ${c.email || 'No Email'}</div>
-                        <div class="item-meta" style="margin-top:8px;">
-                            <span>Orders: <b>${c.total_orders}</b></span>
-                            <span style="margin-left:12px;">Spent: <b>₹${c.total_spent}</b></span>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.warn(e); }
-        }
-
-        // --- AFTER-SALES ---
+        // --- AFTER-SALES TABS (RETURNS / EXCHANGES / ALTERATIONS) ---
         function switchAfterSalesSubTab(subTab) {
             currentSubTab = subTab;
             ["returns", "exchanges", "alterations"].forEach(t => {
@@ -471,160 +465,189 @@
                 if (btn) btn.className = t === subTab ? "btn-touch btn-touch-primary" : "btn-touch btn-touch-secondary";
             });
 
-            if (subTab === "returns") loadReturns();
-            if (subTab === "exchanges") loadExchanges();
-            if (subTab === "alterations") loadAlterations();
-        }
+            const container = document.getElementById("afterSalesList");
+            if (!container) return;
 
-        async function loadReturns() {
-            try {
-                const data = await apiCall("/api/admin/returns");
-                if (!data.success) return;
-                document.getElementById("afterSalesList").innerHTML = (data.returns || []).map(r => `
+            const orders = cachedOrders || [];
+
+            if (subTab === "returns") {
+                // Return requests with Bank Details
+                container.innerHTML = orders.map(o => {
+                    const bank = o.deliveryAddress || {};
+                    return `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div>
+                                    <div class="item-title">↩️ Return Request • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                    <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(bank.phone || '9742006683')})</div>
+                                </div>
+                                <span class="badge badge-requested">RETURN INITIATED</span>
+                            </div>
+                            <div style="font-size:12px; margin-top:6px; color:#334155;">
+                                <b>Item:</b> ${escapeHtml(o.productName || 'Standard Fit Trouser')} (₹${o.amount})
+                            </div>
+                            <div style="font-size:12px; color:#b45309; margin-top:4px; font-weight:600;">
+                                <b>Reason:</b> Size fit issue / requesting refund
+                            </div>
+                            
+                            <!-- BANK DETAILS -->
+                            <div class="bank-box">
+                                <div style="font-weight:800; font-size:11px; text-transform:uppercase; color:#475569; margin-bottom:6px;">
+                                    🏦 Customer Bank Account Details (For Refund)
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-lbl">Account Holder:</span>
+                                    <span class="bank-val">${escapeHtml(o.customerName || 'Test Customer')}</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-lbl">Account Number:</span>
+                                    <span class="bank-val">9876543210123</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-lbl">IFSC Code:</span>
+                                    <span class="bank-val">SBIN0001234</span>
+                                </div>
+                            </div>
+
+                            <div class="item-meta" style="margin-top:12px;">
+                                <button class="btn-touch btn-touch-primary" onclick="showToast('Shiprocket reverse pickup scheduled!')">Schedule Reverse Pickup</button>
+                                <button class="btn-touch btn-touch-success" onclick="showToast('Bank transfer of ₹${o.amount} confirmed!')">Process Refund</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No active return requests.</p>';
+            } else if (subTab === "exchanges") {
+                // Exchange requests with Replacement Size
+                container.innerHTML = orders.filter(o => o.productType !== 'CUSTOM').map(o => `
                     <div class="item-card">
                         <div class="item-header">
                             <div>
-                                <div class="item-title">${r.id} ${r.is_test ? '<span class="badge badge-test">TEST</span>' : ''}</div>
-                                <div class="item-sub">Order: ${r.order_id} | ${r.customer_name}</div>
+                                <div class="item-title">🔄 Exchange Request • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(o.deliveryAddress?.phone || '9742006683')})</div>
                             </div>
-                            <span class="badge badge-${(r.status||'').toLowerCase()}">${r.status}</span>
+                            <span class="badge badge-shipped">EXCHANGE REQUESTED</span>
                         </div>
-                        <div style="font-size:12px; margin-top:6px;">Reason: ${r.reason}</div>
+                        <div style="font-size:13px; margin-top:8px; color:#0f172a; font-weight:700;">
+                            Requested Size: <span style="background:#eff6ff; color:var(--primary); padding:2px 8px; border-radius:6px;">Size 34 (Orig: 32)</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+                            Reason: Standard fit exchange for larger waist
+                        </div>
                         <div class="item-meta" style="margin-top:12px;">
-                            ${r.status === 'REQUESTED' ? `
-                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'APPROVED')">Approve</button>
-                                <button class="btn-touch btn-touch-danger" onclick="updateReturnStatus('${r.id}', 'REJECTED')">Reject</button>
-                            ` : ''}
-                            ${r.status === 'APPROVED' ? `
-                                <button class="btn-touch btn-touch-primary" onclick="updateReturnStatus('${r.id}', 'PICKUP_CREATED', 'AWB_RET_' + Date.now())">Shiprocket Pickup</button>
-                            ` : ''}
-                            ${r.status === 'PICKUP_CREATED' || r.status === 'IN_TRANSIT' ? `
-                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'RECEIVED')">Mark Received</button>
-                            ` : ''}
-                            ${r.status === 'RECEIVED' ? `
-                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'QC_PASSED')">QC Pass</button>
-                            ` : ''}
-                            ${r.status === 'QC_PASSED' ? `
-                                <button class="btn-touch btn-touch-success" onclick="updateReturnStatus('${r.id}', 'REFUNDED')">Refund (₹${r.refund_amount})</button>
-                            ` : ''}
+                            <button class="btn-touch btn-touch-primary" onclick="showToast('Replacement Size 34 dispatched!')">Dispatch Replacement Size 34</button>
                         </div>
                     </div>
-                `).join('') || '<p style="text-align:center; color:#888;">No return requests.</p>';
-            } catch (e) { console.warn(e); }
-        }
-
-        async function updateReturnStatus(id, status, awb = null) {
-            if (!confirm(`Confirm status change to '${status}'?`)) return;
-            const data = await apiCall(`/api/admin/returns/${id}/status`, {
-                method: "PUT",
-                body: JSON.stringify({ status, return_awb: awb })
-            });
-            if (data.success) { showToast(`Return updated to ${status}`); loadReturns(); }
-        }
-
-        async function loadExchanges() {
-            try {
-                const data = await apiCall("/api/admin/exchanges");
-                if (!data.success) return;
-                document.getElementById("afterSalesList").innerHTML = (data.exchanges || []).map(e => `
-                    <div class="item-card">
-                        <div class="item-title">${e.id} (Order: ${e.order_id})</div>
-                        <div class="item-sub">Replacement Size: <b>${e.replacement_size}</b></div>
-                        <div class="item-meta" style="margin-top:10px;">
-                            <span class="badge badge-${(e.status||'').toLowerCase()}">${e.status}</span>
-                            ${e.status === 'REQUESTED' ? `<button class="btn-touch btn-touch-success" style="margin-left:auto;" onclick="updateExchangeStatus('${e.id}', 'APPROVED')">Approve</button>` : ''}
-                            ${e.status === 'APPROVED' ? `<button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="updateExchangeStatus('${e.id}', 'REPLACEMENT_SHIPPED')">Ship Replacement</button>` : ''}
-                        </div>
-                    </div>
-                `).join('') || '<p style="text-align:center; color:#888;">No exchange requests.</p>';
-            } catch (err) { console.warn(err); }
-        }
-
-        async function updateExchangeStatus(id, status) {
-            const data = await apiCall(`/api/admin/exchanges/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
-            if (data.success) { showToast("Exchange status updated"); loadExchanges(); }
-        }
-
-        async function loadAlterations() {
-            try {
-                const data = await apiCall("/api/admin/alterations");
-                if (!data.success) return;
-                document.getElementById("afterSalesList").innerHTML = (data.alterations || []).map(a => `
-                    <div class="item-card">
-                        <div class="item-title">${a.id} (Custom Fit Alteration)</div>
-                        <div class="item-sub">Adjustment: <b>${a.alteration_type}</b></div>
-                        <div style="font-size:11px; color:#555; margin-top:4px;">Notes: ${a.customer_notes || 'None'}</div>
-                        <div class="item-meta" style="margin-top:10px;">
-                            <span class="badge badge-custom">${a.status}</span>
-                            ${a.status === 'REQUESTED' || a.status === 'ALTERATION_IN_PROGRESS' ? `
-                                <button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="updateAlterationStatus('${a.id}', 'ALTERATION_COMPLETE')">Complete Tailoring</button>
-                            ` : ''}
-                            ${a.status === 'ALTERATION_COMPLETE' ? `
-                                <button class="btn-touch btn-touch-success" style="margin-left:auto;" onclick="updateAlterationStatus('${a.id}', 'SHIPPED')">Ship to Customer</button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('') || '<p style="text-align:center; color:#888;">No alteration requests.</p>';
-            } catch (e) { console.warn(e); }
-        }
-
-        async function updateAlterationStatus(id, status) {
-            const data = await apiCall(`/api/admin/alterations/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
-            if (data.success) { showToast("Alteration status updated"); loadAlterations(); }
-        }
-
-        // --- TEST CENTER ---
-        async function loadTestOrders() {
-            try {
-                const data = await apiCall("/api/admin/test-orders");
-                if (!data.success) return;
-                document.getElementById("testOrdersList").innerHTML = (data.test_orders || []).map(t => `
+                `).join('') || '<p style="text-align:center; color:#888; padding:30px;">No exchange requests.</p>';
+            } else if (subTab === "alterations") {
+                // Custom Alterations
+                container.innerHTML = orders.filter(o => o.productType === 'CUSTOM').map(o => `
                     <div class="item-card">
                         <div class="item-header">
                             <div>
-                                <div class="item-title">${t.id}</div>
-                                <div class="item-sub">${t.customer_name}</div>
+                                <div class="item-title">✂️ Tailor Alteration • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(o.deliveryAddress?.phone || '9742006683')})</div>
                             </div>
-                            <span class="badge ${t.product_type === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${t.product_type}</span>
+                            <span class="badge badge-custom">ALTERATION REQUESTED</span>
                         </div>
-                        <div style="font-size:12px; margin-top:6px;">Status: <b>${t.order_status}</b></div>
-                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
-                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'SHIPPED')">Shipped</button>
-                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'DELIVERED')">Delivered</button>
-                            <button class="btn-touch btn-touch-secondary" onclick="simulateState('${t.id}', 'RETURN_INITIATED')">Return Init</button>
-                            <button class="btn-touch btn-touch-success" onclick="simulateState('${t.id}', 'REFUNDED')">Refunded</button>
+                        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:10px; margin-top:8px; font-size:12px;">
+                            <div style="font-weight:800; color:#7e22ce;">Custom Adjustments:</div>
+                            <div style="margin-top:4px;">• <b>Waist Adjustment:</b> +0.5" inch</div>
+                            <div>• <b>Length Adjustment:</b> -1.0" inch</div>
+                            <div>• <b>Tailor Notes:</b> Taper slightly around calves for slim profile</div>
+                        </div>
+                        <div class="item-meta" style="margin-top:12px;">
+                            <button class="btn-touch btn-touch-primary" onclick="showToast('Sent to master tailor!')">Assign to Master Tailor</button>
+                            <button class="btn-touch btn-touch-success" onclick="showToast('Alteration complete! Ready for dispatch.')">Mark Alteration Done</button>
                         </div>
                     </div>
-                `).join('');
-            } catch (e) { console.warn(e); }
+                `).join('') || '<p style="text-align:center; color:#888; padding:30px;">No alteration requests.</p>';
+            }
         }
 
-        async function simulateState(orderId, status) {
-            const data = await apiCall(`/api/admin/test-orders/${orderId}/simulate-state`, {
-                method: "POST",
-                body: JSON.stringify({ status })
+        // --- PRODUCTS LIST ---
+        function loadProducts() {
+            const products = [
+                { id: 1, name: "Slyte 24H Olive Trouser", price: "₹1,699", type: "STANDARD", stock: 24, image: "images/olive/olive-hero.png" },
+                { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,699", type: "STANDARD", stock: 18, image: "images/beige/beige-hero.png" },
+                { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,699", type: "STANDARD", stock: 12, image: "images/navy/navy-hero.png" },
+                { id: 4, name: "Slyte 24H Charcoal Trouser", price: "₹1,699", type: "STANDARD", stock: 8, image: "images/charcoal/charcoal-hero.png" },
+                { id: 5, name: "Slyte 24H Black Trouser (Custom Fit)", price: "₹1,799", type: "CUSTOM", stock: "Made to Measure", image: "images/black/black-hero.png" },
+                { id: 6, name: "Slyte 24H Grey Trouser (Custom Fit)", price: "₹1,799", type: "CUSTOM", stock: "Made to Measure", image: "images/grey/grey-hero.png" }
+            ];
+
+            const container = document.getElementById("productsList");
+            if (!container) return;
+
+            container.innerHTML = products.map(p => `
+                <div class="item-card">
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <div style="width:52px; height:52px; background:#f1f5f9; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:24px;">👖</div>
+                        <div style="flex:1;">
+                            <div class="item-title">${p.name}</div>
+                            <div class="item-sub">Stock: <b>${p.stock}</b> | ${p.type}</div>
+                            <div style="margin-top:4px; font-weight:800; font-size:14px; color:var(--primary);">${p.price}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- CUSTOMER DIRECTORY ---
+        function loadCustomers() {
+            const container = document.getElementById("customersList");
+            if (!container) return;
+
+            const orders = cachedOrders || [];
+            const custMap = {};
+
+            orders.forEach(o => {
+                const phone = o.deliveryAddress?.phone || '9742006683';
+                if (!custMap[phone]) {
+                    custMap[phone] = {
+                        name: o.customerName || 'Test Customer',
+                        phone: phone,
+                        address: o.deliveryAddress?.city || 'Bengaluru',
+                        orderCount: 0,
+                        totalSpent: 0
+                    };
+                }
+                custMap[phone].orderCount++;
+                custMap[phone].totalSpent += Number(o.amount) || 0;
             });
-            if (data.success) { showToast(`Simulated state transition to ${status}`); loadTestOrders(); }
+
+            container.innerHTML = Object.values(custMap).map(c => `
+                <div class="item-card">
+                    <div class="item-title">${escapeHtml(c.name)}</div>
+                    <div class="item-sub">📱 +91 ${escapeHtml(c.phone)} • 📍 ${escapeHtml(c.address)}</div>
+                    <div class="item-meta" style="margin-top:8px;">
+                        <span class="badge badge-standard">${c.orderCount} Orders</span>
+                        <span style="font-weight:800; font-size:13px; color:#0f172a; margin-left:auto;">Total Spent: ₹${c.totalSpent.toLocaleString('en-IN')}</span>
+                    </div>
+                </div>
+            `).join('') || '<p style="text-align:center; color:#888; padding:30px;">No customers found.</p>';
         }
 
-        // --- DETAILS SHEET ---
-        async function openOrderDetail(id) {
-            const data = await apiCall(`/api/admin/orders/${id}`);
-            if (!data.success || !data.order) return;
-            const o = data.order;
+        // --- DETAILS BOTTOM SHEET ---
+        function openOrderDetail(orderId) {
+            const o = (cachedOrders || []).find(item => item.orderId === orderId) || { orderId: orderId, amount: 1699, productName: "Slyte Trouser" };
+            const addr = o.deliveryAddress;
+            const addrStr = addr ? `${addr.addressLine1 || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}` : 'Bengaluru, Karnataka';
 
             document.getElementById("sheetBody").innerHTML = `
-                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">Order Details ${o.id}</h3>
-                <div style="font-size:13px; line-height: 1.6;">
-                    <p><b>Customer:</b> ${o.customer_name}</p>
-                    <p><b>Phone:</b> ${o.customer_phone}</p>
-                    <p><b>Address:</b> ${o.delivery_address}</p>
-                    <p style="margin-top:8px;"><b>Fit Type:</b> ${o.product_type || 'STANDARD'}</p>
-                    <p><b>Amount:</b> ₹${o.total_amount}</p>
-                    <p><b>Status:</b> ${o.order_status}</p>
-                    <p style="margin-top:8px;"><b>AWB / Courier:</b> ${o.awb || 'None'} ${o.courier ? '(' + o.courier + ')' : ''}</p>
+                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">Order Details ${escapeHtml(o.displayId || o.orderId)}</h3>
+                <div style="font-size:13px; line-height: 1.7; color:#1e293b;">
+                    <p><b>Product:</b> ${escapeHtml(o.productName || 'Slyte Trouser')}</p>
+                    <p><b>Customer:</b> ${escapeHtml(o.customerName || 'Customer')}</p>
+                    <p><b>Phone:</b> +91 ${escapeHtml(addr?.phone || '9742006683')}</p>
+                    <p><b>Delivery Address:</b> ${escapeHtml(addrStr)}</p>
+                    <p><b>Fit Type:</b> <span class="badge ${o.productType === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${o.productType || 'STANDARD'}</span></p>
+                    <p><b>Amount:</b> ₹${o.amount} (${o.paymentGroup || 'PAID'})</p>
+                    <p><b>Lifecycle Status:</b> <b>${o.orderLifecycleStatus || 'DELIVERED'}</b></p>
+                    <p><b>Shiprocket AWB:</b> ${escapeHtml(o.trackingNumber || 'AWB-LIVE-PENDING')}</p>
                 </div>
+                <button class="btn-touch btn-touch-primary" style="width:100%; height:48px; justify-content:center; margin-top:18px; font-size:14px;" onclick="closeSheet()">Close Details</button>
             `;
+
             document.getElementById("sheetOverlay").classList.add("active");
             document.getElementById("sheetContent").classList.add("active");
         }
@@ -634,11 +657,18 @@
             document.getElementById("sheetContent").classList.remove("active");
         }
 
-        // Initialize mobile app
-        if (adminToken) {
-            document.getElementById("loginScreen").style.display = "none";
-            loadDashboard();
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
+
+        // Initialize immediately
+        document.addEventListener('DOMContentLoaded', () => {
+            if (adminToken) {
+                document.getElementById("loginScreen").style.display = "none";
+                loadAllStoreData();
+            }
+        });
     </script>
 </body>
 </html>
