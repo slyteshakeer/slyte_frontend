@@ -1,6 +1,6 @@
 /**
- * Slyte Cashfree One-Click Checkout Auth Modal
- * Premium Black UI/UX 2-Step Mobile OTP Authentication before launching Cashfree payment gateway.
+ * Slyte Cashfree One-Click Checkout Auth Modal & Hamburger Profile Manager
+ * Premium Black UI/UX 2-Step Mobile OTP Authentication & Persistent Session Management.
  */
 (function () {
     var API_BASE = "https://api.slyte.in";
@@ -26,6 +26,16 @@
             return clean;
         }
         return null;
+    }
+
+    function logoutCustomer() {
+        try {
+            ["slyte_phone", "userPhone", "dash_phone", "slyteUser", "slyte_otp_token", "username"].forEach(function (key) {
+                localStorage.removeItem(key);
+            });
+        } catch (e) {}
+        updateHamburgerUserProfile();
+        window.dispatchEvent(new CustomEvent("slyteauthchange", { detail: { loggedIn: false } }));
     }
 
     function createModalDom() {
@@ -188,7 +198,7 @@
     function ensureVerifiedPhone(onSuccessCallback) {
         var currentPhone = getVerifiedCustomerPhone();
         if (currentPhone) {
-            onSuccessCallback(currentPhone);
+            if (typeof onSuccessCallback === "function") onSuccessCallback(currentPhone);
             return;
         }
 
@@ -301,7 +311,9 @@
                     localStorage.setItem("userPhone", currentEnteredPhone);
                     localStorage.setItem("slyte_otp_token", data.token || ("jwt_slyte_cust_" + currentEnteredPhone + "_" + Date.now()));
                     overlay.style.display = "none";
-                    onSuccessCallback(currentEnteredPhone);
+                    updateHamburgerUserProfile();
+                    window.dispatchEvent(new CustomEvent("slyteauthchange", { detail: { loggedIn: true, phone: currentEnteredPhone } }));
+                    if (typeof onSuccessCallback === "function") onSuccessCallback(currentEnteredPhone);
                 } else {
                     otpErr.textContent = data.message || "Invalid OTP. Please try again.";
                     otpErr.style.display = "block";
@@ -328,6 +340,160 @@
         resendBtn.onclick = handleGetOtp;
     }
 
+    function updateHamburgerUserProfile() {
+        var menuDrawer = document.getElementById("menuDrawer");
+        if (!menuDrawer) return;
+
+        var profileContainer = document.getElementById("slyte-menu-user-profile");
+        if (!profileContainer) {
+            profileContainer = document.createElement("div");
+            profileContainer.id = "slyte-menu-user-profile";
+            var menuHeader = menuDrawer.querySelector(".menu-header");
+            var menuNav = menuDrawer.querySelector(".menu-nav");
+            if (menuHeader && menuNav) {
+                menuDrawer.insertBefore(profileContainer, menuNav);
+            } else {
+                menuDrawer.prepend(profileContainer);
+            }
+        }
+
+        var phone = getVerifiedCustomerPhone();
+        if (phone) {
+            var formattedPhone = "+91 " + phone;
+            profileContainer.innerHTML = `
+                <div style="
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    padding: 14px 16px;
+                    margin: 12px 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+                    box-sizing: border-box;
+                ">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="
+                            width: 38px; height: 38px;
+                            background: #000000;
+                            color: #ffffff;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">person</span>
+                        </div>
+                        <div style="text-align: left;">
+                            <div style="font-size: 14px; font-weight: 800; color: #000000;">${formattedPhone}</div>
+                            <div style="font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                                <span style="display: inline-block; width: 6px; height: 6px; background: #16a34a; border-radius: 50%;"></span> Logged In
+                            </div>
+                        </div>
+                    </div>
+                    <button id="slyte-menu-logout-btn" style="
+                        background: #ffffff;
+                        border: 1.5px solid #000000;
+                        color: #000000;
+                        border-radius: 8px;
+                        padding: 6px 12px;
+                        font-size: 12px;
+                        font-weight: 800;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                    ">
+                        <span class="material-symbols-outlined" style="font-size: 15px;">logout</span>
+                        Logout
+                    </button>
+                </div>
+            `;
+
+            var logoutBtn = document.getElementById("slyte-menu-logout-btn");
+            if (logoutBtn) {
+                logoutBtn.onclick = function (e) {
+                    e.stopPropagation();
+                    logoutCustomer();
+                };
+            }
+        } else {
+            profileContainer.innerHTML = `
+                <div style="
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    padding: 14px 16px;
+                    margin: 12px 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-sizing: border-box;
+                ">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="
+                            width: 38px; height: 38px;
+                            background: #e2e8f0;
+                            color: #64748b;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">account_circle</span>
+                        </div>
+                        <div style="text-align: left;">
+                            <div style="font-size: 14px; font-weight: 800; color: #000000;">Account</div>
+                            <div style="font-size: 11px; color: #64748b;">Sign in for fast checkout</div>
+                        </div>
+                    </div>
+                    <button id="slyte-menu-login-btn" style="
+                        background: #000000;
+                        border: none;
+                        color: #ffffff;
+                        border-radius: 8px;
+                        padding: 8px 14px;
+                        font-size: 12px;
+                        font-weight: 800;
+                        cursor: pointer;
+                    ">
+                        Log In
+                    </button>
+                </div>
+            `;
+
+            var loginBtn = document.getElementById("slyte-menu-login-btn");
+            if (loginBtn) {
+                loginBtn.onclick = function (e) {
+                    e.stopPropagation();
+                    ensureVerifiedPhone(function () {
+                        updateHamburgerUserProfile();
+                    });
+                };
+            }
+        }
+    }
+
+    function initMenuProfileWatcher() {
+        updateHamburgerUserProfile();
+
+        document.addEventListener("click", function (e) {
+            if (e.target && (e.target.closest(".menu-btn") || e.target.closest("#menuCloseBtn") || e.target.closest("#menuOverlay"))) {
+                updateHamburgerUserProfile();
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initMenuProfileWatcher);
+    } else {
+        initMenuProfileWatcher();
+    }
+
     window.getVerifiedCustomerPhone = getVerifiedCustomerPhone;
     window.ensureVerifiedPhone = ensureVerifiedPhone;
+    window.logoutCustomer = logoutCustomer;
+    window.updateHamburgerUserProfile = updateHamburgerUserProfile;
 })();
