@@ -21,6 +21,10 @@
     "SHIPROCKET_EMAIL": "dashclothingin@gmail.com",
     "SUPABASE_URL": "https://iqdtfllkdtjypiseklzt.supabase.co",
     "PORT": "3000",
-    "GOOGLE_CLIENT_ID": "529998054171-r8b812rrog6vec73leabukse393rndmt.apps.googleusercontent.com"
+    "GOOGLE_CLIENT_ID": "529998054171-r8b812rrog6vec73leabukse393rndmt.apps.googleusercontent.com",
+    "BOT_TOKEN": "8624516378:AAF7PcB57N47qtOKEkliTUwEmgJsFlVjUcA",
+    "CHAT_ID": "7150423241",
+    "SHIPROCKET_PASSWORD": "DQpb6oi^p3D!ypkVCFlff*rCVgb7Mu9G",
+    "SHIPROCKET_PICKUP_LOCATION": "home-1"
   }
 }

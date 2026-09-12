@@ -461,6 +461,7 @@ export default {
 
                             const BOT_TOKEN = env && env.BOT_TOKEN;
                             const CHAT_ID = env && env.CHAT_ID;
+                            console.log(`[slyte-api] BOT_TOKEN available: ${!!BOT_TOKEN}, CHAT_ID: ${!!CHAT_ID}`);
                             if (BOT_TOKEN && CHAT_ID) {
                                 const cartText = cartItems.map((item, i) =>
                                     `${i + 1}. ${item.quantity || 1}x ${item.name || "Item"}${item.size ? " (Size: " + item.size + ")" : ""}`
