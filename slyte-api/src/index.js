@@ -173,50 +173,155 @@ export default {
             }
 
             // ----------------------------------------------------
-            // CHECKOUT & PAYMENT
+            // CHECKOUT & PAYMENT (Cashfree Gateway Integration)
             // ----------------------------------------------------
             if (pathStr === "/create-order" || pathStr === "/api/payment/create") {
                 if (method === "POST") {
                     const body = await request.json().catch(() => ({}));
                     const newOrder = backendStore.createOrder(body);
 
-                    return jsonResponse({
-                        success: true,
-                        message: "Order initiated successfully",
-                        data: {
-                            order_id: newOrder.id,
-                            payment_session_id: "session_cf_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-                            amount: newOrder.total_amount,
-                            user: {
-                                phone: newOrder.customer_phone,
-                                name: newOrder.customer_name
+                    const appId = env && env.CASHFREE_APP_ID;
+                    const secretKey = env && env.CASHFREE_SECRET_KEY;
+                    const cfEnv = ((env && env.CASHFREE_ENV) || "PRODUCTION").toUpperCase();
+                    const cfBaseUrl = cfEnv === "SANDBOX"
+                        ? "https://sandbox.cashfree.com/pg"
+                        : "https://api.cashfree.com/pg";
+
+                    // Call Cashfree API if credentials are provided in environment
+                    if (appId && secretKey) {
+                        try {
+                            const origin = request.headers.get("Origin") || "https://slyte.in";
+                            const cleanPhone = String(newOrder.customer_phone || "9999999999").replace(/\D/g, '').slice(-10) || "9999999999";
+                            const customerId = "cust_" + cleanPhone;
+
+                            const cfPayload = {
+                                order_id: newOrder.id,
+                                order_amount: Number(newOrder.total_amount),
+                                order_currency: "INR",
+                                customer_details: {
+                                    customer_id: customerId,
+                                    customer_name: newOrder.customer_name || "Customer",
+                                    customer_email: newOrder.customer_email || "customer@slyte.in",
+                                    customer_phone: cleanPhone
+                                },
+                                order_meta: {
+                                    return_url: `${origin}/index.html?order_id={order_id}`
+                                }
+                            };
+
+                            console.log(`[slyte-api] Requesting Cashfree payment session for order ${newOrder.id} (${cfEnv})...`);
+
+                            const cfRes = await fetch(`${cfBaseUrl}/orders`, {
+                                method: "POST",
+                                headers: {
+                                    "x-api-version": "2023-08-01",
+                                    "x-client-id": appId,
+                                    "x-client-secret": secretKey,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(cfPayload)
+                            });
+
+                            const cfData = await cfRes.json().catch(() => ({}));
+
+                            if (!cfRes.ok || !cfData.payment_session_id) {
+                                console.error("[slyte-api] Cashfree API error:", cfRes.status, cfData);
+                                return jsonResponse({
+                                    success: false,
+                                    error: cfData.message || cfData.error || `Cashfree API returned status ${cfRes.status}`,
+                                    code: cfData.code,
+                                    details: cfData
+                                }, 400, corsHeaders);
                             }
+
+                            console.log(`[slyte-api] Cashfree payment session created successfully: ${cfData.payment_session_id}`);
+
+                            return jsonResponse({
+                                success: true,
+                                message: "Order initiated successfully",
+                                data: {
+                                    order_id: newOrder.id,
+                                    payment_session_id: cfData.payment_session_id,
+                                    cf_order_id: cfData.cf_order_id,
+                                    amount: newOrder.total_amount,
+                                    user: {
+                                        phone: newOrder.customer_phone,
+                                        name: newOrder.customer_name
+                                    }
+                                }
+                            }, 200, corsHeaders);
+
+                        } catch (err) {
+                            console.error("[slyte-api] Exception calling Cashfree API:", err);
+                            return jsonResponse({
+                                success: false,
+                                error: "Failed to connect to Cashfree Payment Gateway: " + err.message
+                            }, 500, corsHeaders);
                         }
-                    }, 200, corsHeaders);
+                    }
+
+                    // Clear error response when CASHFREE_APP_ID or CASHFREE_SECRET_KEY are missing in Worker secrets
+                    console.warn("[slyte-api] CASHFREE_APP_ID / CASHFREE_SECRET_KEY missing in Cloudflare Worker environment.");
+                    return jsonResponse({
+                        success: false,
+                        error: "Cashfree payment gateway credentials are not configured on the server. Please set CASHFREE_APP_ID and CASHFREE_SECRET_KEY using 'npx wrangler secret put'.",
+                        message: "Cashfree credentials missing"
+                    }, 500, corsHeaders);
                 }
             }
 
             if (pathStr.startsWith("/verify-order/") || pathStr.startsWith("/api/payment/verify/")) {
                 const parts = pathStr.split("/");
                 const orderId = parts[parts.length - 1];
-                const order = backendStore.getOrderById(orderId);
+                let order = backendStore.getOrderById(orderId);
+
+                const appId = env && env.CASHFREE_APP_ID;
+                const secretKey = env && env.CASHFREE_SECRET_KEY;
+                const cfEnv = ((env && env.CASHFREE_ENV) || "PRODUCTION").toUpperCase();
+                const cfBaseUrl = cfEnv === "SANDBOX"
+                    ? "https://sandbox.cashfree.com/pg"
+                    : "https://api.cashfree.com/pg";
+
+                let isPaid = false;
+
+                // Verify status with Cashfree if credentials present
+                if (appId && secretKey && orderId) {
+                    try {
+                        const cfRes = await fetch(`${cfBaseUrl}/orders/${orderId}`, {
+                            method: "GET",
+                            headers: {
+                                "x-api-version": "2023-08-01",
+                                "x-client-id": appId,
+                                "x-client-secret": secretKey
+                            }
+                        });
+                        if (cfRes.ok) {
+                            const cfData = await cfRes.json().catch(() => ({}));
+                            if (cfData.order_status === "PAID") {
+                                isPaid = true;
+                                backendStore.updateOrderStatus(orderId, "PAID");
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("[slyte-api] Could not verify with Cashfree API:", err.message);
+                    }
+                }
 
                 if (order) {
-                    // Idempotent notification check
+                    if (isPaid) order.order_status = "PAID";
+                    
                     let notificationLogged = false;
-                    if (!backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
+                    if (order.order_status === "PAID" && !backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
                         backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");
                         notificationLogged = true;
                         console.log(`[slyte-api] Telegram notification sent once for order ${orderId}`);
-                    } else {
-                        console.log(`[slyte-api] Telegram notification already sent previously for order ${orderId} — skipping duplicate.`);
                     }
 
                     return jsonResponse({
                         success: true,
                         order_id: orderId,
                         order_status: order.order_status,
-                        payment_status: "PAID",
+                        payment_status: order.order_status === "PAID" ? "PAID" : "PENDING",
                         notification_sent: notificationLogged,
                         data: order
                     }, 200, corsHeaders);
@@ -225,16 +330,35 @@ export default {
                 return jsonResponse({
                     success: true,
                     order_id: orderId,
-                    order_status: "PAID",
-                    payment_status: "PAID",
+                    order_status: isPaid ? "PAID" : "PENDING",
+                    payment_status: isPaid ? "PAID" : "PENDING",
                     data: {
                         id: orderId,
                         total_amount: 1699,
                         customer_name: "Valued Customer",
                         customer_phone: "9742006683",
-                        order_status: "PAID"
+                        order_status: isPaid ? "PAID" : "PENDING"
                     }
                 }, 200, corsHeaders);
+            }
+
+            // Webhook handler for Cashfree payment notifications
+            if (pathStr === "/api/payment/webhook" || pathStr === "/webhook/cashfree") {
+                if (method === "POST") {
+                    const webhookBody = await request.json().catch(() => ({}));
+                    console.log("[slyte-api] Cashfree Webhook received:", webhookBody);
+
+                    if (webhookBody.data && webhookBody.data.order) {
+                        const orderId = webhookBody.data.order.order_id;
+                        const status = webhookBody.data.order.order_status;
+                        if (orderId && status === "PAID") {
+                            backendStore.updateOrderStatus(orderId, "PAID");
+                            console.log(`[slyte-api] Webhook marked order ${orderId} as PAID`);
+                        }
+                    }
+
+                    return jsonResponse({ success: true, received: true }, 200, corsHeaders);
+                }
             }
 
             if (pathStr === "/api/orders/cancel" && method === "POST") {
@@ -602,7 +726,14 @@ async function processCashfreeRefund(order, refundAmount, env) {
     }
 }
 
+let cachedShiprocketToken = null;
+let cachedShiprocketTokenExpiry = 0;
+
 async function getShiprocketToken(env) {
+    if (cachedShiprocketToken && Date.now() < cachedShiprocketTokenExpiry) {
+        return cachedShiprocketToken;
+    }
+
     const email = env?.SHIPROCKET_EMAIL || "dashclothingin@gmail.com";
     const password = env?.SHIPROCKET_PASSWORD || atob("RFFwYjZvaV5wM0QheXBrVkNGbGZmKnJDVmdiN011OUc=");
     if (!email || !password) return null;
@@ -616,6 +747,8 @@ async function getShiprocketToken(env) {
         const data = await res.json();
         if (data.token) {
             console.log("[Shiprocket Auth] Token obtained successfully");
+            cachedShiprocketToken = data.token;
+            cachedShiprocketTokenExpiry = Date.now() + (9 * 24 * 60 * 60 * 1000); // 9 days cache
             return data.token;
         } else {
             console.warn("[Shiprocket Auth] Login response:", data);

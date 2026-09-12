@@ -150,11 +150,11 @@
 
         const data = await res.json().catch(() => ({}));
 
-        if (!res.ok) {
+        if (!res.ok || (data && data.success === false)) {
             console.error("Backend error response:", data);
             const msg =
-                data.message ||
                 data.error ||
+                data.message ||
                 `Checkout failed (${res.status})`;
             const err = new Error(msg);
             err.details = data;

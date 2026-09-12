@@ -270,10 +270,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (typeof Cashfree !== "undefined") {
-                const cf = Cashfree({ mode: "production" });
+                const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
+                const cf = Cashfree({ mode: mode.toLowerCase() });
                 cf.checkout({
                     paymentSessionId: sid,
-                    returnUrl: window.location.origin + "/index.html?order_id=" + encodeURIComponent(oid || "")
+                    redirectTarget: "_modal"
                 });
             } else {
                 throw new Error("Cashfree SDK not loaded on this page.");
