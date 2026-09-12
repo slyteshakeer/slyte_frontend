@@ -196,6 +196,18 @@
                             console.warn('Auto-login call:', e);
                         }
 
+                        // Deduct stock in Cloudflare KV across chambers
+                        try {
+                            if (window.SlyteInventory && typeof window.SlyteInventory.deductRemote === 'function') {
+                                const orderItems = order.cart_details || order.items || [];
+                                if (orderItems.length > 0) {
+                                    window.SlyteInventory.deductRemote(orderItems);
+                                }
+                            }
+                        } catch(e) {
+                            console.warn('Stock deduction note:', e);
+                        }
+
                         // Dispatch auth change so hamburger updates
                         window.dispatchEvent(new Event('slyteauthchange'));
                     }

@@ -96,7 +96,77 @@ window.SlyteInventory = {
         } catch(e) {
             console.warn('Storage save error:', e);
         }
+        // Save to remote cloud async
+        this.saveRemote(inv);
         return inv[String(pid)];
+    },
+    // Async remote fetch to sync cloud stock to frontend
+    fetchRemote: async function() {
+        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        try {
+            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.inventory && data.inventory["1"]) {
+                    localStorage.setItem('slyte_inventory_v2', JSON.stringify(data.inventory));
+                    window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: data.inventory } }));
+                    return data.inventory;
+                }
+            }
+        } catch (e) {
+            console.warn('[SlyteInventory] Remote fetch fallback:', e);
+        }
+        return this.getAll();
+    },
+    // Async remote save from Admin app or manager
+    saveRemote: async function(inv) {
+        if (!inv) inv = this.getAll();
+        try {
+            localStorage.setItem('slyte_inventory_v2', JSON.stringify(inv));
+            window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: inv } }));
+        } catch(e) {}
+
+        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        try {
+            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ inventory: inv })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.inventory) {
+                    localStorage.setItem('slyte_inventory_v2', JSON.stringify(data.inventory));
+                    window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: data.inventory } }));
+                    return data.inventory;
+                }
+            }
+        } catch (e) {
+            console.warn('[SlyteInventory] Remote save error:', e);
+        }
+        return inv;
+    },
+    // Async remote deduct on purchase
+    deductRemote: async function(items) {
+        if (!items || (Array.isArray(items) && items.length === 0)) return;
+        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        try {
+            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory/deduct`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: items })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.inventory) {
+                    localStorage.setItem('slyte_inventory_v2', JSON.stringify(data.inventory));
+                    window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: data.inventory, deductions: data.deductions } }));
+                    return data.inventory;
+                }
+            }
+        } catch (e) {
+            console.warn('[SlyteInventory] Remote deduct error:', e);
+        }
     },
     // Stock available for "ALL" (Custom Fit + Standard Fit)
     getAllStock: function(pid, size) {
@@ -161,6 +231,11 @@ window.SlyteInventory = {
         };
     }
 };
+
+// Proactively sync live stock from cloud on load
+if (typeof window !== 'undefined') {
+    try { window.SlyteInventory.fetchRemote(); } catch(e) {}
+}
 
 var productsData = window.productsData;
 if (typeof module !== 'undefined' && module.exports) {

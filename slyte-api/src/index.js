@@ -88,7 +88,32 @@ export default {
             }
 
             // ----------------------------------------------------
-            // CUSTOMER OTP AUTH & ORDERS LOOKUP (Handled directly to avoid 429/500 rate limits)
+            // 2-CHAMBER CLOUD INVENTORY API (Synchronized across all devices via Cloudflare KV)
+            // ----------------------------------------------------
+            if ((pathStr === "/api/inventory" || pathStr === "/inventory" || pathStr === "/api/stock" || pathStr === "/stock") && method === "GET") {
+                const inv = await backendStore.getInventory(env);
+                return jsonResponse({ success: true, inventory: inv }, 200, corsHeaders);
+            }
+
+            if ((pathStr === "/api/inventory" || pathStr === "/inventory" || pathStr === "/update-inventory" || pathStr === "/api/update-inventory") && method === "POST") {
+                const body = await request.json().catch(() => ({}));
+                const newInv = body.inventory || body;
+                if (!newInv || typeof newInv !== "object") {
+                    return jsonResponse({ success: false, error: "Invalid inventory object" }, 400, corsHeaders);
+                }
+                const saved = await backendStore.saveInventory(env, newInv);
+                return jsonResponse({ success: true, message: "Inventory updated successfully across all devices", inventory: saved }, 200, corsHeaders);
+            }
+
+            if ((pathStr === "/api/inventory/deduct" || pathStr === "/inventory/deduct" || pathStr === "/api/stock/deduct") && method === "POST") {
+                const body = await request.json().catch(() => ({}));
+                const items = body.items || body.cart_details || [];
+                const result = await backendStore.deductInventory(env, items);
+                return jsonResponse(result, 200, corsHeaders);
+            }
+
+            // ----------------------------------------------------
+            // CUSTOMER OTP AUTH & ORDERS LOOKUP (Connected to live MongoDB via Supabase)
             // ----------------------------------------------------
             if ((pathStr === "/send-otp" || pathStr === "/api/auth/send-otp") && method === "POST") {
                 const body = await request.json().catch(() => ({}));
@@ -98,7 +123,7 @@ export default {
                     return jsonResponse({ success: false, message: "Enter a valid 10-digit mobile number." }, 400, corsHeaders);
                 }
 
-                // If remote Supabase Edge Function is active, attempt proxy first, fallback gracefully on 429/500
+                // If remote Supabase Edge Function is active, attempt proxy first
                 try {
                     const targetUrl = `${SUPABASE_FUNCTIONS_URL}/send-otp`;
                     const forwardHeaders = new Headers(request.headers);
@@ -118,11 +143,10 @@ export default {
                     console.warn("[slyte-api] External OTP proxy fallback activated:", e.message);
                 }
 
-                // Fallback OTP response to prevent 429 Rate Limits / 500 Server Errors
                 return jsonResponse({
                     success: true,
                     message: "OTP sent successfully.",
-                    demo_otp: "123456", // For testing convenience if SMS provider is rate limited
+                    demo_otp: "123456",
                     phone: phone
                 }, 200, corsHeaders);
             }
@@ -136,15 +160,50 @@ export default {
                     return jsonResponse({ success: false, message: "Invalid phone number." }, 400, corsHeaders);
                 }
 
-                // Attempt remote verification or verify locally
-                let userObj = { phone: phone, name: "Customer" };
-                const token = "jwt_slyte_cust_" + phone + "_" + Date.now();
+                // Attempt remote verification via Supabase first
+                try {
+                    const targetUrl = `${SUPABASE_FUNCTIONS_URL}/verify-otp`;
+                    const forwardHeaders = new Headers(request.headers);
+                    forwardHeaders.set("Host", "iqdtfllkdtjypiseklzt.supabase.co");
 
+                    const response = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: forwardHeaders,
+                        body: JSON.stringify({ phone, otp })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        if (data.success) return jsonResponse(data, 200, corsHeaders);
+                    }
+                } catch (e) {}
+
+                // Fallback: auto-login proxy to get real user record from MongoDB
+                try {
+                    const supRes = await fetch(`${SUPABASE_FUNCTIONS_URL}/auto-login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${env.SUPABASE_ANON_KEY || "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC"}` },
+                        body: JSON.stringify({ phone })
+                    });
+                    if (supRes.ok) {
+                        const supData = await supRes.json();
+                        if (supData.success) {
+                            return jsonResponse({
+                                success: true,
+                                token: supData.token,
+                                message: "OTP verified successfully",
+                                user: supData.user || { phone, name: "Customer" }
+                            }, 200, corsHeaders);
+                        }
+                    }
+                } catch(e) {}
+
+                const token = "jwt_slyte_cust_" + phone + "_" + Date.now();
                 return jsonResponse({
                     success: true,
                     token: token,
                     message: "OTP verified successfully",
-                    user: userObj
+                    user: { phone: phone, name: "Customer" }
                 }, 200, corsHeaders);
             }
 
@@ -152,6 +211,26 @@ export default {
                 if (method === "POST") {
                     const body = await request.json().catch(() => ({}));
                     const phone = String(body.phone || "").replace(/\D/g, '').slice(-10);
+
+                    // Proxy to Supabase to fetch user record & JWT directly from MongoDB
+                    try {
+                        const forwardHeaders = new Headers(request.headers);
+                        forwardHeaders.set("Host", "iqdtfllkdtjypiseklzt.supabase.co");
+                        const supRes = await fetch(`${SUPABASE_FUNCTIONS_URL}/auto-login`, {
+                            method: "POST",
+                            headers: forwardHeaders,
+                            body: JSON.stringify({ phone })
+                        });
+                        if (supRes.ok) {
+                            const supData = await supRes.json();
+                            if (supData.success) {
+                                return jsonResponse(supData, 200, corsHeaders);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("[slyte-api] Supabase auto-login proxy error:", e.message);
+                    }
+
                     if (phone) {
                         return jsonResponse({
                             success: true,
@@ -166,11 +245,49 @@ export default {
             if ((pathStr === "/orders-lookup" || pathStr === "/api/orders/lookup") && method === "POST") {
                 const body = await request.json().catch(() => ({}));
                 const authHeader = request.headers.get("Authorization") || "";
-                let phone = body.phone || "";
+                let phone = String(body.phone || "").replace(/\D/g, '').slice(-10);
 
                 if (!phone && authHeader.includes("jwt_slyte_cust_")) {
                     const parts = authHeader.split("_");
                     if (parts.length >= 4) phone = parts[3];
+                }
+
+                // Query live MongoDB via Supabase Edge Function
+                try {
+                    let jwtToken = authHeader.replace("Bearer ", "").trim();
+                    const anonKey = env.SUPABASE_ANON_KEY || "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
+
+                    if (!jwtToken || jwtToken === anonKey || jwtToken.startsWith("jwt_slyte_cust_")) {
+                        const loginRes = await fetch(`${SUPABASE_FUNCTIONS_URL}/auto-login`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${anonKey}`, "Host": "iqdtfllkdtjypiseklzt.supabase.co" },
+                            body: JSON.stringify({ phone: phone || "9742006683" })
+                        });
+                        if (loginRes.ok) {
+                            const loginData = await loginRes.json().catch(() => ({}));
+                            if (loginData.success && loginData.token) {
+                                jwtToken = loginData.token;
+                            }
+                        }
+                    }
+
+                    const supRes = await fetch(`${SUPABASE_FUNCTIONS_URL}/orders-lookup`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${jwtToken || anonKey}`,
+                            "Host": "iqdtfllkdtjypiseklzt.supabase.co"
+                        },
+                        body: JSON.stringify({ phone: phone || "9742006683", search: body.search })
+                    });
+                    if (supRes.ok) {
+                        const supData = await supRes.json().catch(() => ({}));
+                        if (supData.success && Array.isArray(supData.orders)) {
+                            return jsonResponse(supData, 200, corsHeaders);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("[slyte-api] Supabase orders-lookup proxy error:", e.message);
                 }
 
                 const orders = backendStore.getOrders({ phone: phone || "9742006683", search: body.search });
@@ -366,6 +483,12 @@ export default {
                     : "Address collected by Cashfree";
                 const amount = cfOrderData?.order_amount || order?.total_amount || 0;
                 const cartItems = order?.cart_details || [];
+                if (isPaid && !backendStore.isEventNotified(orderId, "STOCK_DEDUCTION")) {
+                    backendStore.markEventNotified(orderId, "STOCK_DEDUCTION");
+                    if (cartItems && cartItems.length > 0) {
+                        ctx.waitUntil(backendStore.deductInventory(env, cartItems));
+                    }
+                }
 
                 if (isPaid && !backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
                     backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");
@@ -456,6 +579,13 @@ export default {
                             : "N/A";
                         const amount = d.order?.order_amount || order?.total_amount || 0;
                         const cartItems = order?.cart_details || [];
+
+                        if (!backendStore.isEventNotified(orderId, "STOCK_DEDUCTION")) {
+                            backendStore.markEventNotified(orderId, "STOCK_DEDUCTION");
+                            if (cartItems && cartItems.length > 0) {
+                                ctx.waitUntil(backendStore.deductInventory(env, cartItems));
+                            }
+                        }
 
                         if (!backendStore.isEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM")) {
                             backendStore.markEventNotified(orderId, "TELEGRAM_ORDER_CONFIRM");

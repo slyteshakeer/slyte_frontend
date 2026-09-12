@@ -735,6 +735,23 @@
         let activeStockProduct = null;
         let activeStockChamber = "all"; // 'all' or 'standard'
 
+        async function fetchLiveInventory() {
+            try {
+                const apiBase = "https://api.slyte.in";
+                const res = await fetch(`${apiBase}/api/inventory`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.inventory && data.inventory["1"]) {
+                        localStorage.setItem('slyte_inventory_v2', JSON.stringify(data.inventory));
+                        return data.inventory;
+                    }
+                }
+            } catch (e) {
+                console.warn('Cloud inventory fetch note:', e);
+            }
+            return getLiveInventory();
+        }
+
         function getLiveInventory() {
             try {
                 const stored = localStorage.getItem('slyte_inventory_v2');
@@ -750,18 +767,33 @@
             };
         }
 
-        function saveLiveInventory(inv) {
+        async function saveLiveInventory(inv) {
             try {
                 localStorage.setItem('slyte_inventory_v2', JSON.stringify(inv));
                 window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: inv } }));
             } catch(e) {}
+
+            try {
+                const apiBase = "https://api.slyte.in";
+                const res = await fetch(`${apiBase}/api/inventory`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inventory: inv })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.inventory) {
+                        localStorage.setItem('slyte_inventory_v2', JSON.stringify(data.inventory));
+                    }
+                }
+            } catch(e) {
+                console.warn('Cloud inventory save note:', e);
+            }
         }
 
-        function loadProducts() {
+        function renderProductsList(inv) {
             const container = document.getElementById("productsList");
             if (!container) return;
-
-            const inv = getLiveInventory();
             const SIZES = ['28', '30', '32', '34', '36', '38'];
 
             container.innerHTML = STORE_PRODUCTS.map(p => {
@@ -814,6 +846,15 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        async function loadProducts() {
+            const container = document.getElementById("productsList");
+            if (!container) return;
+
+            renderProductsList(getLiveInventory());
+            const live = await fetchLiveInventory();
+            renderProductsList(live);
         }
 
         function openStockManager(productId) {

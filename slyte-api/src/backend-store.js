@@ -307,9 +307,37 @@ const INITIAL_ALTERATIONS = [
     }
 ];
 
+const DEFAULT_INVENTORY = {
+    "1": {
+        name: "Slyte 24H Black Trouser",
+        all: { "28": 2, "30": 4, "32": 8, "34": 5, "36": 3, "38": 2 },
+        standard: { "28": 1, "30": 2, "32": 4, "34": 3, "36": 2, "38": 0 }
+    },
+    "2": {
+        name: "Slyte 24H Beige Trouser",
+        all: { "28": 3, "30": 5, "32": 10, "34": 6, "36": 3, "38": 1 },
+        standard: { "28": 2, "30": 3, "32": 5, "34": 4, "36": 1, "38": 0 }
+    },
+    "3": {
+        name: "Slyte 24H Navy Trouser",
+        all: { "28": 2, "30": 6, "32": 12, "34": 7, "36": 4, "38": 1 },
+        standard: { "28": 1, "30": 4, "32": 6, "34": 5, "36": 2, "38": 0 }
+    }
+};
+
+function getClosestBaseSize(waist) {
+    const w = parseFloat(waist);
+    if (isNaN(w)) return "32";
+    if (w <= 28) return "28";
+    if (w >= 38) return "38";
+    const even = Math.round(w / 2) * 2;
+    return String(Math.min(38, Math.max(28, even)));
+}
+
 class SlyteBackendStore {
     constructor() {
         this.products = [...INITIAL_PRODUCTS];
+        this.inventory = JSON.parse(JSON.stringify(DEFAULT_INVENTORY));
         this.orders = [...INITIAL_TEST_ORDERS];
         this.returns = [];
         this.exchanges = [];
@@ -317,6 +345,125 @@ class SlyteBackendStore {
         this.auditLogs = [];
         this.notifiedEvents = new Set(); // Order event keys for Telegram idempotency
         this.adminSessions = new Map(); // token -> admin object
+    }
+
+    async getInventory(env) {
+        if (env && env.SLYTE_KV) {
+            try {
+                const stored = await env.SLYTE_KV.get("slyte_inventory_v2");
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && parsed["1"] && parsed["1"].all) {
+                        this.inventory = parsed;
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn("[slyte-api] KV getInventory error:", e.message);
+            }
+        }
+        if (!this.inventory) {
+            this.inventory = JSON.parse(JSON.stringify(DEFAULT_INVENTORY));
+        }
+        return this.inventory;
+    }
+
+    async saveInventory(env, inv) {
+        this.inventory = inv;
+        if (env && env.SLYTE_KV) {
+            try {
+                await env.SLYTE_KV.put("slyte_inventory_v2", JSON.stringify(inv));
+            } catch (e) {
+                console.warn("[slyte-api] KV saveInventory error:", e.message);
+            }
+        }
+        return this.inventory;
+    }
+
+    async deductInventory(env, items) {
+        const inv = await this.getInventory(env);
+        const deductions = [];
+        const itemsArr = Array.isArray(items) ? items : [items].filter(Boolean);
+
+        for (const item of itemsArr) {
+            if (!item) continue;
+            const pid = String(item.id || item.productId || 1);
+            const qty = Math.max(1, Number(item.quantity) || 1);
+            
+            if (!inv[pid]) {
+                inv[pid] = {
+                    name: item.name || `Product ${pid}`,
+                    all: { "28": 2, "30": 4, "32": 8, "34": 5, "36": 3, "38": 2 },
+                    standard: { "28": 1, "30": 2, "32": 4, "34": 3, "36": 2, "38": 0 }
+                };
+            }
+            if (!inv[pid].all) inv[pid].all = { "28": 2, "30": 4, "32": 8, "34": 5, "36": 3, "38": 2 };
+            if (!inv[pid].standard) inv[pid].standard = { "28": 1, "30": 2, "32": 4, "34": 3, "36": 2, "38": 0 };
+
+            const isCustom = item.productType === 'CUSTOM' ||
+                             item.fit_type === 'CUSTOM' ||
+                             item.isCustom === true ||
+                             Boolean(item.measurements && (item.measurements.waist || item.measurements.length)) ||
+                             Boolean(item.customFit && (item.customFit.waist || item.customFit.length)) ||
+                             String(item.size || '').toLowerCase().includes('custom');
+
+            if (isCustom) {
+                const waist = item.measurements?.waist || item.customFit?.waist || item.waist || item.size || "32";
+                const baseSize = getClosestBaseSize(waist);
+                const current = Number(inv[pid].all[baseSize]) || 0;
+                const newStock = Math.max(0, current - qty);
+                inv[pid].all[baseSize] = newStock;
+                deductions.push({
+                    productId: pid,
+                    type: "CUSTOM",
+                    baseSize: baseSize,
+                    chamber: "all",
+                    previous: current,
+                    deducted: qty,
+                    remaining: newStock
+                });
+            } else {
+                let size = String(item.size || "32").replace(/\D/g, '');
+                if (!['28', '30', '32', '34', '36', '38'].includes(size)) {
+                    size = "32";
+                }
+                const stdStock = Number(inv[pid].standard[size]) || 0;
+                const allStock = Number(inv[pid].all[size]) || 0;
+
+                if (stdStock >= qty) {
+                    const newStd = Math.max(0, stdStock - qty);
+                    inv[pid].standard[size] = newStd;
+                    deductions.push({
+                        productId: pid,
+                        type: "STANDARD",
+                        size: size,
+                        chamber: "standard",
+                        previous: stdStock,
+                        deducted: qty,
+                        remaining: newStd
+                    });
+                } else {
+                    const fromStd = stdStock;
+                    const fromAll = qty - fromStd;
+                    inv[pid].standard[size] = 0;
+                    const newAll = Math.max(0, allStock - fromAll);
+                    inv[pid].all[size] = newAll;
+                    deductions.push({
+                        productId: pid,
+                        type: "STANDARD",
+                        size: size,
+                        chamber: "standard_then_all",
+                        deductedStd: fromStd,
+                        deductedAll: fromAll,
+                        remainingStd: 0,
+                        remainingAll: newAll
+                    });
+                }
+            }
+        }
+
+        await this.saveInventory(env, inv);
+        return { success: true, inventory: inv, deductions };
     }
 
     resetTestOrders() {

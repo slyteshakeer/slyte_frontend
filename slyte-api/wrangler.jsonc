@@ -15,6 +15,12 @@
   "observability": {
     "enabled": true
   },
+  "kv_namespaces": [
+    {
+      "binding": "SLYTE_KV",
+      "id": "09487cba45104c61a6409af8f548bb65"
+    }
+  ],
   "vars": {
     "ALLOWED_ORIGIN": "https://slyte.in",
     "CASHFREE_ENV": "PRODUCTION",

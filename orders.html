@@ -1110,8 +1110,26 @@
             }
 
             // ── Authentication Check ───────────────────────────────────────
+            function getStoredValidPhone() {
+                const rawKeys = ['slyte_phone', 'userPhone', 'dash_phone'];
+                for (const k of rawKeys) {
+                    const val = (localStorage.getItem(k) || '').replace(/\D/g, '').slice(-10);
+                    if (/^[6-9]\d{9}$/.test(val) && val !== '9999999999') {
+                        return val;
+                    }
+                }
+                try {
+                    const userObj = JSON.parse(localStorage.getItem('slyteUser') || '{}');
+                    const userPhone = String(userObj.phone || userObj.customerPhone || '').replace(/\D/g, '').slice(-10);
+                    if (/^[6-9]\d{9}$/.test(userPhone) && userPhone !== '9999999999') {
+                        return userPhone;
+                    }
+                } catch(e) {}
+                return null;
+            }
+
             document.addEventListener('DOMContentLoaded', async () => {
-                // Purge only placeholder phone numbers (not real user numbers)
+                // Purge placeholder phone numbers
                 ['slyte_phone', 'userPhone', 'dash_phone', 'slyteUser'].forEach(key => {
                     const val = localStorage.getItem(key);
                     if (val && val.includes('9999999999')) {
@@ -1119,31 +1137,34 @@
                     }
                 });
 
-                // Priority 1: Already OTP-verified (has JWT token)
-                const token = localStorage.getItem('slyte_otp_token');
-                if (token) {
-                    showLoggedInState();
-                    fetchOrders();
-                    return;
-                }
+                const loggedInPhone = getStoredValidPhone();
 
-                // Priority 2: Logged in via checkout (Cashfree set userPhone) — auto-login to get JWT
-                const checkoutPhone = (localStorage.getItem('userPhone') || localStorage.getItem('slyte_phone') || '').replace(/\D/g, '').slice(-10);
-                if (checkoutPhone && checkoutPhone.length === 10 && checkoutPhone !== '9999999999') {
-                    // Silently exchange the checkout phone for a JWT
+                // If user is already logged in with a valid phone:
+                if (loggedInPhone) {
+                    const token = localStorage.getItem('slyte_otp_token');
+                    if (token && !token.includes('9999999999')) {
+                        localStorage.setItem('slyte_phone', loggedInPhone);
+                        localStorage.setItem('userPhone', loggedInPhone);
+                        showLoggedInState();
+                        fetchOrders();
+                        return;
+                    }
+
+                    // Automatically exchange the logged-in phone for a fresh JWT session
                     try {
                         const res = await fetch(`${API_BASE}/auto-login`, {
                             method: 'POST',
                             headers: apiHeaders(ANON_KEY),
-                            body: JSON.stringify({ phone: checkoutPhone })
+                            body: JSON.stringify({ phone: loggedInPhone })
                         });
                         const data = await res.json();
                         if (data.success && data.token) {
                             localStorage.setItem('slyte_otp_token', data.token);
-                            localStorage.setItem('slyte_phone', checkoutPhone);
+                            localStorage.setItem('slyte_phone', loggedInPhone);
+                            localStorage.setItem('userPhone', loggedInPhone);
                             const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
                                 ? data.user.name
-                                : (localStorage.getItem('userName') || localStorage.getItem('username') || checkoutPhone);
+                                : (localStorage.getItem('userName') || localStorage.getItem('username') || loggedInPhone);
                             localStorage.setItem('username', displayName);
                             localStorage.setItem('userName', displayName);
                             showLoggedInState();
@@ -1151,11 +1172,11 @@
                             return;
                         }
                     } catch (e) {
-                        // Silently fall through to mobile entry screen
+                        console.warn('Auto-login error:', e);
                     }
                 }
 
-                // Priority 3: Not logged in — show mobile input
+                // If not logged in, show mobile input step
                 showMobileStep();
             });
 
@@ -1163,8 +1184,7 @@
                 mobileStep.style.display = 'none';
                 otpStep.style.display = 'none';
                 loggedInStep.style.display = 'flex';
-                // Decode token payload manually just to show number, or rely on fetch
-                const phone = localStorage.getItem('slyte_phone') || 'User';
+                const phone = getStoredValidPhone() || localStorage.getItem('slyte_phone') || 'User';
                 loggedInMobile.textContent = '+91 ' + phone;
                 const resetBtn = document.getElementById('resetTestOrdersBtn');
                 if (resetBtn) {
@@ -1241,7 +1261,10 @@
                     
                     if (data.success) {
                         showOtpStep(currentMobile);
-                        showSuccess('OTP sent successfully.');
+                        showSuccess('OTP sent successfully to +91 ' + currentMobile);
+                        if (data.demo_otp) {
+                            otpInput.placeholder = `e.g. ${data.demo_otp}`;
+                        }
                     } else {
                         showError(data.message || 'Failed to send OTP.');
                     }
@@ -1256,8 +1279,8 @@
             // ── Verify OTP ───────────────────────────────────────────────
             async function verifyOtp() {
                 const otp = otpInput.value.trim();
-                if (otp.length !== 6) {
-                    showError('Enter a valid 6-digit OTP.');
+                if (otp.length < 4) {
+                    showError('Enter a valid OTP.');
                     return;
                 }
                 clearMessages();
@@ -1274,20 +1297,17 @@
                     
                     if (data.success) {
                         localStorage.setItem('slyte_otp_token', data.token);
-                        if (data.user && data.user.phone) {
-                            const phone = data.user.phone;
-                            const name = data.user.name || '';
-                            // Sync to slyte_phone AND the checkout keys so everything stays consistent
-                            localStorage.setItem('slyte_phone', phone);
-                            localStorage.setItem('userPhone', phone);
-                            // 'username' is what script.js reads to show name in hamburger menu
-                            localStorage.setItem('username', name || phone);
-                            localStorage.setItem('userName', name || phone);
-                        }
+                        const phone = (data.user && data.user.phone) || currentMobile;
+                        const name = (data.user && data.user.name) || '';
+                        localStorage.setItem('slyte_phone', phone);
+                        localStorage.setItem('userPhone', phone);
+                        localStorage.setItem('username', name || phone);
+                        localStorage.setItem('userName', name || phone);
+                        
                         showLoggedInState();
                         fetchOrders();
                     } else {
-                        showError(data.message || 'Invalid OTP.');
+                        showError(data.message || 'Invalid OTP. Please try again.');
                     }
                 } catch (e) {
                     showError('Network error. Please try again.');
