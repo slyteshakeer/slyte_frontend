@@ -102,9 +102,9 @@ window.SlyteInventory = {
     },
     // Async remote fetch to sync cloud stock to frontend
     fetchRemote: async function() {
-        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        const apiBase = "https://api.slyte.in";
         try {
-            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory`);
+            const res = await fetch(`${apiBase}/api/inventory`);
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.inventory && data.inventory["1"]) {
@@ -126,9 +126,9 @@ window.SlyteInventory = {
             window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: inv } }));
         } catch(e) {}
 
-        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        const apiBase = "https://api.slyte.in";
         try {
-            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory`, {
+            const res = await fetch(`${apiBase}/api/inventory`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ inventory: inv })
@@ -149,9 +149,9 @@ window.SlyteInventory = {
     // Async remote deduct on purchase
     deductRemote: async function(items) {
         if (!items || (Array.isArray(items) && items.length === 0)) return;
-        const apiBase = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.API_BASE_URL) || "https://api.slyte.in";
+        const apiBase = "https://api.slyte.in";
         try {
-            const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/inventory/deduct`, {
+            const res = await fetch(`${apiBase}/api/inventory/deduct`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ items: items })

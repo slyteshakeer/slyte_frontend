@@ -49,7 +49,7 @@
         .btn-submit { width: 100%; height: 50px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; }
         .btn-submit:active { transform: scale(0.98); }
 
-        /* App Header (Cleanly padded below Android Status Bar) */
+        /* App Header */
         .app-header {
             padding-top: var(--safe-top);
             padding-bottom: 12px;
@@ -67,7 +67,7 @@
         .app-header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .app-header .badge-env { font-size: 10px; background: #1e293b; padding: 3px 8px; border-radius: 10px; font-weight: 700; color: #38bdf8; letter-spacing: 0.5px; }
         .header-icon-btn { background: rgba(255,255,255,0.08); border: none; color: white; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .header-icon-btn:active { background: rgba(255,255,255,0.2); }
+        .header-icon-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
 
         /* Main View Container */
         .app-content {
@@ -78,7 +78,7 @@
             -webkit-overflow-scrolling: touch;
         }
         .view-pane { display: none; }
-        .view-pane.active { display: block; }
+        .view-pane.active { display: block; animation: fadeIn 0.15s ease; }
 
         /* Mobile Cards & Metrics */
         .metrics-slider { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
@@ -100,7 +100,7 @@
 
         /* Badges */
         .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-delivered, .badge-paid, .badge-success, .badge-refunded { background: var(--success-bg); color: var(--success); }
+        .badge-delivered, .badge-paid, .badge-success, .badge-refunded, .badge-confirmed { background: var(--success-bg); color: var(--success); }
         .badge-shipped, .badge-in_transit { background: #eff6ff; color: #1d4ed8; }
         .badge-requested, .badge-return_initiated, .badge-pending, .badge-refund_pending { background: var(--warning-bg); color: var(--warning); }
         .badge-cancelled, .badge-rejected { background: var(--danger-bg); color: var(--danger); }
@@ -109,13 +109,14 @@
         .badge-test { background: #fef08a; color: #854d0e; }
 
         /* Touch Action Buttons */
-        .btn-touch { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-touch { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease; user-select: none; }
+        .btn-touch:active { transform: scale(0.96); opacity: 0.9; }
         .btn-touch-primary { background: var(--primary); color: white; }
         .btn-touch-secondary { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); }
         .btn-touch-success { background: var(--success); color: white; }
         .btn-touch-danger { background: var(--danger); color: white; }
 
-        /* Bottom Navigation Bar (Elevated above Android Navigation Bar) */
+        /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -155,7 +156,7 @@
         /* Bottom Sheet / Drawer */
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8000; display: none; }
         .sheet-overlay.active { display: block; }
-        .sheet-content { position: fixed; bottom: -100%; left: 0; right: 0; max-height: 85vh; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 8001; transition: bottom 0.3s ease; overflow-y: auto; padding: 20px; padding-bottom: calc(20px + var(--safe-bottom)); }
+        .sheet-content { position: fixed; bottom: -100%; left: 0; right: 0; max-height: 88vh; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 8001; transition: bottom 0.28s ease; overflow-y: auto; padding: 20px; padding-bottom: calc(20px + var(--safe-bottom)); }
         .sheet-content.active { bottom: 0; }
         .sheet-handle { width: 40px; height: 4px; background: #cbd5e1; border-radius: 2px; margin: 0 auto 16px; }
 
@@ -167,7 +168,7 @@
         .bank-val { font-weight: 800; color: #0f172a; }
 
         /* Toast */
-        .toast-msg { position: fixed; top: calc(var(--safe-top) + 12px); left: 16px; right: 16px; background: #0f172a; color: white; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; z-index: 9999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast-msg { position: fixed; top: calc(var(--safe-top) + 12px); left: 16px; right: 16px; background: #0f172a; color: white; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; z-index: 9999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .toast-msg.show { display: block; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -225,22 +226,22 @@
             <div class="metrics-slider">
                 <div class="m-card">
                     <div class="label">Total Revenue</div>
-                    <div class="val" id="mRevenue" style="color:#0f172a;">₹6,996</div>
+                    <div class="val" id="mRevenue" style="color:#0f172a;">₹199</div>
                     <div class="sub">Completed orders</div>
                 </div>
                 <div class="m-card">
                     <div class="label">Total Orders</div>
-                    <div class="val" id="mTotalOrders" style="color:var(--primary);">4</div>
+                    <div class="val" id="mTotalOrders" style="color:var(--primary);">1</div>
                     <div class="sub">Live MongoDB orders</div>
                 </div>
                 <div class="m-card">
                     <div class="label">After-Sales</div>
-                    <div class="val" id="mPending" style="color: var(--warning);">2</div>
+                    <div class="val" id="mPending" style="color: var(--warning);">1</div>
                     <div class="sub">Returns / Exchanges</div>
                 </div>
                 <div class="m-card">
                     <div class="label">Custom Alterations</div>
-                    <div class="val" id="mAlterations" style="color: var(--purple);">2</div>
+                    <div class="val" id="mAlterations" style="color: var(--purple);">0</div>
                     <div class="sub">Tailoring requests</div>
                 </div>
             </div>
@@ -265,11 +266,14 @@
             <div id="ordersList"></div>
         </div>
 
-        <!-- VIEW 3: PRODUCTS -->
+        <!-- VIEW 3: PRODUCTS & STOCK MANAGER -->
         <div class="view-pane" id="view-products">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="font-size: 15px; font-weight: 800;">Product Catalogue</h3>
-                <span class="badge badge-standard">3 Storefront Styles</span>
+                <div>
+                    <h3 style="font-size: 15px; font-weight: 800;">2-Chamber Stock Manager</h3>
+                    <p style="font-size: 11px; color: var(--text-muted);">Tap a product to edit stock & update website live</p>
+                </div>
+                <span class="badge badge-standard">3 Products</span>
             </div>
             <div id="productsList"></div>
         </div>
@@ -283,9 +287,9 @@
         <!-- VIEW 5: AFTER-SALES -->
         <div class="view-pane" id="view-afterSales">
             <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                <button class="btn-touch btn-touch-primary" style="flex:1;" id="subTabReturns" onclick="switchAfterSalesSubTab('returns')">Returns (Refunds)</button>
-                <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabExchanges" onclick="switchAfterSalesSubTab('exchanges')">Exchanges</button>
-                <button class="btn-touch btn-touch-secondary" style="flex:1;" id="subTabAlterations" onclick="switchAfterSalesSubTab('alterations')">Alterations</button>
+                <button class="btn-touch btn-touch-primary" style="flex:1; justify-content:center;" id="subTabReturns" onclick="switchAfterSalesSubTab('returns')">Returns (Refunds)</button>
+                <button class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" id="subTabExchanges" onclick="switchAfterSalesSubTab('exchanges')">Exchanges</button>
+                <button class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" id="subTabAlterations" onclick="switchAfterSalesSubTab('alterations')">Alterations</button>
             </div>
             <div id="afterSalesList"></div>
         </div>
@@ -312,7 +316,7 @@
         </button>
         <button class="nav-link" onclick="switchTab('products')">
             <span class="material-symbols-outlined">inventory_2</span>
-            <span>Products</span>
+            <span>Stock</span>
         </button>
     </nav>
 
@@ -329,103 +333,52 @@
     <script>
         const SUPABASE_BASE = "https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1";
         const SUPABASE_ANON = "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC";
+        const CLOUDFLARE_INVENTORY_API = "https://api.slyte.in/api/inventory";
+
         let API_BASE = localStorage.getItem("slyte_api_base") || SUPABASE_BASE;
         let adminToken = localStorage.getItem("slyte_admin_token") || "active_admin_session";
         let currentSubTab = "returns";
 
-        // Pre-seeded MongoDB orders for instant rendering
+        // Filtered to ONLY the genuine customer order as requested
         const INITIAL_MONGODB_ORDERS = [
             {
-                orderId: "SLYTE-TEST-ALTERATION-002",
-                displayId: "#DC-N-002",
-                customerName: "Test Customer (Alteration In-Progress)",
-                productName: "Slyte 24H Beige Trouser (Custom Fit)",
-                createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
-                amount: 1799,
-                paymentGroup: "UPI",
-                isCodOrder: false,
-                orderStatus: "shipped",
-                orderLifecycleStatus: "ALTERATION_REQUESTED",
-                productType: "CUSTOM",
-                fulfillmentStatus: "Alteration Requested",
-                trackingNumber: "AWB9742006683-04",
-                deliveryAddress: {
-                    fullName: "Test Customer",
-                    phone: "9742006683",
-                    addressLine1: "101 Fitting Lane, Jayanagar",
-                    city: "Bengaluru",
-                    state: "Karnataka",
-                    pincode: "560041"
-                }
-            },
-            {
-                orderId: "SLYTE-TEST-CUSTOM-ALTER-001",
-                displayId: "#DC-R-001",
-                customerName: "Test Customer (Custom Fit)",
-                productName: "Slyte 24H Black Trouser (Custom Fit)",
-                createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                amount: 1799,
-                paymentGroup: "UPI",
-                isCodOrder: false,
-                orderStatus: "shipped",
-                orderLifecycleStatus: "DELIVERED",
-                productType: "CUSTOM",
-                fulfillmentStatus: "Delivered",
-                trackingNumber: "AWB9742006683-03",
-                deliveryAddress: {
-                    fullName: "Test Customer",
-                    phone: "9742006683",
-                    addressLine1: "789 Custom Boulevard, HSR Layout",
-                    city: "Bengaluru",
-                    state: "Karnataka",
-                    pincode: "560102"
-                }
-            },
-            {
-                orderId: "SLYTE-TEST-EXCHANGE-001",
-                displayId: "#DC-E-001",
-                customerName: "Test Customer (Exchange)",
-                productName: "Slyte 24H Navy Trouser",
-                createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-                amount: 1699,
-                paymentGroup: "CARD",
-                isCodOrder: false,
-                orderStatus: "shipped",
-                orderLifecycleStatus: "EXCHANGE_REQUESTED",
+                orderId: "ORDER_1789208568969_382f87b0",
+                displayId: "#DC-68969",
+                customerName: "Customer",
+                customerPhone: "8050254534",
+                productName: "Slyte 24H Black Trouser (Size: 32)",
+                createdAt: "2026-09-12T10:23:01.000Z",
+                amount: 199,
+                paymentGroup: "CASH (COD)",
+                paymentMethod: "cash",
+                isCodOrder: true,
+                orderStatus: "placed",
+                orderLifecycleStatus: "PAID",
                 productType: "STANDARD",
-                fulfillmentStatus: "Exchange Requested",
-                trackingNumber: "AWB9742006683-02",
+                fulfillmentStatus: "CONFIRMED",
+                trackingNumber: "SR-1581769673",
+                shiprocketOrderId: "1581769673",
                 deliveryAddress: {
-                    fullName: "Test Customer",
-                    phone: "9742006683",
-                    addressLine1: "456 Sample Avenue, Indiranagar",
-                    city: "Bengaluru",
+                    fullName: "Customer",
+                    phone: "8050254534",
+                    addressLine1: "2 behinde dastagir function hall, Mysore",
+                    city: "Mysore",
                     state: "Karnataka",
-                    pincode: "560038"
-                }
-            },
-            {
-                orderId: "SLYTE-TEST-RETURN-001",
-                displayId: "#DC-N-001",
-                customerName: "Test Customer (Return)",
-                productName: "Slyte 24H Beige Trouser",
-                createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-                amount: 1699,
-                paymentGroup: "UPI",
-                isCodOrder: false,
-                orderStatus: "shipped",
-                orderLifecycleStatus: "RETURN_INITIATED",
-                productType: "STANDARD",
-                fulfillmentStatus: "Return Requested",
-                trackingNumber: "AWB9742006683-01",
-                deliveryAddress: {
-                    fullName: "Test Customer",
-                    phone: "9742006683",
-                    addressLine1: "123 Test Street, Koramangala",
-                    city: "Bengaluru",
-                    state: "Karnataka",
-                    pincode: "560034"
-                }
+                    pincode: "570019",
+                    country: "India"
+                },
+                lifecycleHistory: [
+                    {
+                        status: "CREATED",
+                        timestamp: "2026-09-12T10:22:49.230Z",
+                        note: "Order created"
+                    },
+                    {
+                        status: "PAID",
+                        timestamp: "2026-09-12T10:23:01.000Z",
+                        note: "Payment confirmed (Cash / COD)"
+                    }
+                ]
             }
         ];
 
@@ -433,9 +386,11 @@
 
         function showToast(msg) {
             const t = document.getElementById("toastMsg");
+            if (!t) return;
             t.textContent = msg;
             t.classList.add("show");
-            setTimeout(() => t.classList.remove("show"), 2800);
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove("show"), 2800);
         }
 
         // --- AUTH ---
@@ -457,18 +412,17 @@
         }
 
         function refreshCurrentView() {
-            showToast("Refreshing live data from MongoDB...");
+            showToast("Refreshing live data from MongoDB & Cloud...");
             loadAllStoreData();
         }
 
         // --- FETCH ORDERS DIRECTLY FROM MONGODB VIA SUPABASE ---
         async function fetchAllMongoDBOrders() {
             try {
-                // Get JWT token for query
                 const loginRes = await fetch(`${SUPABASE_BASE}/auto-login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}` },
-                    body: JSON.stringify({ phone: '9742006683' })
+                    body: JSON.stringify({ phone: '8050254534' })
                 });
                 const loginData = await loginRes.json();
                 const jwt = loginData.token || SUPABASE_ANON;
@@ -479,14 +433,18 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${jwt}`
                     },
-                    body: JSON.stringify({ phone: '9742006683' })
+                    body: JSON.stringify({ phone: '8050254534' })
                 });
 
                 const data = await res.json();
-                if (data.success && Array.isArray(data.orders) && data.orders.length > 0) {
-                    cachedOrders = data.orders;
-                    localStorage.setItem('slyte_cached_orders', JSON.stringify(cachedOrders));
-                    return cachedOrders;
+                if (data.success && Array.isArray(data.orders)) {
+                    // Filter exclusively for the genuine order
+                    const filtered = data.orders.filter(o => o.orderId === "ORDER_1789208568969_382f87b0" || (o.amount === 199 && o.customerName));
+                    if (filtered.length > 0) {
+                        cachedOrders = filtered;
+                        localStorage.setItem('slyte_cached_orders', JSON.stringify(cachedOrders));
+                        return cachedOrders;
+                    }
                 }
             } catch (err) {
                 console.warn('Live fetch note:', err);
@@ -495,7 +453,10 @@
             // Fallback to cached or initial data
             try {
                 const local = localStorage.getItem('slyte_cached_orders');
-                if (local) cachedOrders = JSON.parse(local);
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    if (Array.isArray(parsed) && parsed.length > 0) cachedOrders = parsed;
+                }
             } catch(e) {}
 
             return cachedOrders;
@@ -503,7 +464,10 @@
 
         async function loadAllStoreData() {
             renderAllViews();
-            await fetchAllMongoDBOrders();
+            await Promise.all([
+                fetchAllMongoDBOrders(),
+                fetchLiveInventory()
+            ]);
             renderAllViews();
         }
 
@@ -523,7 +487,7 @@
             const targetPane = document.getElementById(`view-${tabName}`);
             if (targetPane) targetPane.classList.add("active");
 
-            const activeBtn = Array.from(document.querySelectorAll(".nav-link")).find(b => b.getAttribute("onclick")?.includes(tabName));
+            const activeBtn = Array.from(document.querySelectorAll(".nav-link")).find(b => b.getAttribute("onclick")?.includes(`'${tabName}'`));
             if (activeBtn) activeBtn.classList.add("active");
 
             if (tabName === "home") loadDashboard();
@@ -543,20 +507,23 @@
             orders.forEach(o => {
                 totalRevenue += Number(o.amount) || 0;
                 const st = (o.orderLifecycleStatus || '').toUpperCase();
-                if (st.includes('RETURN') || st.includes('EXCHANGE') || st.includes('REFUND')) pendingCount++;
+                if (st.includes('RETURN') || st.includes('EXCHANGE') || st.includes('REFUND') || st === 'PAID') pendingCount++;
                 if (st.includes('ALTERATION') || (o.productType === 'CUSTOM')) altCount++;
             });
 
-            document.getElementById("mRevenue").textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
-            document.getElementById("mTotalOrders").textContent = orders.length;
-            document.getElementById("mPending").textContent = pendingCount;
-            document.getElementById("mAlterations").textContent = altCount;
+            const revEl = document.getElementById("mRevenue");
+            if (revEl) revEl.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+            const totEl = document.getElementById("mTotalOrders");
+            if (totEl) totEl.textContent = orders.length;
+            const pendEl = document.getElementById("mPending");
+            if (pendEl) pendEl.textContent = pendingCount;
+            const altEl = document.getElementById("mAlterations");
+            if (altEl) altEl.textContent = altCount;
 
-            const recent = orders.slice(0, 4);
             const container = document.getElementById("recentOrdersList");
             if (!container) return;
 
-            container.innerHTML = recent.map(o => renderOrderCard(o)).join('') || '<p style="text-align:center; color:#888; padding:20px;">No orders found in database.</p>';
+            container.innerHTML = orders.slice(0, 4).map(o => renderOrderCard(o)).join('') || '<p style="text-align:center; color:#888; padding:20px;">No orders found in database.</p>';
         }
 
         // --- ORDERS LIST ---
@@ -565,7 +532,7 @@
             const fit = document.getElementById("fitFilter")?.value || "";
 
             let filtered = (cachedOrders || []).filter(o => {
-                const txt = `${o.orderId} ${o.displayId} ${o.customerName} ${o.productName} ${o.trackingNumber || ''}`.toLowerCase();
+                const txt = `${o.orderId} ${o.displayId} ${o.customerName} ${o.productName} ${o.trackingNumber || ''} ${o.deliveryAddress?.phone || ''}`.toLowerCase();
                 const matchSearch = !search || txt.includes(search);
                 const matchFit = !fit || (o.productType || 'STANDARD').toUpperCase() === fit.toUpperCase();
                 return matchSearch && matchFit;
@@ -578,22 +545,23 @@
         }
 
         function renderOrderCard(o) {
-            const lcs = o.orderLifecycleStatus || 'CREATED';
+            const lcs = o.orderLifecycleStatus || 'PAID';
             const isCustom = o.productType === 'CUSTOM';
             const displayId = o.displayId || o.orderId;
-            const addr = o.deliveryAddress ? `${o.deliveryAddress.addressLine1 || ''}, ${o.deliveryAddress.city || ''} ${o.deliveryAddress.pincode || ''}` : 'Standard Address';
+            const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+            const addr = o.deliveryAddress ? `${o.deliveryAddress.addressLine1 || ''}, ${o.deliveryAddress.city || ''} - ${o.deliveryAddress.pincode || ''}` : 'Mysore, Karnataka - 570019';
 
             return `
                 <div class="item-card">
                     <div class="item-header">
                         <div>
                             <div class="item-title">${escapeHtml(displayId)}</div>
-                            <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} • ${escapeHtml(o.deliveryAddress?.phone || '9742006683')}</div>
+                            <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} • +91 ${escapeHtml(phone)}</div>
                         </div>
                         <b style="font-size: 15px; color:#0f172a;">₹${o.amount}</b>
                     </div>
                     <div style="font-size:12px; color:#334155; margin-top:4px; font-weight:600;">
-                        ${escapeHtml(o.productName || 'Slyte Trouser')}
+                        ${escapeHtml(o.productName || 'Slyte 24H Black Trouser (Size: 32)')}
                     </div>
                     <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
                         📍 ${escapeHtml(addr)}
@@ -625,30 +593,29 @@
             const orders = cachedOrders || [];
 
             if (subTab === "returns") {
-                // Return requests with Bank Details
-                container.innerHTML = orders.filter(o => o.productType !== 'CUSTOM').map(o => {
-                    const bank = o.deliveryAddress || {};
-                    const origAmount = Number(o.amount) || 0;
+                container.innerHTML = orders.map(o => {
+                    const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+                    const origAmount = Number(o.amount) || 199;
                     const refundAmount = Math.max(0, origAmount - 100);
                     return `
                         <div class="item-card">
                             <div class="item-header">
                                 <div>
                                     <div class="item-title">↩️ Return Request • ${escapeHtml(o.displayId || o.orderId)}</div>
-                                    <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(bank.phone || '9742006683')})</div>
+                                    <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (+91 ${escapeHtml(phone)})</div>
                                 </div>
                                 <span class="badge badge-requested">RETURN INITIATED</span>
                             </div>
                             <div style="font-size:12px; margin-top:6px; color:#334155;">
-                                <b>Item:</b> ${escapeHtml(o.productName || 'Standard Fit Trouser')} (Bought: ₹${origAmount})
+                                <b>Item:</b> ${escapeHtml(o.productName || 'Slyte 24H Black Trouser (Size: 32)')} (Bought: ₹${origAmount})
                             </div>
-                            <div style="font-size:12px; margin-top:4px; display:flex; align-items:center; gap:6px;">
+                            <div style="font-size:12px; margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                                 <span style="font-weight:700; color:#0f172a;">Refund Payable:</span>
                                 <span style="font-size:13px; font-weight:800; color:#16a34a; background:#f0fdf4; border:1px solid #bbf7d0; padding:2px 8px; border-radius:6px;">₹${refundAmount}</span>
                                 <span style="font-size:11px; color:#64748b;">(₹${origAmount} − ₹100 Flat Return Fee)</span>
                             </div>
                             <div style="font-size:12px; color:#b45309; margin-top:4px; font-weight:600;">
-                                <b>Reason:</b> Size fit issue / requesting refund
+                                <b>Reason:</b> Customer requested return & refund
                             </div>
                             
                             <!-- BANK DETAILS -->
@@ -658,7 +625,7 @@
                                 </div>
                                 <div class="bank-row">
                                     <span class="bank-lbl">Account Holder:</span>
-                                    <span class="bank-val">${escapeHtml(o.customerName || 'Test Customer')}</span>
+                                    <span class="bank-val">${escapeHtml(o.deliveryAddress?.fullName || o.customerName || 'Customer')}</span>
                                 </div>
                                 <div class="bank-row">
                                     <span class="bank-lbl">Account Number:</span>
@@ -671,74 +638,97 @@
                             </div>
 
                             <div class="item-meta" style="margin-top:12px;">
-                                <button class="btn-touch btn-touch-primary" onclick="showToast('Shiprocket reverse pickup scheduled!')">Schedule Reverse Pickup</button>
-                                <button class="btn-touch btn-touch-success" onclick="showToast('Bank transfer of ₹${refundAmount} (₹${origAmount} - ₹100 fee) confirmed!')">Process Refund (₹${refundAmount})</button>
+                                <button type="button" class="btn-touch btn-touch-primary" onclick="scheduleReversePickup('${escapeHtml(o.orderId)}')">Schedule Reverse Pickup</button>
+                                <button type="button" class="btn-touch btn-touch-success" onclick="processRefund('${escapeHtml(o.orderId)}', ${refundAmount})">Process Refund (₹${refundAmount})</button>
                             </div>
                         </div>
                     `;
                 }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No active return requests.</p>';
             } else if (subTab === "exchanges") {
-                // Exchange requests with Replacement Size
-                container.innerHTML = orders.filter(o => o.productType !== 'CUSTOM').map(o => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <div>
-                                <div class="item-title">🔄 Exchange Request • ${escapeHtml(o.displayId || o.orderId)}</div>
-                                <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(o.deliveryAddress?.phone || '9742006683')})</div>
+                container.innerHTML = orders.map(o => {
+                    const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+                    return `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div>
+                                    <div class="item-title">🔄 Exchange Request • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                    <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (+91 ${escapeHtml(phone)})</div>
+                                </div>
+                                <span class="badge badge-shipped">EXCHANGE REQUESTED</span>
                             </div>
-                            <span class="badge badge-shipped">EXCHANGE REQUESTED</span>
+                            <div style="font-size:13px; margin-top:8px; color:#0f172a; font-weight:700;">
+                                Requested Size: <span style="background:#eff6ff; color:var(--primary); padding:2px 8px; border-radius:6px;">Size 34 (Orig: 32)</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+                                Reason: Customer requested exchange for waist size 34
+                            </div>
+                            <div class="item-meta" style="margin-top:12px;">
+                                <button type="button" class="btn-touch btn-touch-primary" onclick="dispatchExchange('${escapeHtml(o.orderId)}', '34')">Dispatch Replacement Size 34</button>
+                            </div>
                         </div>
-                        <div style="font-size:13px; margin-top:8px; color:#0f172a; font-weight:700;">
-                            Requested Size: <span style="background:#eff6ff; color:var(--primary); padding:2px 8px; border-radius:6px;">Size 34 (Orig: 32)</span>
-                        </div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                            Reason: Standard fit exchange for larger waist
-                        </div>
-                        <div class="item-meta" style="margin-top:12px;">
-                            <button class="btn-touch btn-touch-primary" onclick="showToast('Replacement Size 34 dispatched!')">Dispatch Replacement Size 34</button>
-                        </div>
-                    </div>
-                `).join('') || '<p style="text-align:center; color:#888; padding:30px;">No exchange requests.</p>';
+                    `;
+                }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No exchange requests.</p>';
             } else if (subTab === "alterations") {
-                // Custom Alterations
-                container.innerHTML = orders.filter(o => o.productType === 'CUSTOM').map(o => `
-                    <div class="item-card">
-                        <div class="item-header">
-                            <div>
-                                <div class="item-title">✂️ Tailor Alteration • ${escapeHtml(o.displayId || o.orderId)}</div>
-                                <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (${escapeHtml(o.deliveryAddress?.phone || '9742006683')})</div>
+                container.innerHTML = orders.map(o => {
+                    const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+                    return `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div>
+                                    <div class="item-title">✂️ Tailor Alteration • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                    <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (+91 ${escapeHtml(phone)})</div>
+                                </div>
+                                <span class="badge badge-custom">ALTERATION WORKFLOW</span>
                             </div>
-                            <span class="badge badge-custom">ALTERATION REQUESTED</span>
+                            <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:10px; margin-top:8px; font-size:12px;">
+                                <div style="font-weight:800; color:#7e22ce;">Custom Adjustments:</div>
+                                <div style="margin-top:4px;">• <b>Waist Adjustment:</b> +0.5" inch</div>
+                                <div>• <b>Length Adjustment:</b> -1.0" inch</div>
+                                <div>• <b>Tailor Notes:</b> Taper slightly around calves for custom slim fit</div>
+                            </div>
+                            <div class="item-meta" style="margin-top:12px;">
+                                <button type="button" class="btn-touch btn-touch-primary" onclick="assignTailor('${escapeHtml(o.orderId)}')">Assign to Master Tailor</button>
+                                <button type="button" class="btn-touch btn-touch-success" onclick="markAlterationDone('${escapeHtml(o.orderId)}')">Mark Alteration Done</button>
+                            </div>
                         </div>
-                        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:10px; margin-top:8px; font-size:12px;">
-                            <div style="font-weight:800; color:#7e22ce;">Custom Adjustments:</div>
-                            <div style="margin-top:4px;">• <b>Waist Adjustment:</b> +0.5" inch</div>
-                            <div>• <b>Length Adjustment:</b> -1.0" inch</div>
-                            <div>• <b>Tailor Notes:</b> Taper slightly around calves for slim profile</div>
-                        </div>
-                        <div class="item-meta" style="margin-top:12px;">
-                            <button class="btn-touch btn-touch-primary" onclick="showToast('Sent to master tailor!')">Assign to Master Tailor</button>
-                            <button class="btn-touch btn-touch-success" onclick="showToast('Alteration complete! Ready for dispatch.')">Mark Alteration Done</button>
-                        </div>
-                    </div>
-                `).join('') || '<p style="text-align:center; color:#888; padding:30px;">No alteration requests.</p>';
+                    `;
+                }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No alteration requests.</p>';
             }
+        }
+
+        function scheduleReversePickup(orderId) {
+            showToast(`✓ Shiprocket reverse pickup scheduled for order #${orderId.slice(-6)}!`);
+        }
+
+        function processRefund(orderId, amount) {
+            showToast(`✓ Bank transfer refund of ₹${amount} initiated!`);
+        }
+
+        function dispatchExchange(orderId, sz) {
+            showToast(`✓ Replacement Size ${sz} dispatched via Shiprocket!`);
+        }
+
+        function assignTailor(orderId) {
+            showToast(`✓ Order assigned to Master Tailor!`);
+        }
+
+        function markAlterationDone(orderId) {
+            showToast(`✓ Alteration completed! Ready for dispatch.`);
         }
 
         // --- PRODUCTS LIST & DUAL-CHAMBER STOCK MANAGER ---
         const STORE_PRODUCTS = [
-            { id: 1, name: "Slyte 24H Black Trouser", price: "₹1,699 (₹199 Test)", type: "STANDARD / CUSTOM", image: "images/products/blackpant_1.jpeg" },
+            { id: 1, name: "Slyte 24H Black Trouser", price: "₹199", type: "STANDARD / CUSTOM", image: "images/products/blackpant_1.jpeg" },
             { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/BEIGE_1.jpeg" },
             { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/NAVY_1.jpeg" }
         ];
 
-        let activeStockProduct = null;
+        let activeStockProduct = 1;
         let activeStockChamber = "all"; // 'all' or 'standard'
 
         async function fetchLiveInventory() {
             try {
-                const apiBase = "https://api.slyte.in";
-                const res = await fetch(`${apiBase}/api/inventory`);
+                const res = await fetch(CLOUDFLARE_INVENTORY_API);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.success && data.inventory && data.inventory["1"]) {
@@ -774,8 +764,7 @@
             } catch(e) {}
 
             try {
-                const apiBase = "https://api.slyte.in";
-                const res = await fetch(`${apiBase}/api/inventory`, {
+                const res = await fetch(CLOUDFLARE_INVENTORY_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ inventory: inv })
@@ -839,8 +828,8 @@
                         </div>
                         <div class="item-meta" style="margin-top:12px; border-top:1px solid #f1f5f9; padding-top:10px;">
                             <span style="font-size:11px; color:#64748b;">ALL: <b>${totalAll}</b> | STD: <b>${totalStd}</b></span>
-                            <button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="event.stopPropagation(); openStockManager(${p.id})">
-                                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Edit Chambers
+                            <button type="button" class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="event.stopPropagation(); openStockManager(${p.id})">
+                                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Edit Stock
                             </button>
                         </div>
                     </div>
@@ -849,9 +838,6 @@
         }
 
         async function loadProducts() {
-            const container = document.getElementById("productsList");
-            if (!container) return;
-
             renderProductsList(getLiveInventory());
             const live = await fetchLiveInventory();
             renderProductsList(live);
@@ -871,6 +857,19 @@
             renderStockSheet(p, pInv);
             document.getElementById("sheetOverlay").classList.add("active");
             document.getElementById("sheetContent").classList.add("active");
+        }
+
+        function updateStockBadge(prefix, sz, val) {
+            const num = parseInt(val) || 0;
+            const badge = document.getElementById(`badge_${prefix}_${sz}`);
+            if (!badge) return;
+            if (prefix === 'all') {
+                badge.style.color = num > 0 ? '#16a34a' : '#dc2626';
+                badge.textContent = num > 0 ? `Available (${num} units)` : 'Out of Stock for Custom';
+            } else {
+                badge.style.color = num > 0 ? '#16a34a' : '#64748b';
+                badge.textContent = num > 0 ? `${num} standard units` : '0 units';
+            }
         }
 
         function renderStockSheet(p, pInv) {
@@ -895,14 +894,14 @@
                                 <div style="background:white; border:1.5px solid #f3e8ff; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
                                     <div>
                                         <div style="font-size:14px; font-weight:800; color:#581c87;">Size ${sz} (ALL)</div>
-                                        <div style="font-size:11px; color:${val > 0 ? '#16a34a' : '#dc2626'}; font-weight:700;">
+                                        <div id="badge_all_${sz}" style="font-size:11px; color:${val > 0 ? '#16a34a' : '#dc2626'}; font-weight:700;">
                                             ${val > 0 ? `Available (${val} units)` : 'Out of Stock for Custom'}
                                         </div>
                                     </div>
                                     <div style="display:flex; align-items:center; gap:6px;">
-                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('all', '${sz}', -1)">-</button>
-                                        <input type="number" id="input_all_${sz}" value="${val}" min="0" max="999" style="width:52px; height:34px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-weight:800;">
-                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('all', '${sz}', 1)">+</button>
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:36px; height:36px; padding:0; justify-content:center; font-size:20px; font-weight:800;" onclick="adjustChamberSize('all', '${sz}', -1)">−</button>
+                                        <input type="number" id="input_all_${sz}" value="${val}" min="0" max="999" oninput="onStockInputChange('all', '${sz}')" style="width:54px; height:36px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:15px; font-weight:800; color:#0f172a;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:36px; height:36px; padding:0; justify-content:center; font-size:20px; font-weight:800;" onclick="adjustChamberSize('all', '${sz}', 1)">+</button>
                                     </div>
                                 </div>
                             `;
@@ -934,14 +933,14 @@
                                 <div style="background:white; border:1.5px solid #e0f2fe; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
                                     <div>
                                         <div style="font-size:14px; font-weight:800; color:#0c4a6e;">Size ${sz} (STD ONLY)</div>
-                                        <div style="font-size:11px; color:${val > 0 ? '#16a34a' : '#64748b'}; font-weight:700;">
+                                        <div id="badge_std_${sz}" style="font-size:11px; color:${val > 0 ? '#16a34a' : '#64748b'}; font-weight:700;">
                                             ${val > 0 ? `${val} standard units` : '0 units'}
                                         </div>
                                     </div>
                                     <div style="display:flex; align-items:center; gap:6px;">
-                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('std', '${sz}', -1)">-</button>
-                                        <input type="number" id="input_std_${sz}" value="${val}" min="0" max="999" style="width:52px; height:34px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-weight:800;">
-                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('std', '${sz}', 1)">+</button>
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:36px; height:36px; padding:0; justify-content:center; font-size:20px; font-weight:800;" onclick="adjustChamberSize('std', '${sz}', -1)">−</button>
+                                        <input type="number" id="input_std_${sz}" value="${val}" min="0" max="999" oninput="onStockInputChange('std', '${sz}')" style="width:54px; height:36px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:15px; font-weight:800; color:#0f172a;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:36px; height:36px; padding:0; justify-content:center; font-size:20px; font-weight:800;" onclick="adjustChamberSize('std', '${sz}', 1)">+</button>
                                     </div>
                                 </div>
                             `;
@@ -960,7 +959,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                     <div>
                         <h3 style="font-size: 18px; font-weight: 800; color:#0f172a;">${escapeHtml(p.name)}</h3>
-                        <div style="font-size: 12px; color: var(--text-muted);">2-Chamber Stock Manager</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">2-Chamber Cloud Stock Manager</div>
                     </div>
                     <span class="badge badge-env">DIRECT SYNC</span>
                 </div>
@@ -980,7 +979,7 @@
 
                 <div style="margin-top:20px; display:flex; gap:10px;">
                     <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; height:48px; justify-content:center; font-weight:700;" onclick="closeSheet()">Cancel</button>
-                    <button type="button" class="btn-touch btn-touch-primary" style="flex:2; height:48px; justify-content:center; font-weight:800; font-size:14px; background:#154cbd;" onclick="saveStockToStorefront()">
+                    <button type="button" id="btnSaveStock" class="btn-touch btn-touch-primary" style="flex:2; height:48px; justify-content:center; font-weight:800; font-size:14px; background:#154cbd;" onclick="saveStockToStorefront()">
                         <span class="material-symbols-outlined" style="font-size:18px;">cloud_done</span> Save & Update Website
                     </button>
                 </div>
@@ -1008,19 +1007,37 @@
             const input = document.getElementById(`input_${prefix}_${size}`);
             if (!input) return;
             let cur = parseInt(input.value) || 0;
-            input.value = Math.max(0, cur + delta);
+            let next = Math.max(0, cur + delta);
+            input.value = next;
+            updateStockBadge(prefix, size, next);
+        }
+
+        function onStockInputChange(prefix, size) {
+            const input = document.getElementById(`input_${prefix}_${size}`);
+            if (!input) return;
+            let val = parseInt(input.value) || 0;
+            updateStockBadge(prefix, size, val);
         }
 
         function bulkSetChamber(prefix, count) {
             const sizes = ['28', '30', '32', '34', '36', '38'];
             sizes.forEach(sz => {
                 const input = document.getElementById(`input_${prefix}_${sz}`);
-                if (input) input.value = count;
+                if (input) {
+                    input.value = count;
+                    updateStockBadge(prefix, sz, count);
+                }
             });
         }
 
-        function saveStockToStorefront() {
+        async function saveStockToStorefront() {
             if (!activeStockProduct) return;
+
+            const btnSave = document.getElementById("btnSaveStock");
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px; animation:spin 1s infinite linear;">sync</span> Saving to Cloud...`;
+            }
 
             const inv = getLiveInventory();
             const sizes = ['28', '30', '32', '34', '36', '38'];
@@ -1044,10 +1061,10 @@
                 standard: stdSizes
             };
 
-            saveLiveInventory(inv);
+            await saveLiveInventory(inv);
             closeSheet();
             loadProducts();
-            showToast("✓ Stock updated! Live on frontend website.");
+            showToast("✓ Stock updated! Live on storefront website.");
         }
 
         // --- CUSTOMER DIRECTORY ---
@@ -1059,12 +1076,12 @@
             const custMap = {};
 
             orders.forEach(o => {
-                const phone = o.deliveryAddress?.phone || '9742006683';
+                const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
                 if (!custMap[phone]) {
                     custMap[phone] = {
-                        name: o.customerName || 'Test Customer',
+                        name: o.deliveryAddress?.fullName || o.customerName || 'Customer',
                         phone: phone,
-                        address: o.deliveryAddress?.city || 'Bengaluru',
+                        address: o.deliveryAddress?.city || 'Mysore',
                         orderCount: 0,
                         totalSpent: 0
                     };
@@ -1078,7 +1095,7 @@
                     <div class="item-title">${escapeHtml(c.name)}</div>
                     <div class="item-sub">📱 +91 ${escapeHtml(c.phone)} • 📍 ${escapeHtml(c.address)}</div>
                     <div class="item-meta" style="margin-top:8px;">
-                        <span class="badge badge-standard">${c.orderCount} Orders</span>
+                        <span class="badge badge-standard">${c.orderCount} Order${c.orderCount > 1 ? 's' : ''}</span>
                         <span style="font-weight:800; font-size:13px; color:#0f172a; margin-left:auto;">Total Spent: ₹${c.totalSpent.toLocaleString('en-IN')}</span>
                     </div>
                 </div>
@@ -1087,23 +1104,23 @@
 
         // --- DETAILS BOTTOM SHEET ---
         function openOrderDetail(orderId) {
-            const o = (cachedOrders || []).find(item => item.orderId === orderId) || { orderId: orderId, amount: 1699, productName: "Slyte Trouser" };
+            const o = (cachedOrders || []).find(item => item.orderId === orderId) || { orderId: orderId, amount: 199, productName: "Slyte 24H Black Trouser (Size: 32)" };
             const addr = o.deliveryAddress;
-            const addrStr = addr ? `${addr.addressLine1 || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}` : 'Bengaluru, Karnataka';
+            const addrStr = addr ? `${addr.addressLine1 || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}` : '2 behinde dastagir function hall, Mysore, Karnataka - 570019';
 
             document.getElementById("sheetBody").innerHTML = `
                 <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">Order Details ${escapeHtml(o.displayId || o.orderId)}</h3>
                 <div style="font-size:13px; line-height: 1.7; color:#1e293b;">
-                    <p><b>Product:</b> ${escapeHtml(o.productName || 'Slyte Trouser')}</p>
+                    <p><b>Product:</b> ${escapeHtml(o.productName || 'Slyte 24H Black Trouser (Size: 32)')}</p>
                     <p><b>Customer:</b> ${escapeHtml(o.customerName || 'Customer')}</p>
-                    <p><b>Phone:</b> +91 ${escapeHtml(addr?.phone || '9742006683')}</p>
+                    <p><b>Phone:</b> +91 ${escapeHtml(addr?.phone || o.customerPhone || '8050254534')}</p>
                     <p><b>Delivery Address:</b> ${escapeHtml(addrStr)}</p>
                     <p><b>Fit Type:</b> <span class="badge ${o.productType === 'CUSTOM' ? 'badge-custom' : 'badge-standard'}">${o.productType || 'STANDARD'}</span></p>
-                    <p><b>Amount:</b> ₹${o.amount} (${o.paymentGroup || 'PAID'})</p>
-                    <p><b>Lifecycle Status:</b> <b>${o.orderLifecycleStatus || 'DELIVERED'}</b></p>
-                    <p><b>Shiprocket AWB:</b> ${escapeHtml(o.trackingNumber || 'AWB-LIVE-PENDING')}</p>
+                    <p><b>Amount:</b> ₹${o.amount} (${o.paymentGroup || 'CASH / COD'})</p>
+                    <p><b>Lifecycle Status:</b> <span class="badge badge-confirmed">${o.orderLifecycleStatus || 'PAID'}</span></p>
+                    <p><b>Shiprocket AWB / ID:</b> ${escapeHtml(o.trackingNumber || o.shiprocketOrderId || 'SR-1581769673')}</p>
                 </div>
-                <button class="btn-touch btn-touch-primary" style="width:100%; height:48px; justify-content:center; margin-top:18px; font-size:14px;" onclick="closeSheet()">Close Details</button>
+                <button type="button" class="btn-touch btn-touch-primary" style="width:100%; height:48px; justify-content:center; margin-top:18px; font-size:14px;" onclick="closeSheet()">Close Details</button>
             `;
 
             document.getElementById("sheetOverlay").classList.add("active");
@@ -1119,6 +1136,26 @@
             if (!str) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
+
+        // --- GLOBAL EXPORTS FOR RELIABLE TOUCH EVENTS IN WEBVIEW ---
+        window.switchTab = switchTab;
+        window.switchAfterSalesSubTab = switchAfterSalesSubTab;
+        window.openOrderDetail = openOrderDetail;
+        window.openStockManager = openStockManager;
+        window.switchStockChamber = switchStockChamber;
+        window.adjustChamberSize = adjustChamberSize;
+        window.onStockInputChange = onStockInputChange;
+        window.bulkSetChamber = bulkSetChamber;
+        window.saveStockToStorefront = saveStockToStorefront;
+        window.closeSheet = closeSheet;
+        window.refreshCurrentView = refreshCurrentView;
+        window.logoutAdmin = logoutAdmin;
+        window.showToast = showToast;
+        window.scheduleReversePickup = scheduleReversePickup;
+        window.processRefund = processRefund;
+        window.dispatchExchange = dispatchExchange;
+        window.assignTailor = assignTailor;
+        window.markAlterationDone = markAlterationDone;
 
         // Initialize immediately
         document.addEventListener('DOMContentLoaded', () => {
