@@ -719,29 +719,288 @@
             }
         }
 
-        // --- PRODUCTS LIST ---
-        function loadProducts() {
-            const products = [
-                { id: 1, name: "Slyte 24H Black Trouser", price: "₹1,699 (₹199 Test)", type: "STANDARD / CUSTOM", stock: "In Stock", image: "images/products/blackpant_1.jpeg" },
-                { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", stock: "In Stock", image: "images/products/BEIGE_1.jpeg" },
-                { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", stock: "In Stock", image: "images/products/NAVY_1.jpeg" }
-            ];
+        // --- PRODUCTS LIST & DUAL-CHAMBER STOCK MANAGER ---
+        const STORE_PRODUCTS = [
+            { id: 1, name: "Slyte 24H Black Trouser", price: "₹1,699 (₹199 Test)", type: "STANDARD / CUSTOM", image: "images/products/blackpant_1.jpeg" },
+            { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/BEIGE_1.jpeg" },
+            { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/NAVY_1.jpeg" }
+        ];
 
+        let activeStockProduct = null;
+        let activeStockChamber = "all"; // 'all' or 'standard'
+
+        function getLiveInventory() {
+            try {
+                const stored = localStorage.getItem('slyte_inventory_v2');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed["1"] && parsed["1"].all) return parsed;
+                }
+            } catch(e) {}
+            return {
+                "1": { name: "Slyte 24H Black Trouser", all: { "28": 2, "30": 4, "32": 8, "34": 5, "36": 3, "38": 2, "40": 0 }, standard: { "28": 1, "30": 2, "32": 4, "34": 3, "36": 2, "38": 0, "40": 0 } },
+                "2": { name: "Slyte 24H Beige Trouser", all: { "28": 3, "30": 5, "32": 10, "34": 6, "36": 3, "38": 1, "40": 0 }, standard: { "28": 2, "30": 3, "32": 5, "34": 4, "36": 1, "38": 0, "40": 0 } },
+                "3": { name: "Slyte 24H Navy Trouser", all: { "28": 2, "30": 6, "32": 12, "34": 7, "36": 4, "38": 1, "40": 0 }, standard: { "28": 1, "30": 4, "32": 6, "34": 5, "36": 2, "38": 0, "40": 0 } }
+            };
+        }
+
+        function saveLiveInventory(inv) {
+            try {
+                localStorage.setItem('slyte_inventory_v2', JSON.stringify(inv));
+                window.dispatchEvent(new CustomEvent('slytestockchange', { detail: { inventory: inv } }));
+            } catch(e) {}
+        }
+
+        function loadProducts() {
             const container = document.getElementById("productsList");
             if (!container) return;
 
-            container.innerHTML = products.map(p => `
-                <div class="item-card">
-                    <div style="display:flex; gap:12px; align-items:center;">
-                        <div style="width:52px; height:52px; background:#f1f5f9; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:24px;">👖</div>
-                        <div style="flex:1;">
-                            <div class="item-title">${p.name}</div>
-                            <div class="item-sub">Stock: <b>${p.stock}</b> | ${p.type}</div>
-                            <div style="margin-top:4px; font-weight:800; font-size:14px; color:var(--primary);">${p.price}</div>
+            const inv = getLiveInventory();
+            const SIZES = ['28', '30', '32', '34', '36', '38', '40'];
+
+            container.innerHTML = STORE_PRODUCTS.map(p => {
+                const pInv = inv[String(p.id)] || { all: {}, standard: {} };
+                const allPool = pInv.all || {};
+                const stdPool = pInv.standard || {};
+
+                const totalAll = Object.values(allPool).reduce((s, v) => s + (Number(v) || 0), 0);
+                const totalStd = Object.values(stdPool).reduce((s, v) => s + (Number(v) || 0), 0);
+                const combined = totalAll + totalStd;
+
+                const allPills = SIZES.map(sz => {
+                    const c = allPool[sz] ?? 0;
+                    return `<span style="font-size:10px; padding:2px 5px; border-radius:5px; background:${c > 0 ? '#faf5ff' : '#fee2e2'}; color:${c > 0 ? '#7e22ce' : '#991b1b'}; font-weight:800;">${sz}:${c}</span>`;
+                }).join(' ');
+
+                const stdPills = SIZES.map(sz => {
+                    const c = stdPool[sz] ?? 0;
+                    return `<span style="font-size:10px; padding:2px 5px; border-radius:5px; background:${c > 0 ? '#f0f9ff' : '#f1f5f9'}; color:${c > 0 ? '#0369a1' : '#64748b'}; font-weight:800;">${sz}:${c}</span>`;
+                }).join(' ');
+
+                return `
+                    <div class="item-card" onclick="openStockManager(${p.id})" style="cursor:pointer; transition:transform 0.15s ease;">
+                        <div style="display:flex; gap:12px; align-items:flex-start;">
+                            <div style="width:56px; height:56px; background:#f1f5f9; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; border:1px solid var(--border);">👖</div>
+                            <div style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div class="item-title">${escapeHtml(p.name)}</div>
+                                    <span class="badge ${combined > 0 ? 'badge-delivered' : 'badge-cancelled'}">${combined} Total Units</span>
+                                </div>
+                                <div class="item-sub" style="margin-top:2px;">${p.price}</div>
+                                
+                                <div style="margin-top:8px; font-size:11px; font-weight:700; color:#7e22ce;">Chamber 1 (ALL / Custom+Std):</div>
+                                <div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:3px;">
+                                    ${allPills}
+                                </div>
+
+                                <div style="margin-top:8px; font-size:11px; font-weight:700; color:#0369a1;">Chamber 2 (STANDARD ONLY):</div>
+                                <div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:3px;">
+                                    ${stdPills}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-meta" style="margin-top:12px; border-top:1px solid #f1f5f9; padding-top:10px;">
+                            <span style="font-size:11px; color:#64748b;">ALL: <b>${totalAll}</b> | STD: <b>${totalStd}</b></span>
+                            <button class="btn-touch btn-touch-primary" style="margin-left:auto;" onclick="event.stopPropagation(); openStockManager(${p.id})">
+                                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Edit Chambers
+                            </button>
                         </div>
                     </div>
+                `;
+            }).join('');
+        }
+
+        function openStockManager(productId) {
+            activeStockProduct = productId;
+            const p = STORE_PRODUCTS.find(item => item.id === productId);
+            if (!p) return;
+
+            const inv = getLiveInventory();
+            const pInv = inv[String(productId)] || {
+                all: { "28": 2, "30": 4, "32": 8, "34": 5, "36": 3, "38": 2, "40": 0 },
+                standard: { "28": 1, "30": 2, "32": 4, "34": 3, "36": 2, "38": 0, "40": 0 }
+            };
+
+            renderStockSheet(p, pInv);
+            document.getElementById("sheetOverlay").classList.add("active");
+            document.getElementById("sheetContent").classList.add("active");
+        }
+
+        function renderStockSheet(p, pInv) {
+            const allPool = pInv.all || {};
+            const stdPool = pInv.standard || {};
+            const sizes = ['28', '30', '32', '34', '36', '38', '40'];
+
+            const chamber1Html = `
+                <!-- CHAMBER 1: ALL (CUSTOM FIT + STANDARD FIT) -->
+                <div id="chamberAllContent" style="display:${activeStockChamber === 'all' ? 'block' : 'none'};">
+                    <div style="background:#faf5ff; border:1.5px solid #e9d5ff; border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                        <div style="font-weight:800; font-size:13px; color:#7e22ce;">✨ Chamber 1: ALL POOL (Custom Fit + Standard Fit)</div>
+                        <div style="font-size:11px; color:#6b21a8; margin-top:3px; line-height:1.4;">
+                            Units here can be bought by <b>BOTH Custom Fit</b> and <b>Standard Fit</b> buyers. If a size is 0 here, Custom Fit shows <i>"Sorry, out of stock"</i>.
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${sizes.map(sz => {
+                            const val = allPool[sz] ?? 0;
+                            return `
+                                <div style="background:white; border:1.5px solid #f3e8ff; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+                                    <div>
+                                        <div style="font-size:14px; font-weight:800; color:#581c87;">Size ${sz} (ALL)</div>
+                                        <div style="font-size:11px; color:${val > 0 ? '#16a34a' : '#dc2626'}; font-weight:700;">
+                                            ${val > 0 ? `Available (${val} units)` : 'Out of Stock for Custom'}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('all', '${sz}', -1)">-</button>
+                                        <input type="number" id="input_all_${sz}" value="${val}" min="0" max="999" style="width:52px; height:34px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-weight:800;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('all', '${sz}', 1)">+</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:14px;">
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" onclick="bulkSetChamber('all', 5)">Set All to 5</button>
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" onclick="bulkSetChamber('all', 10)">Set All to 10</button>
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center; color:#dc2626;" onclick="bulkSetChamber('all', 0)">Zero All</button>
+                    </div>
                 </div>
-            `).join('');
+            `;
+
+            const chamber2Html = `
+                <!-- CHAMBER 2: STANDARD FIT ONLY -->
+                <div id="chamberStandardContent" style="display:${activeStockChamber === 'standard' ? 'block' : 'none'};">
+                    <div style="background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                        <div style="font-weight:800; font-size:13px; color:#0369a1;">👖 Chamber 2: STANDARD ONLY POOL</div>
+                        <div style="font-size:11px; color:#0284c7; margin-top:3px; line-height:1.4;">
+                            Units here can be bought by <b>Standard Fit buyers ONLY</b>. Custom Fit buyers cannot draw from this chamber.
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${sizes.map(sz => {
+                            const val = stdPool[sz] ?? 0;
+                            return `
+                                <div style="background:white; border:1.5px solid #e0f2fe; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+                                    <div>
+                                        <div style="font-size:14px; font-weight:800; color:#0c4a6e;">Size ${sz} (STD ONLY)</div>
+                                        <div style="font-size:11px; color:${val > 0 ? '#16a34a' : '#64748b'}; font-weight:700;">
+                                            ${val > 0 ? `${val} standard units` : '0 units'}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('std', '${sz}', -1)">-</button>
+                                        <input type="number" id="input_std_${sz}" value="${val}" min="0" max="999" style="width:52px; height:34px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-weight:800;">
+                                        <button type="button" class="btn-touch btn-touch-secondary" style="width:34px; height:34px; padding:0; justify-content:center; font-size:18px;" onclick="adjustChamberSize('std', '${sz}', 1)">+</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:14px;">
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" onclick="bulkSetChamber('std', 5)">Set All to 5</button>
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center;" onclick="bulkSetChamber('std', 10)">Set All to 10</button>
+                        <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; justify-content:center; color:#dc2626;" onclick="bulkSetChamber('std', 0)">Zero All</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("sheetBody").innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 800; color:#0f172a;">${escapeHtml(p.name)}</h3>
+                        <div style="font-size: 12px; color: var(--text-muted);">2-Chamber Stock Manager</div>
+                    </div>
+                    <span class="badge badge-env">DIRECT SYNC</span>
+                </div>
+
+                <!-- 2 SEPARATE CHAMBERS (TABS) -->
+                <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:12px; margin-bottom:16px;">
+                    <button type="button" id="tabChamberAll" class="btn-touch ${activeStockChamber === 'all' ? 'btn-touch-primary' : 'btn-touch-secondary'}" style="flex:1; justify-content:center; border:none;" onclick="switchStockChamber('all')">
+                        1. ALL (Custom + Std)
+                    </button>
+                    <button type="button" id="tabChamberStd" class="btn-touch ${activeStockChamber === 'standard' ? 'btn-touch-primary' : 'btn-touch-secondary'}" style="flex:1; justify-content:center; border:none;" onclick="switchStockChamber('standard')">
+                        2. STANDARD ONLY
+                    </button>
+                </div>
+
+                ${chamber1Html}
+                ${chamber2Html}
+
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    <button type="button" class="btn-touch btn-touch-secondary" style="flex:1; height:48px; justify-content:center; font-weight:700;" onclick="closeSheet()">Cancel</button>
+                    <button type="button" class="btn-touch btn-touch-primary" style="flex:2; height:48px; justify-content:center; font-weight:800; font-size:14px; background:#154cbd;" onclick="saveStockToStorefront()">
+                        <span class="material-symbols-outlined" style="font-size:18px;">cloud_done</span> Save & Update Website
+                    </button>
+                </div>
+            `;
+        }
+
+        function switchStockChamber(chamber) {
+            activeStockChamber = chamber;
+            const cAll = document.getElementById("chamberAllContent");
+            const cStd = document.getElementById("chamberStandardContent");
+            const tabAll = document.getElementById("tabChamberAll");
+            const tabStd = document.getElementById("tabChamberStd");
+
+            if (cAll && cStd) {
+                cAll.style.display = chamber === 'all' ? 'block' : 'none';
+                cStd.style.display = chamber === 'standard' ? 'block' : 'none';
+            }
+            if (tabAll && tabStd) {
+                tabAll.className = chamber === 'all' ? 'btn-touch btn-touch-primary' : 'btn-touch btn-touch-secondary';
+                tabStd.className = chamber === 'standard' ? 'btn-touch btn-touch-primary' : 'btn-touch btn-touch-secondary';
+            }
+        }
+
+        function adjustChamberSize(prefix, size, delta) {
+            const input = document.getElementById(`input_${prefix}_${size}`);
+            if (!input) return;
+            let cur = parseInt(input.value) || 0;
+            input.value = Math.max(0, cur + delta);
+        }
+
+        function bulkSetChamber(prefix, count) {
+            const sizes = ['28', '30', '32', '34', '36', '38', '40'];
+            sizes.forEach(sz => {
+                const input = document.getElementById(`input_${prefix}_${sz}`);
+                if (input) input.value = count;
+            });
+        }
+
+        function saveStockToStorefront() {
+            if (!activeStockProduct) return;
+
+            const inv = getLiveInventory();
+            const sizes = ['28', '30', '32', '34', '36', '38', '40'];
+            const allSizes = {};
+            const stdSizes = {};
+
+            sizes.forEach(sz => {
+                const inAll = document.getElementById(`input_all_${sz}`);
+                const inStd = document.getElementById(`input_std_${sz}`);
+                
+                const curAll = inv[String(activeStockProduct)]?.all?.[sz] ?? 0;
+                const curStd = inv[String(activeStockProduct)]?.standard?.[sz] ?? 0;
+
+                allSizes[sz] = inAll ? Math.max(0, parseInt(inAll.value) || 0) : curAll;
+                stdSizes[sz] = inStd ? Math.max(0, parseInt(inStd.value) || 0) : curStd;
+            });
+
+            inv[String(activeStockProduct)] = {
+                name: inv[String(activeStockProduct)]?.name || `Product ${activeStockProduct}`,
+                all: allSizes,
+                standard: stdSizes
+            };
+
+            saveLiveInventory(inv);
+            closeSheet();
+            loadProducts();
+            showToast("✓ Stock updated! Live on frontend website.");
         }
 
         // --- CUSTOMER DIRECTORY ---

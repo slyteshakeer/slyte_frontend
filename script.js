@@ -488,31 +488,98 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fit and Size selection
-    const sizeBoxes = document.querySelectorAll('.size-box');
+    // --- REAL-TIME INVENTORY & SIZE SELECTION ---
     const customFitBtn = document.getElementById('custom-fit-btn');
     const priceEl = document.querySelector('.p-price');
 
-    // Handle size box click (Standard Fit)
-    sizeBoxes.forEach(box => {
-        box.addEventListener('click', () => {
-            if (box.classList.contains('disabled')) return;
-            sizeBoxes.forEach(b => b.classList.remove('selected'));
-            box.classList.add('selected');
-            
-            if (customFitBtn) {
-                customFitBtn.classList.remove('active');
+    const renderProductSizes = (productId) => {
+        const sizeGrid = document.querySelector('.size-grid');
+        if (!sizeGrid) return;
+
+        const ALL_SIZES = ['28', '30', '32', '34', '36', '38', '40'];
+        let firstInStock = null;
+        let html = '';
+
+        ALL_SIZES.forEach(sz => {
+            // Standard size draws from combined pool: ALL + STANDARD
+            const count = window.SlyteInventory ? window.SlyteInventory.getTotalStandardStock(productId, sz) : 5;
+            const inStock = count > 0;
+            if (inStock && firstInStock === null) firstInStock = sz;
+
+            let badge = '';
+            if (count > 0 && count <= 2) {
+                badge = `<span style="position:absolute; top:-8px; right:-6px; background:#ea580c; color:white; font-size:8px; font-weight:800; padding:1px 4px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.15);">Only ${count}!</span>`;
             }
-            const urlParams = new URLSearchParams(window.location.search);
-            const pid = parseInt(urlParams.get('id')) || 1;
-            const baseProd = allProducts.find(p => p.id === pid) || {};
-            if (priceEl) priceEl.textContent = baseProd.price || (pid === 1 ? '₹199' : '₹1,699');
+
+            html += `
+                <button type="button" class="size-box ${inStock ? '' : 'disabled'}" data-size="${sz}" style="position:relative;" ${inStock ? '' : 'disabled title="Out of Stock"'}>
+                    ${sz}
+                    ${badge}
+                </button>
+            `;
         });
+
+        sizeGrid.innerHTML = html;
+
+        const sizeBoxes = sizeGrid.querySelectorAll('.size-box');
+        sizeBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                if (box.disabled || box.classList.contains('disabled')) return;
+                sizeBoxes.forEach(b => b.classList.remove('selected'));
+                box.classList.add('selected');
+                
+                if (customFitBtn) {
+                    customFitBtn.classList.remove('active');
+                }
+                const baseProd = allProducts.find(p => p.id === productId) || {};
+                if (priceEl) priceEl.textContent = baseProd.price || (productId === 1 ? '₹199' : '₹1,699');
+            });
+        });
+
+        if (firstInStock) {
+            const defaultBox = sizeGrid.querySelector(`[data-size="${firstInStock}"]`);
+            if (defaultBox) defaultBox.classList.add('selected');
+        }
+
+        // Custom Fit check: draws from "ALL" chamber pool
+        if (customFitBtn) {
+            const inv = window.SlyteInventory ? window.SlyteInventory.getForProduct(productId) : {};
+            const allStockObj = inv.all || {};
+            const totalAllUnits = Object.values(allStockObj).reduce((sum, v) => sum + (Number(v) || 0), 0);
+            
+            if (totalAllUnits <= 0) {
+                customFitBtn.disabled = true;
+                customFitBtn.style.opacity = '0.5';
+                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (Sorry, Out of Stock)`;
+            } else {
+                customFitBtn.disabled = false;
+                customFitBtn.style.opacity = '1';
+                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (₹1,799)`;
+            }
+        }
+    };
+
+    // Initialize sizes for current product
+    const currentUrlParams = new URLSearchParams(window.location.search);
+    const activeProductId = parseInt(currentUrlParams.get('id')) || 1;
+    renderProductSizes(activeProductId);
+
+    // Listen for live stock changes from Admin App
+    window.addEventListener('slytestockchange', (e) => {
+        if (e.detail?.productId === activeProductId || !e.detail) {
+            renderProductSizes(activeProductId);
+        }
+    });
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'slyte_inventory_v2' || e.key === 'slyte_inventory_v1') {
+            renderProductSizes(activeProductId);
+        }
     });
 
     // Handle Custom Fit button click
     if (customFitBtn) {
         customFitBtn.addEventListener('click', () => {
+            const sizeBoxes = document.querySelectorAll('.size-box');
             sizeBoxes.forEach(b => b.classList.remove('selected'));
             customFitBtn.classList.add('active');
             

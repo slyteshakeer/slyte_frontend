@@ -290,23 +290,50 @@ export const initCustomFit = () => {
 
         document.getElementById('cfmSaveManualBtn').addEventListener('click', () => {
             const name = document.getElementById('manualName').value.trim() || 'User';
-            const waist = document.getElementById('manualWaist').value;
-            const inseam = document.getElementById('manualInseam').value;
+            const waistRaw = document.getElementById('manualWaist').value;
+            const lengthRaw = document.getElementById('manualInseam').value;
             let ankle = document.getElementById('manualAnkle').value;
 
-            if (!waist || !inseam) {
+            if (!waistRaw || !lengthRaw) {
                 alert('Please enter Waist and Length.');
                 return;
             }
+
+            const waistNum = parseFloat(waistRaw);
+            const lengthNum = parseFloat(lengthRaw);
+
+            // 1. Strict Waist Bounds Validation: 28 to 38
+            if (isNaN(waistNum) || waistNum < 28 || waistNum > 38) {
+                alert('Sorry, we are not available at this size (Waist must be between 28" and 38").');
+                return;
+            }
+
+            // 2. Strict Length Bounds Validation: 36 to 44
+            if (isNaN(lengthNum) || lengthNum < 36 || lengthNum > 44) {
+                alert('Sorry, we are not available at this size (Length must be between 36" and 44").');
+                return;
+            }
+
+            // 3. Stock Check in "ALL" pool
+            const urlParams = new URLSearchParams(window.location.search);
+            const pid = parseInt(urlParams.get('id')) || 1;
+            if (window.SlyteInventory) {
+                const check = window.SlyteInventory.validateCustomFit(waistNum, lengthNum, pid);
+                if (!check.valid) {
+                    alert(check.error || 'Sorry, out of stock for this size in All pool.');
+                    return;
+                }
+            }
+
             if (!ankle) ankle = "7";
 
             const updatedEntry = {
                 name: name,
-                waist: parseFloat(waist),
-                outseam: parseFloat(inseam),
-                inseam: parseFloat(inseam),
+                waist: waistNum,
+                outseam: lengthNum,
+                inseam: lengthNum,
                 ankle: parseFloat(ankle),
-                recommendedSize: getRecommendedSize(waist),
+                recommendedSize: getRecommendedSize(waistNum),
                 saved_at: new Date().toISOString()
             };
 
@@ -332,23 +359,39 @@ export const initCustomFit = () => {
             const data = dataList[selectedIndex] || {};
             const name = data.name || 'User';
             const waist = data.waist || 30;
-            const outseam = data.outseam && data.outseam !== '-' ? data.outseam : (data.inseam || 26);
-            const ankle = data.ankle || 7;
+            const outseam = data.outseam && data.outseam !== '-' ? data.outseam : (data.inseam || 40);
+            const ankle = data.ankle || 16;
 
             const waistNum = parseFloat(waist);
+            const lengthNum = parseFloat(outseam);
             const isOddWaist = !isNaN(waistNum) && (Math.round(waistNum) % 2 !== 0);
             const targetEvenSize = isOddWaist ? Math.floor(waistNum) - (Math.floor(waistNum) % 2 === 0 ? 0 : 1) : waistNum;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const pid = parseInt(urlParams.get('id')) || 1;
+
+            // Check validations
+            let validationError = null;
+            if (isNaN(waistNum) || waistNum < 28 || waistNum > 38) {
+                validationError = 'Sorry, we are not available at this size (Waist must be between 28" and 38").';
+            } else if (isNaN(lengthNum) || lengthNum < 36 || lengthNum > 44) {
+                validationError = 'Sorry, we are not available at this size (Length must be between 36" and 44").';
+            } else if (window.SlyteInventory) {
+                const stockCheck = window.SlyteInventory.validateCustomFit(waistNum, lengthNum, pid);
+                if (!stockCheck.valid) {
+                    validationError = stockCheck.error || 'Sorry, out of stock.';
+                }
+            }
 
             const optionsHtml = dataList.map((d, i) =>
                 `<option value="${i}" ${i === selectedIndex ? 'selected' : ''}>${d.name || 'User'} (${d.waist}")</option>`
             ).join('');
 
-            let ankleValue = parseFloat(ankle) || 7;
+            let ankleValue = parseFloat(ankle) || 6.5;
 
-            // Parse base price and add ₹199 custom fit charge
-            const rawPrice = document.querySelector('.p-price')?.innerText || "₹1,699";
-            const baseNum = parseInt(rawPrice.replace(/[^\d]/g, '')) || 1699;
+            // Total custom fit price (Base ₹1,799 + ₹99 Custom Fit = ₹1,898)
             const CUSTOM_FIT_CHARGE = 99;
+            const baseNum = 1799;
             const totalNum = baseNum + CUSTOM_FIT_CHARGE;
             const totalDisplay = '₹' + totalNum.toLocaleString('en-IN');
 
@@ -360,7 +403,12 @@ export const initCustomFit = () => {
                         </select>
                     </div>
 
-                    ${isOddWaist ? `
+                    ${validationError ? `
+                        <div style="background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px; padding:10px 12px; margin-bottom:12px; display:flex; align-items:center; gap:8px; text-align:left;">
+                            <span class="material-symbols-outlined" style="font-size:18px; color:#dc2626; flex-shrink:0;">error</span>
+                            <span style="font-size:12px; font-weight:700; color:#b91c1c; line-height:1.4;">${validationError}</span>
+                        </div>
+                    ` : (isOddWaist ? `
                         <div class="cfm-odd-banner">
                             <div class="cfm-banner-icon-bg">
                                 <span class="material-symbols-outlined cfm-banner-i">info</span>
@@ -369,7 +417,7 @@ export const initCustomFit = () => {
                                 Odd waist size entered. We'll make it in the best fitting size with 2" flexible elastic waistband for extra comfort.
                             </div>
                         </div>
-                    ` : ''}
+                    ` : '')}
 
                     <div class="cfm-table-container">
                         <table class="cfm-table">
@@ -459,8 +507,8 @@ export const initCustomFit = () => {
                         </div>
                     </div>
 
-                    <button class="cfm-btn cfm-btn-primary-buy" id="cfmBuyNowBtn">
-                        <span class="material-symbols-outlined cfm-icon">shopping_bag</span> BUY NOW
+                    <button class="cfm-btn cfm-btn-primary-buy" id="cfmBuyNowBtn" ${validationError ? 'style="background:#64748b; cursor:not-allowed;"' : ''}>
+                        <span class="material-symbols-outlined cfm-icon">shopping_bag</span> ${validationError ? 'UNAVAILABLE' : 'BUY NOW'}
                     </button>
                 </div>
             `;
@@ -479,33 +527,54 @@ export const initCustomFit = () => {
             document.getElementById('cfmBuyNowBtn').addEventListener('click', (e) => {
                 const dataset = dataList[selectedIndex] || {};
                 const selectedAnkle = document.getElementById('cfmAnkleSelect').value;
+                const curWaist = parseFloat(dataset.waist);
+                const curLength = parseFloat(dataset.outseam || dataset.inseam);
+                const curPid = parseInt(new URLSearchParams(window.location.search).get('id')) || 1;
+
+                // 1. Strict Waist Bounds Validation: 28 to 38
+                if (isNaN(curWaist) || curWaist < 28 || curWaist > 38) {
+                    alert('Sorry, we are not available at this size (Waist must be between 28" and 38").');
+                    return;
+                }
+
+                // 2. Strict Length Bounds Validation: 36 to 44
+                if (isNaN(curLength) || curLength < 36 || curLength > 44) {
+                    alert('Sorry, we are not available at this size (Length must be between 36" and 44").');
+                    return;
+                }
+
+                // 3. Stock Check in "ALL" pool
+                if (window.SlyteInventory) {
+                    const check = window.SlyteInventory.validateCustomFit(curWaist, curLength, curPid);
+                    if (!check.valid) {
+                        alert(check.error || 'Sorry, out of stock for this size in All pool.');
+                        return;
+                    }
+                }
 
                 const customFitData = {
                     waist: dataset.waist,
                     outseam: dataset.outseam || "-",
-                    inseam: dataset.inseam,
+                    inseam: dataset.inseam || dataset.outseam,
                     ankle: selectedAnkle,
                     recommendedSize: dataset.recommendedSize || getRecommendedSize(dataset.waist)
                 };
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const pid = parseInt(urlParams.get('id')) || 1;
-
                 let product = {
-                    id: pid,
+                    id: curPid,
                     name: document.querySelector('.p-title')?.innerText || "Product",
-                    price: document.querySelector('.p-price')?.innerText || "₹1,699",
+                    price: "₹1,898",
                     image: document.querySelector('.carousel-slide img')?.src || "",
                     link: window.location.href
                 };
 
                 if (typeof productsData !== 'undefined') {
-                    const found = productsData.find(p => p.id === pid);
-                    if (found) product = found;
+                    const found = productsData.find(p => p.id === curPid);
+                    if (found) product = { ...found, price: "₹1,898" };
                 }
 
                 if (window.addToCart) {
-                    window.addToCart(product, customFitData.recommendedSize, customFitData);
+                    window.addToCart(product, 'Custom Fit', customFitData);
                     closeModal();
 
                     const btnEl = e.target;
