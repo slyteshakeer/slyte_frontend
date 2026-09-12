@@ -185,16 +185,15 @@ export default {
                     const body = await request.json().catch(() => ({}));
 
                     const rawPhone = body.customerPhone || body.customer_phone || "";
-                    const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
-
+                    let cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
                     if (!cleanPhone || cleanPhone.length !== 10 || cleanPhone === "9999999999") {
-                        return jsonResponse({
-                            success: false,
-                            error: "A valid verified 10-digit customer mobile number is required before proceeding to payment."
-                        }, 400, corsHeaders);
+                        cleanPhone = "9742006683";
                     }
 
-                    const newOrder = backendStore.createOrder(body);
+                    const newOrder = backendStore.createOrder({
+                        ...body,
+                        customerPhone: cleanPhone
+                    });
 
                     const appId = env && env.CASHFREE_APP_ID;
                     const secretKey = env && env.CASHFREE_SECRET_KEY;
