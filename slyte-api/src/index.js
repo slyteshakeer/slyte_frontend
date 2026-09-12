@@ -185,14 +185,12 @@ export default {
                     const body = await request.json().catch(() => ({}));
 
                     const rawPhone = body.customerPhone || body.customer_phone || "";
-                    let cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
-                    if (!cleanPhone || cleanPhone.length !== 10 || cleanPhone === "9999999999") {
-                        cleanPhone = "9742006683";
-                    }
+                    const hasUserPhone = Boolean(rawPhone && String(rawPhone).replace(/\D/g, '').length === 10 && rawPhone !== "9999999999" && rawPhone !== "9742006683");
+                    const cleanPhone = hasUserPhone ? String(rawPhone).replace(/\D/g, '').slice(-10) : "9742006683";
 
                     const newOrder = backendStore.createOrder({
                         ...body,
-                        customerPhone: cleanPhone
+                        customerPhone: hasUserPhone ? cleanPhone : null
                     });
 
                     const appId = env && env.CASHFREE_APP_ID;
@@ -263,10 +261,10 @@ export default {
                                     payment_session_id: cfData.payment_session_id,
                                     cf_order_id: cfData.cf_order_id,
                                     amount: newOrder.total_amount,
-                                    user: {
-                                        phone: newOrder.customer_phone,
+                                    user: hasUserPhone ? {
+                                        phone: cleanPhone,
                                         name: newOrder.customer_name
-                                    }
+                                    } : null
                                 }
                             }, 200, corsHeaders);
 

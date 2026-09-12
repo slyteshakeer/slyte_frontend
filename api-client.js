@@ -161,13 +161,12 @@
             throw err;
         }
 
-        // ── Auto-login: save checkout phone + name to localStorage ────────
-        // No tokens needed — my-orders page queries MongoDB directly by phone.
-        if (data.data && data.data.user && data.data.user.phone && data.data.user.phone !== "9999999999") {
+        // ── Save user phone only if customer explicitly provided their phone ──
+        if (customerPhone && String(customerPhone).replace(/\D/g, '').length === 10 && customerPhone !== "9999999999" && customerPhone !== "9742006683") {
             try {
-                localStorage.setItem("userPhone", data.data.user.phone);
-                localStorage.setItem("userName",  data.data.user.name || "Customer");
-                console.log("[slyte] Auto-login: phone saved →", data.data.user.phone);
+                const cleanP = String(customerPhone).replace(/\D/g, '').slice(-10);
+                localStorage.setItem("userPhone", cleanP);
+                localStorage.setItem("slyte_phone", cleanP);
             } catch (e) {
                 console.warn("[slyte] Could not save user info:", e);
             }
