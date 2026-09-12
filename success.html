@@ -165,17 +165,39 @@
                     const order = result.data || {};
 
                     // Save real phone from Cashfree OCC to localStorage (shows in hamburger)
-                    const realPhone = order.customer_phone || order.customerPhone || '';
+                    const realPhone = order.customer_phone || order.customerPhone || (order.deliveryAddress && order.deliveryAddress.phone) || '';
                     const cleanPhone = String(realPhone).replace(/\D/g, '').slice(-10);
                     if (/^[6-9]\d{9}$/.test(cleanPhone)) {
+                        const custName = order.customer_name || order.customerName || 'Customer';
                         localStorage.setItem('slyte_phone', cleanPhone);
                         localStorage.setItem('userPhone', cleanPhone);
                         localStorage.setItem('slyteUser', JSON.stringify({
                             phone: cleanPhone,
-                            name: order.customer_name || order.customerName || 'Customer',
+                            name: custName,
                             address: order.shipping_address || order.deliveryAddress || ''
                         }));
-                        localStorage.setItem('username', order.customer_name || order.customerName || 'Customer');
+                        localStorage.setItem('username', custName);
+                        localStorage.setItem('userName', custName);
+
+                        // Call auto-login to obtain persistent JWT session from Supabase
+                        try {
+                            const autoRes = await fetch(`${apiBase}/auto-login`, {
+                                method: 'POST',
+                                headers: {
+                                    "Authorization": `Bearer ${ANON_KEY}`,
+                                    "apikey": ANON_KEY,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ phone: cleanPhone })
+                            });
+                            const autoData = await autoRes.json();
+                            if (autoData.success && autoData.token) {
+                                localStorage.setItem('slyte_otp_token', autoData.token);
+                            }
+                        } catch(e) {
+                            console.warn('Auto-login call:', e);
+                        }
+
                         // Dispatch auth change so hamburger updates
                         window.dispatchEvent(new Event('slyteauthchange'));
                     }
