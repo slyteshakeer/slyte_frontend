@@ -418,45 +418,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
                 const originalText = buyNowBtn.innerHTML;
-                buyNowBtn.innerHTML = 'PROCESSING...';
-                buyNowBtn.disabled = true;
 
-                try {
-                    const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
-                    const res = await window.initiateCheckout({
-                        amount: priceNum,
-                        customerPhone: (savedPhone && savedPhone.length === 10 && savedPhone !== "9999999999" && savedPhone !== "9742006683") ? savedPhone : undefined,
-                        customerName: localStorage.getItem("username") || "Customer",
-                        cartItems: [{
-                            ...product,
-                            size: size,
-                            quantity: 1,
-                            price: priceNum
-                        }]
-                    });
+                const executeCheckoutWithPhone = async (customerPhone) => {
+                    buyNowBtn.innerHTML = 'PROCESSING...';
+                    buyNowBtn.disabled = true;
 
-                    const sid = res.data && res.data.payment_session_id;
-
-                    if (!sid) {
-                        throw new Error("No payment_session_id from server");
-                    }
-
-                    if (typeof Cashfree !== "undefined") {
-                        const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
-                        const cf = Cashfree({ mode: mode.toLowerCase() });
-                        cf.checkout({
-                            paymentSessionId: sid,
-                            redirectTarget: "_modal"
+                    try {
+                        const res = await window.initiateCheckout({
+                            amount: priceNum,
+                            customerPhone: customerPhone,
+                            customerName: localStorage.getItem("username") || "Customer",
+                            cartItems: [{
+                                ...product,
+                                size: size,
+                                quantity: 1,
+                                price: priceNum
+                            }]
                         });
-                    } else {
-                        window.location.href = 'cart.html';
+
+                        const sid = res.data && res.data.payment_session_id;
+
+                        if (!sid) {
+                            throw new Error("No payment_session_id from server");
+                        }
+
+                        if (typeof Cashfree !== "undefined") {
+                            const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
+                            const cf = Cashfree({ mode: mode.toLowerCase() });
+                            cf.checkout({
+                                paymentSessionId: sid,
+                                redirectTarget: "_modal"
+                            });
+                        } else {
+                            window.location.href = 'cart.html';
+                        }
+                    } catch (e) {
+                        console.error("Buy Now Checkout failed:", e);
+                        window.showToast("Checkout failed. Please try again or use cart.");
+                    } finally {
+                        buyNowBtn.innerHTML = originalText;
+                        buyNowBtn.disabled = false;
                     }
-                } catch (e) {
-                    console.error("Buy Now Checkout failed:", e);
-                    window.showToast("Checkout failed. Please try again or use cart.");
-                } finally {
-                    buyNowBtn.innerHTML = originalText;
-                    buyNowBtn.disabled = false;
+                };
+
+                if (typeof window.ensureVerifiedPhone === "function") {
+                    window.ensureVerifiedPhone(executeCheckoutWithPhone);
+                } else {
+                    const savedPhone = (localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone") || "").replace(/\D/g, "");
+                    if (!savedPhone || savedPhone === "9999999999" || savedPhone === "9742006683") {
+                        window.showToast("Please enter your mobile number first.");
+                        return;
+                    }
+                    executeCheckoutWithPhone(savedPhone);
                 }
             }
         });
