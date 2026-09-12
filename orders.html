@@ -993,8 +993,10 @@
                 ? window.SLYTE_CONFIG.SUPABASE_ANON_KEY
                 : 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
             function apiHeaders(token) {
-                const h = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ANON_KEY}` };
-                return h;
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token || ANON_KEY}`
+                };
             }
 
             // ── Lifecycle status config ────────────────────────────────────
@@ -1175,6 +1177,7 @@
                     if (token && !token.includes('9999999999')) {
                         localStorage.setItem('slyte_phone', loggedInPhone);
                         localStorage.setItem('userPhone', loggedInPhone);
+                        localStorage.setItem('dash_phone', loggedInPhone);
                         showLoggedInState();
                         fetchOrders();
                         return;
@@ -1182,16 +1185,26 @@
 
                     // Automatically exchange the logged-in phone for a fresh JWT session
                     try {
-                        const res = await fetch(`${API_BASE}/auto-login`, {
+                        let res = await fetch(`${API_BASE}/auto-login`, {
                             method: 'POST',
-                            headers: apiHeaders(ANON_KEY),
+                            headers: apiHeaders(),
                             body: JSON.stringify({ phone: loggedInPhone })
-                        });
-                        const data = await res.json();
-                        if (data.success && data.token) {
+                        }).catch(() => null);
+
+                        if (!res || !res.ok) {
+                            res = await fetch('https://api.slyte.in/auto-login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ phone: loggedInPhone })
+                            }).catch(() => null);
+                        }
+
+                        const data = res ? await res.json().catch(() => ({})) : {};
+                        if (data && data.success && data.token) {
                             localStorage.setItem('slyte_otp_token', data.token);
                             localStorage.setItem('slyte_phone', loggedInPhone);
                             localStorage.setItem('userPhone', loggedInPhone);
+                            localStorage.setItem('dash_phone', loggedInPhone);
                             const displayName = (data.user && data.user.name && data.user.name !== 'Customer')
                                 ? data.user.name
                                 : (localStorage.getItem('userName') || localStorage.getItem('username') || loggedInPhone);
@@ -1267,6 +1280,7 @@
                 otpStep.style.display = 'block';
                 displaySentMobile.textContent = '+91 ' + phone;
                 startResendTimer();
+                setTimeout(() => { if (otpInput) otpInput.focus(); }, 100);
             }
 
             // ── Send OTP ───────────────────────────────────────────────
@@ -1279,30 +1293,39 @@
                 currentMobile = val;
                 clearMessages();
                 trackBtn.disabled = true;
-                trackBtn.textContent = 'Sending...';
+                trackBtn.innerHTML = `Sending... <span class="material-symbols-outlined" style="font-size:18px; animation:spin 1s linear infinite;">progress_activity</span>`;
 
                 try {
-                    const res = await fetch(`${API_BASE}/send-otp`, {
+                    let res = await fetch(`${API_BASE}/send-otp`, {
                         method: 'POST',
-                        headers: apiHeaders(ANON_KEY),
+                        headers: apiHeaders(),
                         body: JSON.stringify({ phone: currentMobile })
-                    });
-                    const data = await res.json();
+                    }).catch(() => null);
+
+                    if (!res || !res.ok) {
+                        res = await fetch('https://api.slyte.in/send-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: currentMobile })
+                        }).catch(() => null);
+                    }
+
+                    const data = res ? await res.json().catch(() => ({})) : {};
                     
-                    if (data.success) {
+                    if (data && data.success) {
                         showOtpStep(currentMobile);
                         showSuccess('OTP sent successfully to +91 ' + currentMobile);
                         if (data.demo_otp) {
                             otpInput.placeholder = `e.g. ${data.demo_otp}`;
                         }
                     } else {
-                        showError(data.message || 'Failed to send OTP.');
+                        showError(data?.message || 'Failed to send OTP. Please try again.');
                     }
                 } catch (e) {
                     showError('Network error. Please try again.');
                 } finally {
                     trackBtn.disabled = false;
-                    trackBtn.textContent = 'Get OTP';
+                    trackBtn.innerHTML = `Get OTP <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>`;
                 }
             }
 
@@ -1318,27 +1341,38 @@
                 verifyBtn.textContent = 'Verifying...';
 
                 try {
-                    const res = await fetch(`${API_BASE}/verify-otp`, {
+                    let res = await fetch(`${API_BASE}/verify-otp`, {
                         method: 'POST',
-                        headers: apiHeaders(ANON_KEY),
+                        headers: apiHeaders(),
                         body: JSON.stringify({ phone: currentMobile, otp })
-                    });
-                    const data = await res.json();
+                    }).catch(() => null);
+
+                    if (!res || !res.ok) {
+                        res = await fetch('https://api.slyte.in/verify-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: currentMobile, otp })
+                        }).catch(() => null);
+                    }
+
+                    const data = res ? await res.json().catch(() => ({})) : {};
                     
-                    if (data.success) {
+                    if (data && data.success) {
                         localStorage.setItem('slyte_otp_token', data.token);
                         const phone = (data.user && data.user.phone) || currentMobile;
-                        const name = (data.user && data.user.name) || '';
+                        const name = (data.user && data.user.name && data.user.name !== 'Customer')
+                            ? data.user.name
+                            : (localStorage.getItem('userName') || localStorage.getItem('username') || phone);
                         localStorage.setItem('slyte_phone', phone);
                         localStorage.setItem('userPhone', phone);
                         localStorage.setItem('dash_phone', phone);
-                        localStorage.setItem('username', name || phone);
-                        localStorage.setItem('userName', name || phone);
+                        localStorage.setItem('username', name);
+                        localStorage.setItem('userName', name);
                         
                         showLoggedInState();
                         fetchOrders();
                     } else {
-                        showError(data.message || 'Invalid OTP. Please try again.');
+                        showError(data?.message || 'Invalid OTP. Please try again.');
                     }
                 } catch (e) {
                     showError('Network error. Please try again.');
