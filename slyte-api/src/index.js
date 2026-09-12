@@ -57,6 +57,11 @@ export default {
         const pathStr = url.pathname;
         const method = request.method.toUpperCase();
 
+        // Redirect requests for index.html on worker domain to frontend
+        if ((pathStr === "/index.html" || pathStr === "/") && url.hostname.includes("api.slyte.in")) {
+            return Response.redirect("https://slyte.in" + url.search, 302);
+        }
+
         try {
             // ----------------------------------------------------
             // HEALTH & DIAGNOSTICS
@@ -175,9 +180,20 @@ export default {
             // ----------------------------------------------------
             // CHECKOUT & PAYMENT (Cashfree Gateway Integration)
             // ----------------------------------------------------
-            if (pathStr === "/create-order" || pathStr === "/api/payment/create") {
+            if (pathStr === "/create-order" || pathStr === "/api/create-order" || pathStr === "/api/payment/create") {
                 if (method === "POST") {
                     const body = await request.json().catch(() => ({}));
+
+                    const rawPhone = body.customerPhone || body.customer_phone || "";
+                    const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+
+                    if (!cleanPhone || cleanPhone.length !== 10 || cleanPhone === "9999999999") {
+                        return jsonResponse({
+                            success: false,
+                            error: "A valid verified 10-digit customer mobile number is required before proceeding to payment."
+                        }, 400, corsHeaders);
+                    }
+
                     const newOrder = backendStore.createOrder(body);
 
                     const appId = env && env.CASHFREE_APP_ID;
@@ -190,8 +206,12 @@ export default {
                     // Call Cashfree API if credentials are provided in environment
                     if (appId && secretKey) {
                         try {
-                            const origin = request.headers.get("Origin") || "https://slyte.in";
-                            const cleanPhone = String(newOrder.customer_phone || "9999999999").replace(/\D/g, '').slice(-10) || "9999999999";
+                            let returnDomain = "https://slyte.in";
+                            const reqOrigin = request.headers.get("Origin") || "";
+                            if (reqOrigin && !reqOrigin.includes("api.slyte.in")) {
+                                returnDomain = reqOrigin.replace(/\/$/, "");
+                            }
+                            const returnUrl = `${returnDomain}/index.html?order_id={order_id}`;
                             const customerId = "cust_" + cleanPhone;
 
                             const cfPayload = {
@@ -205,7 +225,7 @@ export default {
                                     customer_phone: cleanPhone
                                 },
                                 order_meta: {
-                                    return_url: `${origin}/index.html?order_id={order_id}`
+                                    return_url: returnUrl
                                 }
                             };
 
@@ -270,9 +290,10 @@ export default {
                 }
             }
 
-            if (pathStr.startsWith("/verify-order/") || pathStr.startsWith("/api/payment/verify/")) {
+            if (pathStr.startsWith("/verify-order/") || pathStr.startsWith("/api/verify-order/") || pathStr.startsWith("/api/payment/verify/")) {
                 const parts = pathStr.split("/");
-                const orderId = parts[parts.length - 1];
+                const rawId = parts[parts.length - 1] || "";
+                const orderId = rawId.split("?")[0].trim();
                 let order = backendStore.getOrderById(orderId);
 
                 const appId = env && env.CASHFREE_APP_ID;
@@ -343,7 +364,7 @@ export default {
             }
 
             // Webhook handler for Cashfree payment notifications
-            if (pathStr === "/api/payment/webhook" || pathStr === "/webhook/cashfree") {
+            if (pathStr === "/api/payment/webhook" || pathStr === "/webhook/cashfree" || pathStr === "/api/webhook/cashfree" || pathStr === "/webhook") {
                 if (method === "POST") {
                     const webhookBody = await request.json().catch(() => ({}));
                     console.log("[slyte-api] Cashfree Webhook received:", webhookBody);

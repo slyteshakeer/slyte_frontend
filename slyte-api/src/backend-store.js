@@ -541,17 +541,19 @@ class SlyteBackendStore {
     }
 
     createOrder(orderPayload) {
+        const rawPhone = orderPayload.customerPhone || orderPayload.customer_phone || "";
+        const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
         const newOrder = {
             id: orderPayload.id || ("SLYTE_" + Date.now()),
             customer_name: orderPayload.customerName || orderPayload.customer_name || "Customer",
-            customer_phone: orderPayload.customerPhone || orderPayload.customer_phone || "9999999999",
+            customer_phone: cleanPhone || null,
             customer_email: orderPayload.customerEmail || orderPayload.customer_email || "customer@slyte.in",
             delivery_address: orderPayload.delivery_address || orderPayload.deliveryAddress || "Standard Delivery Address",
             total_amount: Number(orderPayload.amount) || 0,
             payment_method: orderPayload.payment_method || "CASHFREE",
-            payment_status: orderPayload.payment_status || "PAID",
-            order_status: orderPayload.order_status || "PAID",
-            orderLifecycleStatus: orderPayload.orderLifecycleStatus || "PAID",
+            payment_status: orderPayload.payment_status || "PENDING",
+            order_status: orderPayload.order_status || "PENDING",
+            orderLifecycleStatus: orderPayload.orderLifecycleStatus || "PENDING",
             product_type: orderPayload.product_type || "STANDARD",
             fit_type: orderPayload.fit_type || "Standard Fit",
             shiprocket_order_id: orderPayload.shiprocket_order_id || null,

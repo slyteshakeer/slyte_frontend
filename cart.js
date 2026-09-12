@@ -237,55 +237,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
         isProcessing = true;
         const originalBtnHtml = payBtn.innerHTML;
-        payBtn.innerHTML = `
-            <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
-                <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
-                <path d="M12 2a10 10 0 0 1 10 10"></path>
-            </svg> 
-            PROCESSING...
-        `;
-        // Insert inline style mapping for spin if it doesn't exist
-        if (!document.getElementById('spin-style')) {
-            const style = document.createElement('style');
-            style.id = 'spin-style';
-            style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
-            document.head.appendChild(style);
-        }
-
-        payBtn.disabled = true;
-
-        try {
-            const res = await window.initiateCheckout({
-                amount: amountForCheckout,
-                customerPhone: localStorage.getItem("slyte_phone") || localStorage.getItem("dash_phone") || undefined,
-                customerName: localStorage.getItem("username") || undefined,
-                cartItems: items
-            });
-
-            const sid = res.data && res.data.payment_session_id;
-            const oid = res.data && res.data.order_id;
-
-            if (!sid) {
-                throw new Error("No payment_session_id from server");
+        const startCheckoutWithPhone = async (verifiedPhone) => {
+            payBtn.innerHTML = `
+                <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+                    <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                    <path d="M12 2a10 10 0 0 1 10 10"></path>
+                </svg> 
+                PROCESSING...
+            `;
+            if (!document.getElementById('spin-style')) {
+                const style = document.createElement('style');
+                style.id = 'spin-style';
+                style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+                document.head.appendChild(style);
             }
+            payBtn.disabled = true;
 
-            if (typeof Cashfree !== "undefined") {
-                const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
-                const cf = Cashfree({ mode: mode.toLowerCase() });
-                cf.checkout({
-                    paymentSessionId: sid,
-                    redirectTarget: "_modal"
+            try {
+                const res = await window.initiateCheckout({
+                    amount: amountForCheckout,
+                    customerPhone: verifiedPhone,
+                    customerName: localStorage.getItem("username") || "Customer",
+                    cartItems: items
                 });
-            } else {
-                throw new Error("Cashfree SDK not loaded on this page.");
+
+                const sid = res.data && res.data.payment_session_id;
+
+                if (!sid) {
+                    throw new Error("No payment_session_id from server");
+                }
+
+                if (typeof Cashfree !== "undefined") {
+                    const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
+                    const cf = Cashfree({ mode: mode.toLowerCase() });
+                    cf.checkout({
+                        paymentSessionId: sid,
+                        redirectTarget: "_modal"
+                    });
+                } else {
+                    throw new Error("Cashfree SDK not loaded on this page.");
+                }
+            } catch (e) {
+                console.error(e);
+                showErr(e.message || "Checkout failed");
+            } finally {
+                payBtn.innerHTML = originalBtnHtml;
+                payBtn.disabled = false;
+                isProcessing = false;
             }
-        } catch (e) {
-            console.error(e);
-            showErr(e.message || "Checkout failed");
-            payBtn.innerHTML = originalBtnHtml;
-            payBtn.disabled = false;
-        } finally {
-            isProcessing = false;
+        };
+
+        if (typeof window.ensureVerifiedPhone === "function") {
+            window.ensureVerifiedPhone(startCheckoutWithPhone);
+        } else {
+            const existingPhone = localStorage.getItem("slyte_phone") || localStorage.getItem("userPhone");
+            if (!existingPhone || existingPhone === "9999999999") {
+                showErr("Please verify your mobile number before checkout.");
+                payBtn.innerHTML = originalBtnHtml;
+                payBtn.disabled = false;
+                isProcessing = false;
+                return;
+            }
+            startCheckoutWithPhone(existingPhone);
         }
     });
 
