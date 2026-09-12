@@ -185,12 +185,18 @@ export default {
                     const body = await request.json().catch(() => ({}));
 
                     const rawPhone = body.customerPhone || body.customer_phone || "";
-                    const hasUserPhone = Boolean(rawPhone && String(rawPhone).replace(/\D/g, '').length === 10 && rawPhone !== "9999999999" && rawPhone !== "9742006683");
-                    const cleanPhone = hasUserPhone ? String(rawPhone).replace(/\D/g, '').slice(-10) : "9742006683";
+                    const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+
+                    if (!cleanPhone || cleanPhone.length !== 10 || cleanPhone === "9999999999" || cleanPhone === "9742006683") {
+                        return jsonResponse({
+                            success: false,
+                            error: "A valid customer mobile number is required before proceeding to payment."
+                        }, 400, corsHeaders);
+                    }
 
                     const newOrder = backendStore.createOrder({
                         ...body,
-                        customerPhone: hasUserPhone ? cleanPhone : null
+                        customerPhone: cleanPhone
                     });
 
                     const appId = env && env.CASHFREE_APP_ID;
@@ -261,10 +267,10 @@ export default {
                                     payment_session_id: cfData.payment_session_id,
                                     cf_order_id: cfData.cf_order_id,
                                     amount: newOrder.total_amount,
-                                    user: hasUserPhone ? {
+                                    user: {
                                         phone: cleanPhone,
                                         name: newOrder.customer_name
-                                    } : null
+                                    }
                                 }
                             }, 200, corsHeaders);
 
