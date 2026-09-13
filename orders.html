@@ -1427,7 +1427,7 @@
                         localOverride === 'ALTERATION_REQUESTED' ? 'Alteration Requested' :
                         localOverride === 'RETURN_INITIATED' ? 'Return Requested' : localOverride
                     ) : (o.fulfillmentStatus || o.tracking_status || o.order_status || 'DELIVERED'),
-                    amount: o.amount || o.total_amount || 1699,
+                    amount: o.amount || o.total_amount || 1799,
                     paymentGroup: o.paymentGroup || o.payment_method || (isCod ? 'COD' : 'CASHFREE'),
                     isCodOrder: isCod,
                     createdAt: o.createdAt || o.created_at || new Date().toISOString(),
@@ -1453,7 +1453,7 @@
                     fitType: "Standard Fit",
                     orderLifecycleStatus: "DELIVERED",
                     fulfillmentStatus: "Delivered",
-                    amount: 1699,
+                    amount: 1799,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
@@ -1469,7 +1469,7 @@
                     fitType: "Custom Fit",
                     orderLifecycleStatus: "DELIVERED",
                     fulfillmentStatus: "Delivered",
-                    amount: 1799,
+                    amount: 1899,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
@@ -1485,7 +1485,7 @@
                     fitType: "Standard Fit",
                     orderLifecycleStatus: "SHIPPED",
                     fulfillmentStatus: "Dispatched",
-                    amount: 1699,
+                    amount: 1799,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
@@ -1501,7 +1501,7 @@
                     fitType: "Standard Fit",
                     orderLifecycleStatus: "RETURN_INITIATED",
                     fulfillmentStatus: "Return Requested",
-                    amount: 1699,
+                    amount: 1799,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
@@ -1517,7 +1517,7 @@
                     fitType: "Standard Fit",
                     orderLifecycleStatus: "EXCHANGE_REQUESTED",
                     fulfillmentStatus: "Exchange Requested",
-                    amount: 1699,
+                    amount: 1799,
                     paymentGroup: "CASHFREE_CARD",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
@@ -1533,7 +1533,7 @@
                     fitType: "Custom Fit",
                     orderLifecycleStatus: "ALTERATION_REQUESTED",
                     fulfillmentStatus: "Alteration Requested",
-                    amount: 1799,
+                    amount: 1899,
                     paymentGroup: "CASHFREE_UPI",
                     isCodOrder: false,
                     createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
@@ -1564,7 +1564,7 @@
                 .then(data => {
                     setLoading(false);
                     let list = (data.orders || []).map(normalizeOrder);
-                    
+
                     // Guarantee pre-seeded test orders for 9742006683 / 97420066683
                     if (userPhone.includes('9742006683') || userPhone.includes('97420066683') || token.includes('9742006683')) {
                         const existingIds = new Set(list.map(o => o.orderId));
@@ -1635,7 +1635,6 @@
                 .then(res => {
                     setLoading(false);
                     if (res.success) {
-                        // Show different alert based on payment type
                         const msg = res.message || (res.isCodOrder
                             ? 'Order cancelled successfully.'
                             : 'Order cancelled. Refund will be credited within 5–7 business days.');
@@ -2194,11 +2193,9 @@
 
             try {
                 const token = localStorage.getItem('slyte_otp_token');
-                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
-                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
-                const res = await fetch(apiBase + '/alteration-request', {
+                const res = await fetch('https://api.slyte.in/api/after-sales/alteration', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
                     body: JSON.stringify({
                         order_id: orderId,
                         alteration_type: `Waist: ${selectedWaistVal}", Length: ${selectedLengthVal}"`,
@@ -2336,11 +2333,9 @@
 
             try {
                 const token = localStorage.getItem('slyte_otp_token');
-                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
-                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
-                const res = await fetch(apiBase + '/return-request', {
+                const res = await fetch('https://api.slyte.in/api/after-sales/return', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
                     body: JSON.stringify({
                         order_id: orderId,
                         reason,
@@ -2432,11 +2427,9 @@
             btn.innerHTML = 'Submitting...';
             try {
                 const token = localStorage.getItem('slyte_otp_token');
-                const apiBase = (window.SLYTE_CONFIG?.API_BASE_URL || 'https://iqdtfllkdtjypiseklzt.supabase.co/functions/v1').replace(/\/+$/, '');
-                const anonKey = window.SLYTE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC';
-                const res = await fetch(apiBase + '/exchange-request', {
+                const res = await fetch('https://api.slyte.in/api/after-sales/exchange', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || anonKey}`, 'apikey': anonKey },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
                     body: JSON.stringify({ order_id: orderId, replacement_size, reason, customer_notes: notes })
                 });
                 const data = await res.json();

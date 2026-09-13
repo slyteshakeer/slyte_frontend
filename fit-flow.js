@@ -389,8 +389,8 @@ export const initCustomFit = () => {
 
             let ankleValue = parseFloat(ankle) || 6.5;
 
-            // Total custom fit price (Base ₹1,799 + ₹99 Custom Fit = ₹1,898)
-            const CUSTOM_FIT_CHARGE = 99;
+            // Total custom fit price (Base ₹1,799 + ₹100 Custom Fit = ₹1,899)
+            const CUSTOM_FIT_CHARGE = 100;
             const baseNum = 1799;
             const totalNum = baseNum + CUSTOM_FIT_CHARGE;
             const totalDisplay = '₹' + totalNum.toLocaleString('en-IN');
@@ -503,12 +503,12 @@ export const initCustomFit = () => {
                         <div class="cfm-price-divider"></div>
                         <div class="cfm-price-right">
                             <span style="font-size:13px; font-weight:700; color:#0f172a; display:block; margin-bottom:3px;">Custom made just for you.</span>
-                            <span style="font-size:10px; font-weight:500; color:#64748b;">ⓘ Includes <strong style="color:#0f172a;">₹99</strong> Custom Fit</span>
+                            <span style="font-size:10px; font-weight:500; color:#64748b;">ⓘ Includes <strong style="color:#0f172a;">₹100</strong> Custom Fit</span>
                         </div>
                     </div>
 
-                    <button class="cfm-btn cfm-btn-primary-buy" id="cfmBuyNowBtn" ${validationError ? 'style="background:#64748b; cursor:not-allowed;"' : ''}>
-                        <span class="material-symbols-outlined cfm-icon">shopping_bag</span> ${validationError ? 'UNAVAILABLE' : 'BUY NOW'}
+                    <button class="cfm-btn cfm-btn-primary-buy" id="cfmBuyNowBtn" ${validationError ? 'style="background:#94a3b8; cursor:not-allowed;" disabled' : ''}>
+                        <span class="material-symbols-outlined cfm-icon">${validationError ? 'block' : 'shopping_bag'}</span> ${validationError ? 'Sorry, Out of Stock' : 'BUY NOW'}
                     </button>
                 </div>
             `;
@@ -547,7 +547,7 @@ export const initCustomFit = () => {
                 if (window.SlyteInventory) {
                     const check = window.SlyteInventory.validateCustomFit(curWaist, curLength, curPid);
                     if (!check.valid) {
-                        alert(check.error || 'Sorry, out of stock for this size in All pool.');
+                        alert(check.error || 'Sorry, out of stock (Custom Fit currently unavailable).');
                         return;
                     }
                 }
@@ -563,14 +563,14 @@ export const initCustomFit = () => {
                 let product = {
                     id: curPid,
                     name: document.querySelector('.p-title')?.innerText || "Product",
-                    price: "₹1,898",
+                    price: "₹1,899",
                     image: document.querySelector('.carousel-slide img')?.src || "",
                     link: window.location.href
                 };
 
                 if (typeof productsData !== 'undefined') {
                     const found = productsData.find(p => p.id === curPid);
-                    if (found) product = { ...found, price: "₹1,898" };
+                    if (found) product = { ...found, price: "₹1,899" };
                 }
 
                 if (window.addToCart) {

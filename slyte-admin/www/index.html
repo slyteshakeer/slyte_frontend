@@ -226,7 +226,7 @@
             <div class="metrics-slider">
                 <div class="m-card">
                     <div class="label">Total Revenue</div>
-                    <div class="val" id="mRevenue" style="color:#0f172a;">₹199</div>
+                    <div class="val" id="mRevenue" style="color:#0f172a;">₹1,799</div>
                     <div class="sub">Completed orders</div>
                 </div>
                 <div class="m-card">
@@ -348,7 +348,7 @@
                 customerPhone: "8050254534",
                 productName: "Slyte 24H Black Trouser (Size: 32)",
                 createdAt: "2026-09-12T10:23:01.000Z",
-                amount: 199,
+                amount: 1799,
                 paymentGroup: "CASH (COD)",
                 paymentMethod: "cash",
                 isCodOrder: true,
@@ -419,29 +419,14 @@
         // --- FETCH ORDERS DIRECTLY FROM MONGODB VIA SUPABASE ---
         async function fetchAllMongoDBOrders() {
             try {
-                const loginRes = await fetch(`${SUPABASE_BASE}/auto-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}` },
-                    body: JSON.stringify({ phone: '8050254534' })
+                // ✅ Fetch all orders from Cloudflare API (includes return/exchange/alteration statuses)
+                const res = await fetch('https://api.slyte.in/api/admin/orders', {
+                    headers: { 'Authorization': 'Bearer slyte_admin_demo_secret_key' }
                 });
-                const loginData = await loginRes.json();
-                const jwt = loginData.token || SUPABASE_ANON;
-
-                const res = await fetch(`${SUPABASE_BASE}/orders-lookup`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${jwt}`
-                    },
-                    body: JSON.stringify({ phone: '8050254534' })
-                });
-
-                const data = await res.json();
-                if (data.success && Array.isArray(data.orders)) {
-                    // Filter exclusively for the genuine order
-                    const filtered = data.orders.filter(o => o.orderId === "ORDER_1789208568969_382f87b0" || (o.amount === 199 && o.customerName));
-                    if (filtered.length > 0) {
-                        cachedOrders = filtered;
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && Array.isArray(data.orders) && data.orders.length > 0) {
+                        cachedOrders = data.orders;
                         localStorage.setItem('slyte_cached_orders', JSON.stringify(cachedOrders));
                         return cachedOrders;
                     }
@@ -499,7 +484,8 @@
 
         // --- DASHBOARD ---
         function loadDashboard() {
-            const orders = cachedOrders || [];
+            // ✅ Exclude CANCELLED orders from all admin metrics and recent orders
+            const orders = (cachedOrders || []).filter(o => (o.orderLifecycleStatus || '').toUpperCase() !== 'CANCELLED');
             let totalRevenue = 0;
             let pendingCount = 0;
             let altCount = 0;
@@ -532,6 +518,10 @@
             const fit = document.getElementById("fitFilter")?.value || "";
 
             let filtered = (cachedOrders || []).filter(o => {
+                // ✅ Auto-hide CANCELLED orders in admin APK
+                const lcs = (o.orderLifecycleStatus || '').toUpperCase();
+                if (lcs === 'CANCELLED') return false;
+
                 const txt = `${o.orderId} ${o.displayId} ${o.customerName} ${o.productName} ${o.trackingNumber || ''} ${o.deliveryAddress?.phone || ''}`.toLowerCase();
                 const matchSearch = !search || txt.includes(search);
                 const matchFit = !fit || (o.productType || 'STANDARD').toUpperCase() === fit.toUpperCase();
@@ -590,10 +580,14 @@
             const container = document.getElementById("afterSalesList");
             if (!container) return;
 
-            const orders = cachedOrders || [];
+            const orders = (cachedOrders || []).filter(o => (o.orderLifecycleStatus || '').toUpperCase() !== 'CANCELLED');
 
             if (subTab === "returns") {
-                container.innerHTML = orders.map(o => {
+                const returnOrders = orders.filter(o => {
+                    const lcs = (o.orderLifecycleStatus || '').toUpperCase();
+                    return lcs === 'RETURN_INITIATED' || lcs === 'RTO_IN_TRANSIT' || lcs === 'RTO_DELIVERED' || lcs === 'REFUND_PENDING' || lcs === 'REFUNDED';
+                });
+                container.innerHTML = returnOrders.map(o => {
                     const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
                     const origAmount = Number(o.amount) || 199;
                     const refundAmount = Math.max(0, origAmount - 100);
@@ -645,8 +639,11 @@
                     `;
                 }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No active return requests.</p>';
             } else if (subTab === "exchanges") {
-                container.innerHTML = orders.map(o => {
-                    const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+                const exchangeOrders = orders.filter(o => (o.orderLifecycleStatus || '').toUpperCase().startsWith('EXCHANGE_') || o.orderLifecycleStatus === 'EXCHANGE_REQUESTED');
+                container.innerHTML = exchangeOrders.map(o => {
+                    const phone = o.deliveryAddress?.phone || o.customerPhone || 'N/A';
+                    const exchSize = o.exchangeDetails?.replacement_size || o.replacement_size || '—';
+                    const exchReason = o.exchangeDetails?.reason || o.exchange_reason || 'Customer requested exchange';
                     return `
                         <div class="item-card">
                             <div class="item-header">
@@ -654,37 +651,49 @@
                                     <div class="item-title">🔄 Exchange Request • ${escapeHtml(o.displayId || o.orderId)}</div>
                                     <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (+91 ${escapeHtml(phone)})</div>
                                 </div>
-                                <span class="badge badge-shipped">EXCHANGE REQUESTED</span>
+                                <span class="badge badge-shipped">${escapeHtml(o.orderLifecycleStatus || 'EXCHANGE_REQUESTED')}</span>
+                            </div>
+                            <div style="font-size:12px; margin-top:6px; color:#334155;">
+                                <b>Item:</b> ${escapeHtml(o.productName || 'Slyte Trouser')} • <b>Amount:</b> ₹${o.amount || '—'}
                             </div>
                             <div style="font-size:13px; margin-top:8px; color:#0f172a; font-weight:700;">
-                                Requested Size: <span style="background:#eff6ff; color:var(--primary); padding:2px 8px; border-radius:6px;">Size 34 (Orig: 32)</span>
+                                Replacement Size: <span style="background:#eff6ff; color:var(--primary); padding:2px 8px; border-radius:6px;">${escapeHtml(exchSize)}</span>
                             </div>
                             <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                                Reason: Customer requested exchange for waist size 34
+                                Reason: ${escapeHtml(exchReason)}
                             </div>
+                            <div style="font-size:11px; color:#64748b; margin-top:2px;">📞 +91 ${escapeHtml(phone)}</div>
                             <div class="item-meta" style="margin-top:12px;">
-                                <button type="button" class="btn-touch btn-touch-primary" onclick="dispatchExchange('${escapeHtml(o.orderId)}', '34')">Dispatch Replacement Size 34</button>
+                                <button type="button" class="btn-touch btn-touch-primary" onclick="dispatchExchange('${escapeHtml(o.orderId)}', '${escapeHtml(exchSize)}')">Dispatch Replacement ${escapeHtml(exchSize) !== '—' ? 'Size ' + escapeHtml(exchSize) : ''}</button>
                             </div>
                         </div>
                     `;
                 }).join('') || '<p style="text-align:center; color:#888; padding:30px;">No exchange requests.</p>';
             } else if (subTab === "alterations") {
-                container.innerHTML = orders.map(o => {
-                    const phone = o.deliveryAddress?.phone || o.customerPhone || '8050254534';
+                const altOrders = orders.filter(o => (o.orderLifecycleStatus || '').toUpperCase().startsWith('ALTERATION_') || o.orderLifecycleStatus === 'ALTERATION_REQUESTED');
+                container.innerHTML = altOrders.map(o => {
+                    const phone = o.deliveryAddress?.phone || o.customerPhone || 'N/A';
+                    const waist = o.alterationDetails?.measurements?.waist_diff || o.waist_diff || '0';
+                    const length = o.alterationDetails?.measurements?.length_diff || o.length_diff || '0';
+                    const notes = o.alterationDetails?.customer_notes || o.alteration_notes || 'None';
+                    const altType = o.alterationDetails?.alteration_type || o.alteration_type || 'Adjustment';
                     return `
                         <div class="item-card">
                             <div class="item-header">
                                 <div>
-                                    <div class="item-title">✂️ Tailor Alteration • ${escapeHtml(o.displayId || o.orderId)}</div>
+                                    <div class="item-title">✂️ Alteration • ${escapeHtml(o.displayId || o.orderId)}</div>
                                     <div class="item-sub">${escapeHtml(o.customerName || 'Customer')} (+91 ${escapeHtml(phone)})</div>
                                 </div>
-                                <span class="badge badge-custom">ALTERATION WORKFLOW</span>
+                                <span class="badge badge-custom">${escapeHtml(o.orderLifecycleStatus || 'ALTERATION_REQUESTED')}</span>
+                            </div>
+                            <div style="font-size:12px; margin-top:6px; color:#334155;">
+                                <b>Item:</b> ${escapeHtml(o.productName || 'Slyte Trouser')} • <b>Amount:</b> ₹${o.amount || '—'}
                             </div>
                             <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:10px; margin-top:8px; font-size:12px;">
-                                <div style="font-weight:800; color:#7e22ce;">Custom Adjustments:</div>
-                                <div style="margin-top:4px;">• <b>Waist Adjustment:</b> +0.5" inch</div>
-                                <div>• <b>Length Adjustment:</b> -1.0" inch</div>
-                                <div>• <b>Tailor Notes:</b> Taper slightly around calves for custom slim fit</div>
+                                <div style="font-weight:800; color:#7e22ce;">Custom Adjustments (${escapeHtml(altType)}):</div>
+                                <div style="margin-top:4px;">• <b>Waist:</b> ${escapeHtml(waist)}"</div>
+                                <div>• <b>Length:</b> ${escapeHtml(length)}"</div>
+                                <div>• <b>Notes:</b> ${escapeHtml(notes)}</div>
                             </div>
                             <div class="item-meta" style="margin-top:12px;">
                                 <button type="button" class="btn-touch btn-touch-primary" onclick="assignTailor('${escapeHtml(o.orderId)}')">Assign to Master Tailor</button>
@@ -718,9 +727,9 @@
 
         // --- PRODUCTS LIST & DUAL-CHAMBER STOCK MANAGER ---
         const STORE_PRODUCTS = [
-            { id: 1, name: "Slyte 24H Black Trouser", price: "₹199", type: "STANDARD / CUSTOM", image: "images/products/blackpant_1.jpeg" },
-            { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/BEIGE_1.jpeg" },
-            { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,699", type: "STANDARD / CUSTOM", image: "images/products/NAVY_1.jpeg" }
+            { id: 1, name: "Slyte 24H Black Trouser", price: "₹1,799 (₹1,899 Custom)", type: "STANDARD / CUSTOM", image: "images/products/blackpant_1.jpeg" },
+            { id: 2, name: "Slyte 24H Beige Trouser", price: "₹1,799 (₹1,899 Custom)", type: "STANDARD / CUSTOM", image: "images/products/BEIGE_1.jpeg" },
+            { id: 3, name: "Slyte 24H Navy Trouser", price: "₹1,799 (₹1,899 Custom)", type: "STANDARD / CUSTOM", image: "images/products/NAVY_1.jpeg" }
         ];
 
         let activeStockProduct = 1;
@@ -1039,7 +1048,21 @@
                 btnSave.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px; animation:spin 1s infinite linear;">sync</span> Saving to Cloud...`;
             }
 
-            const inv = getLiveInventory();
+            // ✅ FIX: Always fetch FRESH inventory from cloud first so all 3 products are preserved.
+            // This prevents Beige/Navy stock from being reset when editing one product.
+            let inv;
+            try {
+                const res = await fetch(CLOUDFLARE_INVENTORY_API);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.inventory && data.inventory["1"]) {
+                        inv = data.inventory;
+                        localStorage.setItem('slyte_inventory_v2', JSON.stringify(inv));
+                    }
+                }
+            } catch(e) {}
+            if (!inv) inv = getLiveInventory(); // fallback to local if cloud unreachable
+
             const sizes = ['28', '30', '32', '34', '36', '38'];
             const allSizes = {};
             const stdSizes = {};
@@ -1047,7 +1070,7 @@
             sizes.forEach(sz => {
                 const inAll = document.getElementById(`input_all_${sz}`);
                 const inStd = document.getElementById(`input_std_${sz}`);
-                
+
                 const curAll = inv[String(activeStockProduct)]?.all?.[sz] ?? 0;
                 const curStd = inv[String(activeStockProduct)]?.standard?.[sz] ?? 0;
 
@@ -1055,6 +1078,7 @@
                 stdSizes[sz] = inStd ? Math.max(0, parseInt(inStd.value) || 0) : curStd;
             });
 
+            // Only update the edited product — preserve all others untouched
             inv[String(activeStockProduct)] = {
                 name: inv[String(activeStockProduct)]?.name || `Product ${activeStockProduct}`,
                 all: allSizes,
@@ -1104,7 +1128,7 @@
 
         // --- DETAILS BOTTOM SHEET ---
         function openOrderDetail(orderId) {
-            const o = (cachedOrders || []).find(item => item.orderId === orderId) || { orderId: orderId, amount: 199, productName: "Slyte 24H Black Trouser (Size: 32)" };
+            const o = (cachedOrders || []).find(item => item.orderId === orderId) || { orderId: orderId, amount: 1799, productName: "Slyte 24H Black Trouser (Size: 32)" };
             const addr = o.deliveryAddress;
             const addrStr = addr ? `${addr.addressLine1 || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}` : '2 behinde dastagir function hall, Mysore, Karnataka - 570019';
 

@@ -651,13 +651,36 @@ export default {
                             customer_name: body.customer_name || "Valued Customer",
                             customer_phone: body.customer_phone || "9742006683",
                             delivery_address: body.delivery_address || "123 Test Street, Koramangala, Bengaluru, Karnataka 560034",
-                            total_amount: 1699,
-                            items: [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]
+                            total_amount: 1799,
+                            items: [{ name: "Slyte Trouser", price: 1799, quantity: 1 }]
                         };
                     }
-                    
+
                     ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
-                    
+
+                    // ── Telegram notification for Return ──
+                    const BOT_TOKEN = env && env.BOT_TOKEN;
+                    const CHAT_ID = env && env.CHAT_ID;
+                    if (BOT_TOKEN && CHAT_ID) {
+                        const retTime = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+                        const retMsg = `↩ <b>Return Request Submitted</b>\n\n` +
+                            `👤 <b>Customer:</b> ${order.customer_name || "Customer"}\n` +
+                            `📞 <b>Phone:</b> ${order.customer_phone || "N/A"}\n` +
+                            `🆔 <b>Order ID:</b> ${body.order_id}\n` +
+                            `📦 <b>Product:</b> ${order.items?.[0]?.name || "Slyte Trouser"}\n` +
+                            `💰 <b>Refund Amount:</b> ₹${(order.total_amount || 1799) - 100} (after ₹100 return fee)\n` +
+                            `📋 <b>Reason:</b> ${body.reason || "Not specified"}\n` +
+                            `🏦 <b>Bank:</b> ${body.bank_details?.account_name || "Provided"} — IFSC: ${body.bank_details?.ifsc_code || "Provided"}\n` +
+                            `⏰ <b>Time:</b> ${retTime}`;
+                        ctx.waitUntil(
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ chat_id: CHAT_ID, text: retMsg, parse_mode: "HTML" })
+                            }).catch(e => console.error("[slyte-api] Telegram return notify failed:", e.message))
+                        );
+                    }
+
                     return jsonResponse({
                         success: true,
                         message: "Return request & bank details submitted; reverse pickup scheduled",
@@ -679,12 +702,34 @@ export default {
                             customer_name: body.customer_name || "Valued Customer",
                             customer_phone: body.customer_phone || "9742006683",
                             delivery_address: body.delivery_address || "456 Sample Avenue, Indiranagar, Bengaluru, Karnataka 560038",
-                            total_amount: 1699,
-                            items: [{ name: "Slyte Trouser", price: 1699, quantity: 1 }]
+                            total_amount: 1799,
+                            items: [{ name: "Slyte Trouser", price: 1799, quantity: 1 }]
                         };
                     }
-                    
+
                     ctx.waitUntil(createShiprocketExchangeOrder(order, exchangeRec, env));
+
+                    // ── Telegram notification for Exchange ──
+                    const BOT_TOKEN_EXC = env && env.BOT_TOKEN;
+                    const CHAT_ID_EXC = env && env.CHAT_ID;
+                    if (BOT_TOKEN_EXC && CHAT_ID_EXC) {
+                        const excTime = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+                        const excMsg = `🔄 <b>Exchange Request Submitted</b>\n\n` +
+                            `👤 <b>Customer:</b> ${order.customer_name || "Customer"}\n` +
+                            `📞 <b>Phone:</b> ${order.customer_phone || "N/A"}\n` +
+                            `🆔 <b>Order ID:</b> ${body.order_id}\n` +
+                            `📦 <b>Product:</b> ${order.items?.[0]?.name || "Slyte Trouser"}\n` +
+                            `🔁 <b>Replacement Size:</b> ${body.replacement_size || "Not specified"}\n` +
+                            `📋 <b>Reason:</b> ${body.reason || "Not specified"}\n` +
+                            `⏰ <b>Time:</b> ${excTime}`;
+                        ctx.waitUntil(
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN_EXC}/sendMessage`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ chat_id: CHAT_ID_EXC, text: excMsg, parse_mode: "HTML" })
+                            }).catch(e => console.error("[slyte-api] Telegram exchange notify failed:", e.message))
+                        );
+                    }
 
                     return jsonResponse({
                         success: true,
@@ -707,12 +752,35 @@ export default {
                             customer_name: body.customer_name || "Valued Customer",
                             customer_phone: body.customer_phone || "9742006683",
                             delivery_address: body.delivery_address || "789 Custom Blvd, HSR Layout, Bengaluru, Karnataka 560102",
-                            total_amount: 1799,
-                            items: [{ name: "Slyte Trouser (Custom Fit)", price: 1799, quantity: 1 }]
+                            total_amount: 1899,
+                            items: [{ name: "Slyte Trouser (Custom Fit)", price: 1899, quantity: 1 }]
                         };
                     }
-                    
+
                     ctx.waitUntil(createShiprocketReturnPickup(order, order.items, env));
+
+                    // ── Telegram notification for Alteration ──
+                    const BOT_TOKEN_ALT = env && env.BOT_TOKEN;
+                    const CHAT_ID_ALT = env && env.CHAT_ID;
+                    if (BOT_TOKEN_ALT && CHAT_ID_ALT) {
+                        const altTime = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+                        const altMsg = `✂️ <b>Alteration Request Submitted</b>\n\n` +
+                            `👤 <b>Customer:</b> ${order.customer_name || "Customer"}\n` +
+                            `📞 <b>Phone:</b> ${order.customer_phone || "N/A"}\n` +
+                            `🆔 <b>Order ID:</b> ${body.order_id}\n` +
+                            `📦 <b>Product:</b> ${order.items?.[0]?.name || "Slyte Trouser (Custom Fit)"}\n` +
+                            `📐 <b>Alteration:</b> ${body.alteration_type || "Waist & Length Adjustment"}\n` +
+                            `📏 <b>Measurements:</b> Waist: ${body.measurements?.waist_diff || "0"}", Length: ${body.measurements?.length_diff || "0"}"\n` +
+                            `📋 <b>Notes:</b> ${body.customer_notes || "None"}\n` +
+                            `⏰ <b>Time:</b> ${altTime}`;
+                        ctx.waitUntil(
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN_ALT}/sendMessage`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ chat_id: CHAT_ID_ALT, text: altMsg, parse_mode: "HTML" })
+                            }).catch(e => console.error("[slyte-api] Telegram alteration notify failed:", e.message))
+                        );
+                    }
 
                     return jsonResponse({
                         success: true,
@@ -722,6 +790,24 @@ export default {
                 } catch (err) {
                     return jsonResponse({ success: false, error: err.message }, 400, corsHeaders);
                 }
+            }
+
+            // ----------------------------------------------------
+            // ORDER DELETE (for cancelled orders)
+            // ----------------------------------------------------
+            if ((pathStr === "/api/orders/delete" || pathStr === "/orders-delete") && method === "POST") {
+                const body = await request.json().catch(() => ({}));
+                const orderId = body.order_id || body.orderId;
+                if (!orderId) return jsonResponse({ success: false, error: "order_id required" }, 400, corsHeaders);
+                const order = backendStore.getOrderById(orderId);
+                if (!order) return jsonResponse({ success: false, error: "Order not found" }, 404, corsHeaders);
+                // Only allow deleting CANCELLED orders
+                if (!["CANCELLED", "CANCEL_REQUESTED", "REFUNDED"].includes(order.orderLifecycleStatus || order.order_status)) {
+                    return jsonResponse({ success: false, error: "Only cancelled or refunded orders can be deleted" }, 400, corsHeaders);
+                }
+                const idx = backendStore.orders.findIndex(o => String(o.id || o.orderId).replace(/^#/, '') === String(orderId).replace(/^#/, ''));
+                if (idx !== -1) backendStore.orders.splice(idx, 1);
+                return jsonResponse({ success: true, message: `Order ${orderId} deleted successfully` }, 200, corsHeaders);
             }
 
             if ((pathStr === "/api/test/reset-orders" || pathStr === "/test/reset-orders") && (method === "POST" || method === "GET")) {

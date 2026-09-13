@@ -3,7 +3,7 @@ window.productsData = [
     {
         id: 1,
         name: "Slyte 24H Black Trouser",
-        price: "₹199",
+        price: "₹1,799",
         image: "images/products/blackpant_1.jpeg",
         images: [
             "images/products/blackpant_1.jpeg",
@@ -17,7 +17,7 @@ window.productsData = [
     {
         id: 2,
         name: "Slyte 24H Beige Trouser",
-        price: "₹1,699",
+        price: "₹1,799",
         image: "images/products/BEIGE_1.jpeg",
         images: [
             "images/products/BEIGE_1.jpeg",
@@ -31,7 +31,7 @@ window.productsData = [
     {
         id: 3,
         name: "Slyte 24H Navy Trouser",
-        price: "₹1,699",
+        price: "₹1,799",
         image: "images/products/NAVY_1.jpeg",
         images: [
             "images/products/NAVY_1.jpeg",

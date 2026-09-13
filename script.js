@@ -374,8 +374,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
-            const priceFormatted = isCustom ? '₹1,799' : (baseProd.price || (pid === 1 ? '₹199' : '₹1,699'));
+            const priceFormatted = isCustom ? '₹1,899' : (baseProd.price || '₹1,799');
             
+            if (isCustom && window.SlyteInventory) {
+                const inv = window.SlyteInventory.getForProduct(pid) || {};
+                const allStock = inv.all || {};
+                const totalAll = Object.values(allStock).reduce((sum, v) => sum + (Number(v) || 0), 0);
+                if (totalAll <= 0) {
+                    showToast('Sorry, Custom Fit is currently out of stock.');
+                    return;
+                }
+            }
+
             product.price = priceFormatted;
             product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
@@ -406,14 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
             const size = isCustom ? 'Custom Fit' : (document.querySelector('.size-box.selected')?.textContent || '32');
+
+            if (isCustom && window.SlyteInventory) {
+                const inv = window.SlyteInventory.getForProduct(pid) || {};
+                const allStock = inv.all || {};
+                const totalAll = Object.values(allStock).reduce((sum, v) => sum + (Number(v) || 0), 0);
+                if (totalAll <= 0) {
+                    showToast('Sorry, Custom Fit is currently out of stock.');
+                    return;
+                }
+            }
             
             const priceEl = document.querySelector('.p-price');
             if (priceEl) product.price = priceEl.textContent;
             
             if (product) {
-                const isCustom = document.getElementById('custom-fit-btn')?.classList.contains('active');
-                const priceNum = isCustom ? 1799 : (pid === 1 ? 199 : 1699);
-                const priceFormatted = isCustom ? '₹1,799' : (pid === 1 ? '₹199' : '₹1,699');
+                const priceNum = isCustom ? 1899 : 1799;
+                const priceFormatted = isCustom ? '₹1,899' : '₹1,799';
                 product.price = priceFormatted;
                 product.fit = isCustom ? 'Custom Fit' : 'Standard Fit';
 
@@ -526,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     customFitBtn.classList.remove('active');
                 }
                 const baseProd = allProducts.find(p => p.id === productId) || {};
-                if (priceEl) priceEl.textContent = baseProd.price || (productId === 1 ? '₹199' : '₹1,699');
+                if (priceEl) priceEl.textContent = baseProd.price || '₹1,799';
             });
         });
 
@@ -541,14 +560,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const allStockObj = inv.all || {};
             const totalAllUnits = Object.values(allStockObj).reduce((sum, v) => sum + (Number(v) || 0), 0);
             
+            let warningEl = document.getElementById('custom-fit-stock-warning');
+
             if (totalAllUnits <= 0) {
                 customFitBtn.disabled = true;
-                customFitBtn.style.opacity = '0.5';
-                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (Sorry, Out of Stock)`;
+                customFitBtn.classList.add('disabled');
+                customFitBtn.style.opacity = '0.6';
+                customFitBtn.style.cursor = 'not-allowed';
+                customFitBtn.innerHTML = `<span class="material-symbols-outlined">block</span> Custom Fit (Sorry, Out of Stock)`;
+
+                if (!warningEl) {
+                    warningEl = document.createElement('div');
+                    warningEl.id = 'custom-fit-stock-warning';
+                    warningEl.style.cssText = 'background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px; padding:10px 12px; margin-top:10px; display:flex; align-items:center; gap:8px; text-align:left;';
+                    warningEl.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size:18px; color:#dc2626; flex-shrink:0;">error</span>
+                        <span style="font-size:12px; font-weight:700; color:#b91c1c; line-height:1.4;">Custom Fit (Sorry, Out of Stock). Custom tailoring is currently unavailable.</span>
+                    `;
+                    customFitBtn.parentNode.insertBefore(warningEl, customFitBtn.nextSibling);
+                }
             } else {
                 customFitBtn.disabled = false;
+                customFitBtn.classList.remove('disabled');
                 customFitBtn.style.opacity = '1';
-                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (₹1,799)`;
+                customFitBtn.style.cursor = 'pointer';
+                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (₹1,899)`;
+                if (warningEl) warningEl.remove();
             }
         }
     };
@@ -573,11 +610,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Custom Fit button click
     if (customFitBtn) {
         customFitBtn.addEventListener('click', () => {
+            if (customFitBtn.disabled || customFitBtn.classList.contains('disabled')) return;
             const sizeBoxes = document.querySelectorAll('.size-box');
             sizeBoxes.forEach(b => b.classList.remove('selected'));
             customFitBtn.classList.add('active');
             
-            if (priceEl) priceEl.textContent = '₹1,799';
+            if (priceEl) priceEl.textContent = '₹1,899';
         });
     }
 
