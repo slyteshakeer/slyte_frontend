@@ -161,6 +161,11 @@
             body.customer_details = customer_details;
         }
 
+        // Pass 1st-party attribution to backend for CAPI server-side tracking
+        if (typeof window !== "undefined" && window.SlyteMeta && typeof window.SlyteMeta.getAttribution === "function") {
+            body.attribution = window.SlyteMeta.getAttribution();
+        }
+
         const res = await fetch(`${apiBase()}/create-order`, {
             method: "POST",
             headers: apiHeaders(),

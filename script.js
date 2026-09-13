@@ -160,6 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         saveCart(cart);
         updateCartUI();
+
+        // Meta Pixel AddToCart
+        if (typeof window !== 'undefined' && window.SlyteMeta && typeof window.SlyteMeta.trackAddToCart === 'function') {
+            window.SlyteMeta.trackAddToCart(product);
+        }
     };
 
     // Internal usage wrapper
@@ -732,6 +737,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // update page title
         document.title = `${product.name} - SLYTE Custom Fit Menswear`;
+
+        // Meta Pixel ViewContent
+        if (typeof window !== 'undefined' && window.SlyteMeta && typeof window.SlyteMeta.trackViewContent === 'function') {
+            window.SlyteMeta.trackViewContent(product);
+        }
 
         // Update Schema.org Product JSON-LD dynamically with real product data
         const jsonLdEl = document.getElementById('product-jsonld');

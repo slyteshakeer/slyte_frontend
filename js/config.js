@@ -16,6 +16,12 @@
         API_BASE_URL: defaultApiUrl,
         SUPABASE_ANON_KEY: "sb_publishable_yuWFd82KPnEivFusXrV3Ww_mq7cw9VC",
 
+        // Centralized Meta Pixel Configuration
+        // Reads from window.SLYTE_META_PIXEL_ID or localStorage, with default fallback
+        META_PIXEL_ID: (typeof window !== "undefined" && window.SLYTE_META_PIXEL_ID) ||
+                       (typeof localStorage !== "undefined" && localStorage.getItem("slyte_meta_pixel_id")) ||
+                       "1724036665042858",
+
         /**
          * Normalizes image path for static local serving from images/ directory.
          * @param {string} path - Image path (e.g. 'images/products/white-relaxed-fit-trouser-front.webp')

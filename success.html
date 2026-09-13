@@ -9,6 +9,7 @@
 
     <!-- Central Application Config -->
     <script src="js/config.js"></script>
+    <script src="js/meta-tracker.js"></script>
 
     <!-- Cloudflare Web Analytics -->
     <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
@@ -162,6 +163,11 @@
 
                 if (result.success) {
                     const order = result.data || {};
+
+                    // Meta Pixel Purchase tracking (fires strictly upon confirmed order with deduplication)
+                    if (window.SlyteMeta && typeof window.SlyteMeta.trackPurchase === 'function') {
+                        window.SlyteMeta.trackPurchase(order, true);
+                    }
 
                     // Save real phone from Cashfree OCC to localStorage (shows in hamburger)
                     const realPhone = order.customer_phone || order.customerPhone || (order.deliveryAddress && order.deliveryAddress.phone) || '';

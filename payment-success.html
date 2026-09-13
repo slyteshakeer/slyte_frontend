@@ -9,6 +9,7 @@
 
     <!-- Central Application Config -->
     <script src="js/config.js"></script>
+    <script src="js/meta-tracker.js"></script>
 
     <!-- Cloudflare Web Analytics -->
     <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
@@ -433,7 +434,7 @@
         } else {
             countLabel.textContent = 'Redirecting now…';
             clearInterval(tick);
-            window.location.href = 'my-orders.html';
+            window.location.href = 'orders.html';
         }
     }, 1000);
 </script>

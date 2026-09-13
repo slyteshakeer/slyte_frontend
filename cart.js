@@ -255,6 +255,11 @@ document.addEventListener("DOMContentLoaded", () => {
             payBtn.disabled = true;
 
             try {
+                // Meta Pixel InitiateCheckout
+                if (typeof window !== 'undefined' && window.SlyteMeta && typeof window.SlyteMeta.trackInitiateCheckout === 'function') {
+                    window.SlyteMeta.trackInitiateCheckout(items, amountForCheckout);
+                }
+
                 const res = await window.initiateCheckout({
                     amount: amountForCheckout,
                     customerPhone: customerPhone,

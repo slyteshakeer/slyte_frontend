@@ -44,6 +44,102 @@ function verifyAdminAuth(request) {
     return backendStore.verifyAdminToken(authHeader);
 }
 
+// ── Meta Conversions API (CAPI) Dispatcher ────────────────────────────────
+async function hashSha256(str) {
+    if (!str || typeof str !== "string") return "";
+    const clean = str.trim().toLowerCase();
+    if (!clean) return "";
+    const msgBuffer = new TextEncoder().encode(clean);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sendMetaCapiPurchase(env, orderData) {
+    const pixelId = (env && env.META_PIXEL_ID) || "1724036665042858";
+    const accessToken = env && env.META_ACCESS_TOKEN;
+    if (!accessToken) {
+        console.log("[slyte-api] META_ACCESS_TOKEN not set in Cloudflare Worker environment. Skipping Meta CAPI dispatch.");
+        return;
+    }
+
+    try {
+        const orderId = orderData.orderId;
+        const eventId = "SLYTE_PURCHASE_" + orderId;
+        const amount = Number(orderData.amount || 1799);
+        const cartItems = orderData.cartItems || [];
+        let contentIds = cartItems.map(it => String(it.id || it.productId || "1"));
+        if (contentIds.length === 0) contentIds = ["1"];
+
+        // Hash customer PII
+        const rawPhone = String(orderData.customerPhone || "").replace(/\D/g, "").slice(-10);
+        let hashedPhone = "";
+        if (/^[6-9]\d{9}$/.test(rawPhone)) {
+            hashedPhone = await hashSha256("+91" + rawPhone);
+        }
+
+        const rawName = String(orderData.customerName || "").trim();
+        const firstName = rawName.split(" ")[0];
+        const hashedFirstName = firstName ? await hashSha256(firstName) : "";
+
+        const rawEmail = String(orderData.customerEmail || "").trim();
+        const hashedEmail = (rawEmail && rawEmail.includes("@") && !rawEmail.includes("guest@slyte.in"))
+            ? await hashSha256(rawEmail)
+            : "";
+
+        const attribution = orderData.attribution || {};
+        const userData = {
+            client_ip_address: orderData.clientIp || undefined,
+            client_user_agent: orderData.userAgent || undefined,
+            fbp: attribution.fbp || undefined,
+            fbc: attribution.fbc || undefined
+        };
+
+        if (hashedPhone) userData.ph = [hashedPhone];
+        if (hashedFirstName) userData.fn = [hashedFirstName];
+        if (hashedEmail) userData.em = [hashedEmail];
+
+        const eventPayload = {
+            data: [
+                {
+                    event_name: "Purchase",
+                    event_time: Math.floor(Date.now() / 1000),
+                    event_id: eventId,
+                    event_source_url: attribution.source_url || "https://slyte.in/success.html",
+                    action_source: "website",
+                    user_data: userData,
+                    custom_data: {
+                        currency: "INR",
+                        value: amount,
+                        content_ids: contentIds,
+                        content_type: "product",
+                        order_id: orderId
+                    }
+                }
+            ]
+        };
+
+        if (env.META_TEST_EVENT_CODE) {
+            eventPayload.test_event_code = env.META_TEST_EVENT_CODE;
+        }
+
+        const res = await fetch(`https://graph.facebook.com/v20.0/${pixelId}/events?access_token=${accessToken}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(eventPayload)
+        });
+
+        const resJson = await res.json().catch(() => ({}));
+        if (res.ok) {
+            console.log(`[slyte-api] ✅ Meta CAPI Purchase successfully dispatched for order ${orderId} (eventID: ${eventId})`, JSON.stringify(resJson));
+        } else {
+            console.error(`[slyte-api] ❌ Meta CAPI error for order ${orderId}:`, JSON.stringify(resJson));
+        }
+    } catch (err) {
+        console.error(`[slyte-api] Meta CAPI exception for order:`, err);
+    }
+}
+
 export default {
     async fetch(request, env, ctx) {
         const corsHeaders = getCorsHeaders(request, env);
@@ -398,7 +494,10 @@ export default {
                             total_amount: amount,
                             cart_details: cartItems,
                             order_note: orderNote,
-                            order_status: "PENDING"
+                            order_status: "PENDING",
+                            attribution: body.attribution || null,
+                            client_ip: request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "",
+                            user_agent: request.headers.get("User-Agent") || ""
                         });
 
                         console.log(`[slyte-api] Cashfree session created: ${cfData.payment_session_id}`);
@@ -534,6 +633,24 @@ export default {
                     );
                 }
 
+                // ── Meta Conversions API (CAPI) Server-Side Purchase Dispatch ──
+                if (isPaid && !backendStore.isEventNotified(orderId, "META_CAPI_PURCHASE")) {
+                    backendStore.markEventNotified(orderId, "META_CAPI_PURCHASE");
+                    ctx.waitUntil(
+                        sendMetaCapiPurchase(env, {
+                            orderId,
+                            amount,
+                            customerName,
+                            customerPhone,
+                            customerEmail: order?.customer_email,
+                            cartItems,
+                            attribution: order?.attribution,
+                            clientIp: request.headers.get("CF-Connecting-IP") || order?.client_ip,
+                            userAgent: request.headers.get("User-Agent") || order?.user_agent
+                        })
+                    );
+                }
+
                 return jsonResponse({
                     success: true,
                     order_id: orderId,
@@ -619,6 +736,24 @@ export default {
                                 createShiprocketForwardOrder(orderId, {
                                     customerName, customerPhone: realPhone, extShip, amount, cartItems, order
                                 }, env)
+                            );
+                        }
+
+                        // ── Meta Conversions API (CAPI) Server-Side Purchase Dispatch ──
+                        if (!backendStore.isEventNotified(orderId, "META_CAPI_PURCHASE")) {
+                            backendStore.markEventNotified(orderId, "META_CAPI_PURCHASE");
+                            ctx.waitUntil(
+                                sendMetaCapiPurchase(env, {
+                                    orderId,
+                                    amount,
+                                    customerName,
+                                    customerPhone: realPhone,
+                                    customerEmail: order?.customer_email || customer?.customer_email,
+                                    cartItems,
+                                    attribution: order?.attribution,
+                                    clientIp: request.headers.get("CF-Connecting-IP") || order?.client_ip,
+                                    userAgent: request.headers.get("User-Agent") || order?.user_agent
+                                })
                             );
                         }
                     }

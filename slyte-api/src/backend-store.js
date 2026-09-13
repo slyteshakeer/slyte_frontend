@@ -711,6 +711,9 @@ class SlyteBackendStore {
             tracking_url: orderPayload.tracking_url || null,
             is_test: orderPayload.is_test || false,
             telegram_notified: false,
+            attribution: orderPayload.attribution || null,
+            client_ip: orderPayload.client_ip || null,
+            user_agent: orderPayload.user_agent || null,
             items: orderPayload.cart_details || orderPayload.items || [],
             created_at: new Date().toISOString()
         };
