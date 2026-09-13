@@ -56,7 +56,7 @@ async function hashSha256(str) {
 }
 
 async function sendMetaCapiPurchase(env, orderData) {
-    const pixelId = (env && env.META_PIXEL_ID) || "1724036665042858";
+    const pixelId = (env && env.META_PIXEL_ID) || "1637211777821079";
     const accessToken = env && env.META_ACCESS_TOKEN;
     if (!accessToken) {
         console.log("[slyte-api] META_ACCESS_TOKEN not set in Cloudflare Worker environment. Skipping Meta CAPI dispatch.");

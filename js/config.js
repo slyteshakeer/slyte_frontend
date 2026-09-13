@@ -20,7 +20,7 @@
         // Reads from window.SLYTE_META_PIXEL_ID or localStorage, with default fallback
         META_PIXEL_ID: (typeof window !== "undefined" && window.SLYTE_META_PIXEL_ID) ||
                        (typeof localStorage !== "undefined" && localStorage.getItem("slyte_meta_pixel_id")) ||
-                       "1724036665042858",
+                       "1637211777821079",
 
         /**
          * Normalizes image path for static local serving from images/ directory.

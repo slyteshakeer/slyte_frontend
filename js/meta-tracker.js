@@ -12,7 +12,7 @@
     if (typeof window === 'undefined') return;
 
     // ── 1. CONFIGURATION & ATTRIBUTION SETUP ───────────────────────────────
-    const PIXEL_ID = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.META_PIXEL_ID) || '1724036665042858';
+    var PIXEL_ID = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.META_PIXEL_ID) || '1637211777821079';
     const ATTRIBUTION_STORAGE_KEY = 'slyte_attribution';
     const PURCHASED_ORDERS_KEY = 'slyte_meta_purchased_orders';
 
