@@ -214,35 +214,70 @@
       position: fixed;
       bottom: 0; left: 0; right: 0;
       background: #fff;
-      border-radius: 20px 20px 0 0;
-      padding: 16px 20px 40px;
-      box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+      border-radius: 28px 28px 0 0;
+      padding: 12px 18px 28px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.18);
       z-index: 1000;
-      animation: slideUp 0.25s ease;
+      max-width: 440px;
+      margin: 0 auto;
+      max-height: 92vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
     #picker-sheet.open { display: block; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .picker-cancel {
-      color: #22c55e; font-size: 1rem; font-weight: 700;
-      background: none; border: none; cursor: pointer;
-      padding: 4px 0 16px; display: block;
+    .picker-drag-handle {
+      width: 40px; height: 4px; background: #e4e4e7;
+      border-radius: 4px; margin: 4px auto 14px;
     }
-    .picker-options { display: flex; gap: 16px; flex-wrap: wrap; }
-    .picker-option {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 8px; cursor: pointer; min-width: 72px;
+    .picker-guide-img {
+      width: 100%;
+      max-width: 360px;
+      height: auto;
+      display: block;
+      margin: 0 auto 16px;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+    .picker-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .picker-btn {
+      flex: 1;
+      height: 54px;
+      border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, opacity 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
-    .picker-icon {
-      width: 72px; height: 72px; border-radius: 18px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; transition: transform 0.15s;
+    .picker-btn:active { transform: scale(0.96); }
+    .picker-btn-camera {
+      background: #111827;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .picker-option:active .picker-icon { transform: scale(0.92); }
-    .picker-icon.camera { background: #1a1a2e; }
-    .picker-icon.files  { background: #e8f0fe; }
-    .picker-name { font-size: 0.8rem; font-weight: 600; color: #111; }
-    #picker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 999; }
+    .picker-btn-gallery {
+      background: #f4f4f5;
+      color: #111827;
+      border: 1px solid #e4e4e7;
+    }
+    .picker-btn .material-symbols-outlined {
+      font-size: 20px;
+    }
+    #picker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 999; }
     #picker-overlay.open { display: block; }
 
     /* ── TILT CAMERA FULLSCREEN (phone_tilt exact) ── */
@@ -829,16 +864,17 @@
 <!-- Mobile Picker Overlay + Sheet -->
 <div id="picker-overlay"></div>
 <div id="picker-sheet">
-  <button class="picker-cancel" id="picker-cancel">Cancel</button>
-  <div class="picker-options">
-    <div class="picker-option" id="pick-camera">
-      <div class="picker-icon camera">📷</div>
-      <div class="picker-name">Camera</div>
-    </div>
-    <div class="picker-option" id="pick-files">
-      <div class="picker-icon files">📁</div>
-      <div class="picker-name">Files</div>
-    </div>
+  <div class="picker-drag-handle"></div>
+  <img src="images/other/pant_photo_guide.png" alt="Add your pant photo guide" class="picker-guide-img">
+  <div class="picker-actions">
+    <button type="button" class="picker-btn picker-btn-camera" id="pick-camera">
+      <span class="material-symbols-outlined">photo_camera</span>
+      <span>Take Photo</span>
+    </button>
+    <button type="button" class="picker-btn picker-btn-gallery" id="pick-files">
+      <span class="material-symbols-outlined">image</span>
+      <span>Choose from Gallery</span>
+    </button>
   </div>
 </div>
 
@@ -1107,7 +1143,7 @@ function closePicker() {
   pickerOverlay.classList.remove('open');
 }
 
-document.getElementById('picker-cancel').addEventListener('click', closePicker);
+document.getElementById('picker-cancel')?.addEventListener('click', closePicker);
 pickerOverlay.addEventListener('click', closePicker);
 
 document.getElementById('pick-files').addEventListener('click', () => {
