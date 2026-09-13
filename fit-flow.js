@@ -127,11 +127,11 @@ export const initCustomFit = () => {
                             <tr><th>Size</th><th>Waist</th><th>Inseam</th><th>Outseam</th><th>Ankle</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>S</td><td>28-30"</td><td>29"</td><td>38"</td><td>12.5"</td></tr>
-                            <tr><td>M</td><td>30-32"</td><td>29.5"</td><td>39"</td><td>13"</td></tr>
-                            <tr><td>L</td><td>32-34"</td><td>30"</td><td>40"</td><td>13.5"</td></tr>
-                            <tr><td>XL</td><td>34-36"</td><td>30.5"</td><td>41"</td><td>14"</td></tr>
-                            <tr><td>XXL</td><td>36-38"</td><td>31"</td><td>42"</td><td>14.5"</td></tr>
+                            <tr><td>S</td><td>28-30"</td><td>29"</td><td>38"</td><td>14.5 - 15"</td></tr>
+                            <tr><td>M</td><td>30-32"</td><td>29.5"</td><td>39"</td><td>14.75 - 15.5"</td></tr>
+                            <tr><td>L</td><td>32-34"</td><td>30"</td><td>40"</td><td>15.5 - 16"</td></tr>
+                            <tr><td>XL</td><td>34-36"</td><td>30.5"</td><td>41"</td><td>16 - 16.5"</td></tr>
+                            <tr><td>XXL</td><td>36-38"</td><td>31"</td><td>42"</td><td>16.5 - 17"</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -267,8 +267,14 @@ export const initCustomFit = () => {
                         <input type="number" id="manualInseam" class="cfm-input" placeholder="Enter total leg length" value="${editItem.outseam && editItem.outseam !== '-' ? editItem.outseam : (editItem.inseam || '')}">
                     </div>
                     <div class="cfm-input-group" style="margin-bottom:0;">
-                        <label class="cfm-input-label">Ankle Opening (in) <span style="font-weight:400; text-transform:none;">- Optional</span></label>
-                        <input type="number" id="manualAnkle" class="cfm-input" placeholder="Enter ankle opening" value="${editItem.ankle || ''}">
+                        <label class="cfm-input-label">Ankle Opening (in)</label>
+                        <select id="manualAnkle" class="cfm-input" style="cursor:pointer; appearance:auto; -webkit-appearance:menulist; font-weight:600;">
+                            ${[12, 12.5, 13, 13.5, 14, 14.5, 14.75, 15, 15.25, 15.5, 15.75, 16, 16.25, 16.5, 16.75, 17, 17.5, 18].map(v => {
+                                let curAnk = parseFloat(editItem.ankle || 15);
+                                if (curAnk < 11) curAnk = curAnk * 2;
+                                return `<option value="${v}" ${curAnk === v ? 'selected' : ''}>${v}"</option>`;
+                            }).join('')}
+                        </select>
                     </div>
                 </div>
 
@@ -325,7 +331,7 @@ export const initCustomFit = () => {
                 }
             }
 
-            if (!ankle) ankle = "7";
+            if (!ankle) ankle = "15";
 
             const updatedEntry = {
                 name: name,
@@ -387,7 +393,30 @@ export const initCustomFit = () => {
                 `<option value="${i}" ${i === selectedIndex ? 'selected' : ''}>${d.name || 'User'} (${d.waist}")</option>`
             ).join('');
 
-            let ankleValue = parseFloat(ankle) || 6.5;
+            // Calculate 3 custom fit options for ankle based on waist size:
+            // 28: (14.5, 14.75, 15), 30: (14.5, 14.75, 15)
+            // 32: (15.5, 15.75, 16), 34: (15.5, 15.75, 16)
+            // 36: (16.5, 16.75, 17), 38: (16.5, 16.75, 17)
+            const getAnkleOptionsForWaist = (wNum) => {
+                const w = Math.round(parseFloat(wNum) || 30);
+                if (w <= 30) {
+                    return [14.5, 14.75, 15];
+                } else if (w <= 34) {
+                    return [15.5, 15.75, 16];
+                } else {
+                    return [16.5, 16.75, 17];
+                }
+            };
+
+            const ankleOptions = getAnkleOptionsForWaist(waistNum);
+
+            // Format user's recorded ankle (convert to circumference if < 11)
+            let userAnkle = parseFloat(ankle) || 15;
+            if (userAnkle < 11) userAnkle = Math.round(userAnkle * 2 * 10) / 10;
+            const displayUserAnkle = userAnkle;
+
+            // Default selected custom fit ankle option
+            let defaultSelectedAnkle = ankleOptions.includes(userAnkle) ? userAnkle : ankleOptions[1];
 
             // Total custom fit price (Base ₹1,799 + ₹100 Custom Fit = ₹1,899)
             const CUSTOM_FIT_CHARGE = 100;
@@ -469,16 +498,14 @@ export const initCustomFit = () => {
                                         <div class="cfm-measurement-desc">Bottom leg opening</div>
                                     </td>
                                     <td style="text-align:center;">
-                                        <div class="cfm-size-val">${ankle}</div>
+                                        <div class="cfm-size-val">${displayUserAnkle}</div>
                                         <div class="cfm-size-unit">inches</div>
                                     </td>
                                     <td style="text-align:center;">
                                         <select class="cfm-custom-select" id="cfmAnkleSelect">
-                                            <option value="6.5" ${ankleValue === 6.5 ? 'selected' : ''}>6.5</option>
-                                            <option value="7" ${ankleValue === 7 ? 'selected' : ''}>7</option>
-                                            <option value="7.5" ${ankleValue === 7.5 ? 'selected' : ''}>7.5</option>
-                                            <option value="8" ${ankleValue === 8 ? 'selected' : ''}>8</option>
-                                            <option value="8.5" ${ankleValue === 8.5 ? 'selected' : ''}>8.5</option>
+                                            ${ankleOptions.map(opt => `
+                                                <option value="${opt}" ${defaultSelectedAnkle === opt ? 'selected' : ''}>${opt}</option>
+                                            `).join('')}
                                         </select>
                                     </td>
                                 </tr>

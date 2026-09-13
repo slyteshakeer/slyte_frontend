@@ -1473,6 +1473,14 @@ analyzeBtn.addEventListener('click', async () => {
     if (data.error) {
       throw new Error(data.error);
     }
+
+    // Double ankle size (circumference format) if returned in lay-flat width (e.g. 7 -> 14, 7.5 -> 15)
+    if (data.ankle) {
+      let a = parseFloat(data.ankle);
+      if (!isNaN(a) && a < 11) {
+        data.ankle = Math.round(a * 2 * 10) / 10;
+      }
+    }
     
     showResults(data, name);
     emitFitData(data, name);
