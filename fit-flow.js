@@ -120,18 +120,19 @@ export const initCustomFit = () => {
             e.preventDefault();
             openModal();
             contentArea.innerHTML = `
-                <h2>Slyte Size Chart</h2>
+                <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; color: #0f172a;">Standard Fit Size Chart</h2>
                 <div style="overflow-x:auto;">
                     <table class="size-chart-table">
                         <thead>
-                            <tr><th>Size</th><th>Waist</th><th>Inseam</th><th>Outseam</th><th>Ankle</th></tr>
+                            <tr><th>Size</th><th>Waist</th><th>Thigh</th><th>Ankle</th><th>Length</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td>S</td><td>28-30"</td><td>29"</td><td>38"</td><td>14.5 - 15"</td></tr>
-                            <tr><td>M</td><td>30-32"</td><td>29.5"</td><td>39"</td><td>14.75 - 15.5"</td></tr>
-                            <tr><td>L</td><td>32-34"</td><td>30"</td><td>40"</td><td>15.5 - 16"</td></tr>
-                            <tr><td>XL</td><td>34-36"</td><td>30.5"</td><td>41"</td><td>16 - 16.5"</td></tr>
-                            <tr><td>XXL</td><td>36-38"</td><td>31"</td><td>42"</td><td>16.5 - 17"</td></tr>
+                            <tr><td><b>28</b></td><td>28"</td><td>23"</td><td>15"</td><td>39"</td></tr>
+                            <tr><td><b>30</b></td><td>30"</td><td>24"</td><td>15"</td><td>39"</td></tr>
+                            <tr><td><b>32</b></td><td>32"</td><td>25"</td><td>16"</td><td>39"</td></tr>
+                            <tr><td><b>34</b></td><td>34"</td><td>26"</td><td>16"</td><td>39"</td></tr>
+                            <tr><td><b>36</b></td><td>36"</td><td>27"</td><td>17"</td><td>39"</td></tr>
+                            <tr><td><b>38</b></td><td>38"</td><td>28"</td><td>17"</td><td>39"</td></tr>
                         </tbody>
                     </table>
                 </div>
