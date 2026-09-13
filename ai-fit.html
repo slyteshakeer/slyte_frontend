@@ -215,12 +215,12 @@
       bottom: 0; left: 0; right: 0;
       background: #fff;
       border-radius: 28px 28px 0 0;
-      padding: 12px 18px 28px;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.18);
-      z-index: 1000;
+      padding: 12px 18px max(32px, calc(24px + env(safe-area-inset-bottom, 20px)));
+      box-shadow: 0 -12px 48px rgba(0,0,0,0.25);
+      z-index: 99999;
       max-width: 440px;
       margin: 0 auto;
-      max-height: 92vh;
+      max-height: 90vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -229,14 +229,15 @@
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .picker-drag-handle {
       width: 40px; height: 4px; background: #e4e4e7;
-      border-radius: 4px; margin: 4px auto 14px;
+      border-radius: 4px; margin: 4px auto 12px;
     }
     .picker-guide-img {
       width: 100%;
-      max-width: 360px;
+      max-width: 330px;
+      max-height: 50vh;
       height: auto;
       display: block;
-      margin: 0 auto 16px;
+      margin: 0 auto 14px;
       border-radius: 12px;
       object-fit: contain;
     }
@@ -244,12 +245,13 @@
       display: flex;
       gap: 10px;
       width: 100%;
-      max-width: 360px;
+      max-width: 340px;
       margin: 0 auto;
+      padding-bottom: 8px;
     }
     .picker-btn {
       flex: 1;
-      height: 54px;
+      height: 52px;
       border-radius: 14px;
       font-family: 'Inter', sans-serif;
       font-size: 0.85rem;
@@ -267,7 +269,7 @@
     .picker-btn-camera {
       background: #111827;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     .picker-btn-gallery {
       background: #f4f4f5;
@@ -277,7 +279,7 @@
     .picker-btn .material-symbols-outlined {
       font-size: 20px;
     }
-    #picker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 999; }
+    #picker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 99998; }
     #picker-overlay.open { display: block; }
 
     /* ── TILT CAMERA FULLSCREEN (phone_tilt exact) ── */
