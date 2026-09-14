@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customFitBtn.classList.add('disabled');
                 customFitBtn.style.opacity = '0.6';
                 customFitBtn.style.cursor = 'not-allowed';
-                customFitBtn.innerHTML = `<span class="material-symbols-outlined">block</span> Custom Fit (Sorry, Out of Stock)`;
+                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit (Out of Stock)</span><span class="custom-fit-sub">Custom tailoring is currently unavailable.</span></div><span class="custom-fit-arrow">›</span>`;
 
                 if (!warningEl) {
                     warningEl = document.createElement('div');

@@ -30,7 +30,7 @@
     <!-- Cloudflare Web Analytics -->
     <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=10">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -123,9 +123,12 @@
             <div class="product-details-section">
                 <div class="product-header-row">
                     <h1 class="p-title">Slyte 24H Black Trouser</h1>
-                    <span class="p-price">₹1,799</span>
+                    <div class="p-price-group">
+                        <span class="p-price-mrp">₹1,999</span>
+                        <span class="p-price">₹1,799</span>
+                        <span class="tax-note-inline">Tax included.</span>
+                    </div>
                 </div>
-                <p class="tax-note">Tax included.</p>
 
                 <!-- 3. Size Selection -->
                 <div class="size-section">
@@ -134,15 +137,20 @@
                         <button class="size-chart-link">SIZE CHART</button>
                     </div>
                     <div class="size-grid">
-                        <button class="size-box">30</button>
+                        <button class="size-box">28</button>
+                        <button class="size-box disabled">30</button>
                         <button class="size-box">32</button>
                         <button class="size-box">34</button>
                         <button class="size-box">36</button>
-                        <button class="size-box disabled">38</button>
+                        <button class="size-box">38</button>
                     </div>
-                    <button class="find-my-size-btn" id="custom-fit-btn" style="margin-top:15px;">
-                        <span class="material-symbols-outlined">straighten</span>
-                        Custom Fit (₹1,899)
+                    <button class="find-my-size-btn" id="custom-fit-btn">
+                        <span class="custom-fit-icon">+</span>
+                        <div class="custom-fit-text">
+                            <span class="custom-fit-title">Custom Fit</span>
+                            <span class="custom-fit-sub">Upload a photo. AI finds your fit.</span>
+                        </div>
+                        <span class="custom-fit-arrow">›</span>
                     </button>
                 </div>
 
@@ -299,7 +307,7 @@
     <script src="checkout-auth.js" defer></script>
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
     <script src="api-client.js?v=6" defer></script>
-    <script type="module" src="script.js?v=9"></script>
+    <script type="module" src="script.js?v=10"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="fit-flow.js"></script>
 
