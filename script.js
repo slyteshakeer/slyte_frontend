@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customFitBtn.classList.add('disabled');
                 customFitBtn.style.opacity = '0.6';
                 customFitBtn.style.cursor = 'not-allowed';
-                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit (Out of Stock)</span><span class="custom-fit-sub">Custom tailoring is currently unavailable.</span></div><span class="custom-fit-arrow">›</span>`;
+                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit (Out of Stock)</span><span class="custom-fit-sub">Custom tailoring is currently unavailable.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
 
                 if (!warningEl) {
                     warningEl = document.createElement('div');
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customFitBtn.classList.remove('disabled');
                 customFitBtn.style.opacity = '1';
                 customFitBtn.style.cursor = 'pointer';
-                customFitBtn.innerHTML = `<span class="material-symbols-outlined">straighten</span> Custom Fit (â‚¹1,899)`;
+                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit</span><span class="custom-fit-sub">Upload a photo. AI finds your fit.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
                 if (warningEl) warningEl.remove();
             }
         }
