@@ -166,6 +166,14 @@
                 if (result.success) {
                     const order = result.data || {};
 
+                    // Check actual payment status — API returns success:true for ALL orders
+                    // (paid, cancelled, failed). Only show confirmation for genuinely paid orders.
+                    const pStatus = (order.paymentStatus || order.payment_status || '').toUpperCase();
+                    if (pStatus && pStatus !== 'PAID') {
+                        window.location.replace('index.html');
+                        return;
+                    }
+
                     // Meta Pixel Purchase tracking (fires strictly upon confirmed order with deduplication)
                     if (window.SlyteMeta && typeof window.SlyteMeta.trackPurchase === 'function') {
                         window.SlyteMeta.trackPurchase(order, true);
