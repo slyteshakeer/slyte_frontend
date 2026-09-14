@@ -3273,26 +3273,27 @@ html {
         padding: 64px 80px 72px;
     }
 
-    .seo-content-visible h2 {
-        font-size: 30px;
-    }
-}
-.find-my-size-btn.active {
-    background: var(--primary-blue) !important;
-    color: var(--primary-white) !important;
-    border-color: var(--primary-blue) !important;
-}
-
-
-
-
-
-
-
 
 
 
 /* Product page: white background end-to-end, no black gap */
 body.page-product {
     background-color: #fff !important;
+}
+
+
+.find-my-size-btn.active {
+    background: #154cbd !important;
+    color: #ffffff !important;
+    border-color: #154cbd !important;
+}
+
+.find-my-size-btn.active .custom-fit-title,
+.find-my-size-btn.active .custom-fit-icon,
+.find-my-size-btn.active .custom-fit-arrow {
+    color: #ffffff !important;
+}
+
+.find-my-size-btn.active .custom-fit-sub {
+    color: rgba(255, 255, 255, 0.85) !important;
 }
