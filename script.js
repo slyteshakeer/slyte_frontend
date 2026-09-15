@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shopGrid.innerHTML = allProducts.map(product => `
             <div class="shop-card">
                 <a href="${product.link}" class="card-image" style="display:block; text-decoration:none;">
-                    <img src="${product.image}" alt="${product.name}">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy" decoding="async" width="700" height="983">
                 </a>
                 <div class="card-details">
                     <a href="${product.link}" style="text-decoration:none;">

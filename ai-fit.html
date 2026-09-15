@@ -27,8 +27,11 @@
     <script src="js/meta-tracker.js"></script>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1637211777821079&ev=PageView&noscript=1" /></noscript>
 
-    <!-- Cloudflare Web Analytics -->
-    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script> -->
+    <!-- Performance Preconnect Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://dashgaming-slyte.hf.space">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -1065,6 +1068,38 @@ onAuthStateChanged(auth, (user) => {
 const API_URL = "https://dashgaming-slyte.hf.space/analyze";
 const CLOUDINARY_UPLOAD_PRESET = ""; // Set if you want direct Cloudinary uploads from frontend (optional)
 
+// ── FAST PRE-WARMING (Gradio & Background Compression) ───────────────────
+let prewarmedClientPromise = null;
+function getHfApp() {
+  if (!prewarmedClientPromise) {
+    prewarmedClientPromise = (async () => {
+      const { client } = await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js");
+      return await client("dashgaming/slyte");
+    })().catch(err => {
+      console.warn("[ai-fit] Pre-warming HF client failed:", err);
+      prewarmedClientPromise = null;
+      throw err;
+    });
+  }
+  return prewarmedClientPromise;
+}
+
+// Warm up Hugging Face connection in background on idle
+if (typeof requestIdleCallback === "function") {
+  requestIdleCallback(() => getHfApp().catch(() => {}));
+} else {
+  setTimeout(() => getHfApp().catch(() => {}), 800);
+}
+
+let precompressedFilePromise = null;
+function triggerBackgroundCompression(file) {
+  if (!file) return;
+  precompressedFilePromise = compressImageFile(file, 800, 0.75).catch(err => {
+    console.warn("[ai-fit] Background compression fallback:", err);
+    return file;
+  });
+}
+
 // ── STATE ────────────────────────────────────────────────────────────────
 let uploadedFile = null;
 let capturedBlob = null;
@@ -1113,6 +1148,9 @@ function showBlobPreview(blob) {
   uploadZone.querySelector('.upload-label').style.display = 'none';
   uploadZone.querySelector('.upload-hint').style.display = 'none';
   uploadSuccessBadge.style.display = 'inline-block';
+  try {
+    triggerBackgroundCompression(new File([blob], 'captured.jpg', { type: 'image/jpeg' }));
+  } catch(e) {}
 }
 
 // ── START FIT TRACKING ───────────────────────────────────────────────────
@@ -1125,6 +1163,7 @@ fileInput.addEventListener('change', (e) => {
   if (!file) return;
   uploadedFile = file;
   capturedBlob = null;
+  triggerBackgroundCompression(file);
   showUploadPreview(file);
   fileInput.value = '';
 
@@ -1138,6 +1177,7 @@ fileInputCamera.addEventListener('change', (e) => {
   if (!file) return;
   uploadedFile = file;
   capturedBlob = null;
+  triggerBackgroundCompression(file);
   showUploadPreview(file);
   fileInputCamera.value = '';
   closePicker();
@@ -1517,8 +1557,8 @@ analyzeBtn.addEventListener('click', async () => {
   setLoading(true, 'Analyzing with SAM3 + HRNet AI…');
 
   try {
-    const { client } = await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js");
-    const hfApp = await client("dashgaming/slyte");
+    // Initiate/retrieve pre-warmed Gradio Hugging Face client
+    const hfAppPromise = getHfApp();
     
     // Attach Firebase token if logged in
     let token = "";
@@ -1526,11 +1566,16 @@ analyzeBtn.addEventListener('click', async () => {
       token = await window._currentUser.getIdToken();
     }
     
-    // Compress image before upload (max 800px, 75% JPEG) to speed up transfer
+    // Use pre-compressed image (or compress now if still running)
     const rawFile = uploadedFile
       ? uploadedFile
       : new File([capturedBlob], 'captured.jpg', { type: 'image/jpeg' });
-    const imageFile = await compressImageFile(rawFile, 800, 0.75);
+    const imageFile = precompressedFilePromise
+      ? await precompressedFilePromise
+      : await compressImageFile(rawFile, 800, 0.75);
+
+    setLoading(true, 'Connecting to AI model…');
+    const hfApp = await hfAppPromise;
     setLoading(true, `Uploading image (${(imageFile.size/1024).toFixed(0)} KB)…`);
 
     // Call the hidden JSON API endpoint we added in Gradio

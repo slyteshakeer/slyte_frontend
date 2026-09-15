@@ -2,8 +2,16 @@
  * Slyte Cashfree One-Click Checkout Auth Modal & Hamburger Profile Manager
  * Premium Black UI/UX 2-Step Mobile OTP Authentication & Persistent Session Management.
  */
-(function () {
     var API_BASE = "https://api.slyte.in";
+
+    try {
+        if (typeof document !== "undefined" && !document.querySelector('link[href="' + API_BASE + '"]')) {
+            var pl = document.createElement("link");
+            pl.rel = "preconnect";
+            pl.href = API_BASE;
+            document.head.appendChild(pl);
+        }
+    } catch(e) {}
 
     function cleanupDummyPhone() {
         try {
@@ -102,7 +110,7 @@
                     <div style="margin-bottom: 16px;">
                         <div style="display: flex; gap: 8px;">
                             <div style="padding: 12px 14px; background: #000000; border: 1.5px solid #000000; border-radius: 10px; font-weight: 800; color: #ffffff; font-size: 15px; display: flex; align-items: center;">+91</div>
-                            <input type="tel" id="slyte-auth-phone-input" placeholder="Enter mobile number" maxlength="10" style="
+                            <input type="tel" id="slyte-auth-phone-input" placeholder="Enter mobile number" maxlength="10" inputmode="numeric" autocomplete="tel" pattern="[0-9]*" style="
                                 flex: 1;
                                 height: 48px;
                                 border: 1.5px solid #000000;
@@ -153,7 +161,7 @@
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <input type="text" id="slyte-auth-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="
+                        <input type="text" id="slyte-auth-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" style="
                             width: 100%;
                             height: 48px;
                             border: 1.5px solid #000000;
@@ -347,6 +355,13 @@
         verifyBtn.onclick = handleVerifyOtp;
         otpInput.onkeyup = function (e) {
             if (e.key === "Enter") handleVerifyOtp();
+        };
+        // Auto-verify as soon as 6-digit OTP is typed or auto-filled by iOS/Android SMS suggestion
+        otpInput.oninput = function () {
+            var digits = (otpInput.value || "").replace(/\D/g, "").slice(0, 6);
+            if (digits.length === 6 && !verifyBtn.disabled) {
+                handleVerifyOtp();
+            }
         };
 
         resendBtn.onclick = handleGetOtp;

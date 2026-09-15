@@ -10,6 +10,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const errEl = document.getElementById("checkout-err");
 
     let isProcessing = false;
+    let cachedCashfree = null;
+
+    function getCashfreeInstance() {
+        if (cachedCashfree) return cachedCashfree;
+        if (typeof Cashfree !== "undefined") {
+            try {
+                const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
+                cachedCashfree = Cashfree({ mode: mode.toLowerCase() });
+            } catch(e) {
+                console.warn("[cart] Cashfree init warning:", e);
+            }
+        }
+        return cachedCashfree;
+    }
+
+    // Pre-warm Cashfree instance in background
+    if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(() => getCashfreeInstance());
+    } else {
+        setTimeout(getCashfreeInstance, 100);
+    }
 
     // Optional: Load fallback products
     const productsDB = window.productsData || [];
@@ -273,9 +294,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     throw new Error("No payment_session_id from server");
                 }
 
-                if (typeof Cashfree !== "undefined") {
-                    const mode = (window.SLYTE_CONFIG && window.SLYTE_CONFIG.CASHFREE_MODE) || "production";
-                    const cf = Cashfree({ mode: mode.toLowerCase() });
+                const cf = getCashfreeInstance();
+                if (cf) {
                     const orderId = res.data && res.data.order_id;
                     cf.checkout({
                         paymentSessionId: sid,
