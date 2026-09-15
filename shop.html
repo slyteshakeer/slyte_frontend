@@ -155,19 +155,34 @@
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item" aria-label="Home">
             <span class="material-symbols-outlined">home</span>
+            <span class="nav-label">Home</span>
         </a>
         <a href="search.html" class="nav-item" aria-label="Search">
             <span class="material-symbols-outlined">search</span>
+            <span class="nav-label">Search</span>
         </a>
-        <a href="ai-fit.html" class="nav-item-center" aria-label="AI Fit">
-            <span class="material-symbols-outlined">straighten</span>
+        <a href="ai-fit.html" class="nav-item-center-wrap" aria-label="Fit AI">
+            <div class="nav-item-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.5 8.5V6C4.5 4.89543 5.39543 4 6.5 4H9" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M19.5 8.5V6C19.5 4.89543 18.6046 4 17.5 4H15" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M4.5 15.5V18C4.5 19.1046 5.39543 20 6.5 20H9" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M19.5 15.5V18C19.5 19.1046 18.6046 20 17.5 20H15" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <rect x="9.5" y="10.5" width="5" height="3" rx="1.5" fill="white"/>
+                </svg>
+            </div>
+            <span class="nav-label nav-label-blue">Fit AI</span>
         </a>
         <a href="shop.html" class="nav-item active" aria-label="Shop">
             <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="nav-label">Shop</span>
         </a>
         <a href="cart.html" class="nav-item" aria-label="Cart">
-            <span class="material-symbols-outlined">shopping_cart</span>
-            <span class="nav-cart-count">0</span>
+            <div class="nav-icon-wrap">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="nav-cart-count">0</span>
+            </div>
+            <span class="nav-label">Cart</span>
         </a>
     </nav>
 

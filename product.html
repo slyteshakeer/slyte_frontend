@@ -145,7 +145,15 @@
                         <button class="size-box">38</button>
                     </div>
                     <button class="find-my-size-btn" id="custom-fit-btn">
-                        <span class="custom-fit-icon">+</span>
+                        <div class="custom-fit-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 9V5a1 1 0 0 1 1-1h4"></path>
+                                <path d="M20 9V5a1 1 0 0 0-1-1h-4"></path>
+                                <path d="M4 15v4a1 1 0 0 0 1 1h4"></path>
+                                <path d="M20 15v4a1 1 0 0 1-1 1h-4"></path>
+                                <line x1="10" y1="12" x2="14" y2="12"></line>
+                            </svg>
+                        </div>
                         <div class="custom-fit-text">
                             <span class="custom-fit-title">Custom Fit</span>
                             <span class="custom-fit-sub">Upload a photo. AI finds your fit.</span>
@@ -156,8 +164,10 @@
 
                 <!-- 4. Action Buttons -->
                 <div class="action-buttons">
-                    <button class="add-to-cart-btn">ADD TO CART</button>
-                    <button class="buy-now-btn">ORDER NOW</button>
+                    <button class="add-to-cart-btn" id="addToCartBtn">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                        <span>ADD TO CART</span>
+                    </button>
                 </div>
 
                 <!-- 5. Info Accordions -->
@@ -249,19 +259,34 @@
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item" aria-label="Home">
             <span class="material-symbols-outlined">home</span>
+            <span class="nav-label">Home</span>
         </a>
         <a href="search.html" class="nav-item" aria-label="Search">
             <span class="material-symbols-outlined">search</span>
+            <span class="nav-label">Search</span>
         </a>
-        <a href="ai-fit.html" class="nav-item-center" aria-label="AI Fit">
-            <span class="material-symbols-outlined">straighten</span>
+        <a href="ai-fit.html" class="nav-item-center-wrap" aria-label="Fit AI">
+            <div class="nav-item-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.5 8.5V6C4.5 4.89543 5.39543 4 6.5 4H9" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M19.5 8.5V6C19.5 4.89543 18.6046 4 17.5 4H15" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M4.5 15.5V18C4.5 19.1046 5.39543 20 6.5 20H9" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M19.5 15.5V18C19.5 19.1046 18.6046 20 17.5 20H15" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                    <rect x="9.5" y="10.5" width="5" height="3" rx="1.5" fill="white"/>
+                </svg>
+            </div>
+            <span class="nav-label nav-label-blue">Fit AI</span>
         </a>
         <a href="shop.html" class="nav-item" aria-label="Shop">
             <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="nav-label">Shop</span>
         </a>
         <a href="cart.html" class="nav-item" aria-label="Cart">
-            <span class="material-symbols-outlined">shopping_cart</span>
-            <span class="nav-cart-count">0</span>
+            <div class="nav-icon-wrap">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="nav-cart-count">0</span>
+            </div>
+            <span class="nav-label">Cart</span>
         </a>
     </nav>
 

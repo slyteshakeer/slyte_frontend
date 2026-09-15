@@ -370,6 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCustomCheck = document.getElementById('custom-fit-btn')?.classList.contains('active');
             if (!selectedSizeBox && !isCustomCheck) {
                 showToast('Please select a size first');
+                const sizeSection = document.querySelector('.size-section') || document.querySelector('.size-grid');
+                if (sizeSection) {
+                    sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
             const urlParams = new URLSearchParams(window.location.search);
@@ -399,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (product) {
                 addToCart(product, size);
-                showToast('Added to Cart');
+                window.location.href = 'cart.html';
             }
         });
     }
@@ -412,6 +416,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCustomCheck = document.getElementById('custom-fit-btn')?.classList.contains('active');
             if (!selectedSizeBox && !isCustomCheck) {
                 showToast('Please select a size first');
+                const sizeSection = document.querySelector('.size-section') || document.querySelector('.size-grid');
+                if (sizeSection) {
+                    sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
             const urlParams = new URLSearchParams(window.location.search);
@@ -554,10 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        if (firstInStock) {
-            const defaultBox = sizeGrid.querySelector(`[data-size="${firstInStock}"]`);
-            if (defaultBox) defaultBox.classList.add('selected');
-        }
+        // Do not auto-select any size by default
 
         // Custom Fit check: draws from "ALL" chamber pool
         if (customFitBtn) {
@@ -572,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customFitBtn.classList.add('disabled');
                 customFitBtn.style.opacity = '0.6';
                 customFitBtn.style.cursor = 'not-allowed';
-                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit (Out of Stock)</span><span class="custom-fit-sub">Custom tailoring is currently unavailable.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
+                customFitBtn.innerHTML = `<div class="custom-fit-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4"></path><path d="M20 9V5a1 1 0 0 0-1-1h-4"></path><path d="M4 15v4a1 1 0 0 0 1 1h4"></path><path d="M20 15v4a1 1 0 0 1-1 1h-4"></path><line x1="10" y1="12" x2="14" y2="12"></line></svg></div><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit (Out of Stock)</span><span class="custom-fit-sub">Custom tailoring is currently unavailable.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
 
                 if (!warningEl) {
                     warningEl = document.createElement('div');
@@ -589,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customFitBtn.classList.remove('disabled');
                 customFitBtn.style.opacity = '1';
                 customFitBtn.style.cursor = 'pointer';
-                customFitBtn.innerHTML = `<span class="custom-fit-icon">+</span><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit</span><span class="custom-fit-sub">Upload a photo. AI finds your fit.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
+                customFitBtn.innerHTML = `<div class="custom-fit-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4"></path><path d="M20 9V5a1 1 0 0 0-1-1h-4"></path><path d="M4 15v4a1 1 0 0 0 1 1h4"></path><path d="M20 15v4a1 1 0 0 1-1 1h-4"></path><line x1="10" y1="12" x2="14" y2="12"></line></svg></div><div class="custom-fit-text"><span class="custom-fit-title">Custom Fit</span><span class="custom-fit-sub">Upload a photo. AI finds your fit.</span></div><span class="custom-fit-arrow">&rsaquo;</span>`;
                 if (warningEl) warningEl.remove();
             }
         }
